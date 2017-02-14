@@ -1,0 +1,55 @@
+var API = require('../_api.msx');
+
+var Controller = function(){
+  var ctrl = this;
+  
+  ctrl.mode = "new"
+  ctrl.initCate = function() {
+    ctrl.newCate = {
+      name: "",
+      cover: {
+        contentType: "image/jpeg",
+        createAt: 1484816738107,
+        filename: "courseDefault.jpg",
+        id: 0,
+        path: "courseDefault.jpg"
+      },
+      slug: "",
+      description: ""
+    };
+  }
+  ctrl.initCate();
+  
+  ctrl.page = 1;
+  ctrl.cates = m.prop([]);
+  
+  ctrl.setupFetchCates = function(){
+    console.log(ctrl.cates())
+  };
+
+  ctrl.request = function() {
+    ctrl.fetchCates = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/cate/get"
+    }, ctrl.cates, ctrl.setupFetchCates);
+  };
+  ctrl.reRequest = function() {
+     API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/cate/get"
+    }, ctrl.cates, ctrl.setupFetchCates);
+  };
+  ctrl.selectImage = function(img){
+    if(ctrl.mode === "new"){
+      ctrl.newCate.cover = img;
+    } else {
+      ctrl.selectedCate.cover = img;
+    }
+  }
+  
+  ctrl.request();
+  
+};
+
+
+module.exports = Controller;

@@ -1,0 +1,122 @@
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+
+var View = function(ctrl){
+  return [
+    <div className="page-content-wrapper ">
+    
+      <div className="content ">
+      
+        <div className="jumbotron" data-pages="parallax">
+          <div className="container-fluid  container-fixed-lg sm-p-l-20 sm-p-r-20">
+            <div className="inner">
+              <ul className="breadcrumb">
+                <li>
+                  <p>Anabim</p>
+                </li>
+                <li><a href="#" className="active">Membership</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      
+      
+        <div className="container-fluid container-fluid2 container-fixed-lg">
+          <div className="panel panel-transparent">
+            <div className="panel-body">
+              <table className="table table-hover demo-table-search" id="tableWithSearch" style="border: 1px solid #ddd;">
+                <thead>
+                <tr>
+                  <th>Một tháng</th>
+                  <th>Ba tháng</th>
+                  <th>Sáu tháng</th>
+                  <th>Một năm</th>
+                </tr>
+                </thead>
+                <tbody>
+                  {ctrl.fetchPrice.ready()?[
+                        <tr style="">
+                          <td className="v-align-middle">
+                            <input type="text" class="form-control"
+                                   onchange = {function(e){
+                                     ctrl.price().one = parseInt($(e.target).val())
+                                   }}
+                                   value={ctrl.price().one}
+                            />
+                          </td>
+                          <td className="v-align-middle">
+                            <input type="text" class="form-control"
+                                   onchange = {function(e){
+                                     ctrl.price().three = parseInt($(e.target).val())
+                                   }}
+                                   value={ctrl.price().three}
+                            />
+                          </td>
+                          <td className="v-align-middle">
+                            <input type="text" class="form-control"
+                                   onchange = {function(e){
+                                     ctrl.price().six = parseInt($(e.target).val())
+                                   }}
+                                   value={ctrl.price().six}
+                            />
+                          </td>
+                          <td className="v-align-middle">
+                            <input type="text" class="form-control"
+                                   onchange = {function(e){
+                                     ctrl.price().twelve = parseInt($(e.target).val())
+                                   }}
+                                   value={ctrl.price().twelve}
+                            />
+                          </td>
+                        </tr>
+                  ]:("")}
+                
+                </tbody>
+              </table>
+              <div className="row" style="text-align : center">
+                <input type="button" className="btn btn-primary" value="Cập nhập"
+                  onclick={function(){
+                          $.ajax({
+                            type: "POST",
+                            url: "/admin/price/update",
+                            data: JSON.stringify(ctrl.price()),
+                            contentType: "application/json",
+                            dataType: "text",
+                            success: function(data){
+                              {/*ctrl.initCate();*/}
+                              ctrl.request();
+                              {/*$('#myModal').modal('toggle');*/}
+                            },
+                            error: function(data){
+                              alert(data)
+                            }
+                          });
+                    }
+                  }
+                />
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+      <div className="container-fluid container-fixed-lg footer">
+        <div className="copyright sm-text-center">
+          <p className="small no-margin pull-left sm-pull-reset">
+            <span className="hint-text">Copyright &copy; 2014 </span>
+            <span className="font-montserrat">REVOX</span>.
+            <span className="hint-text">All rights reserved. </span>
+            <span className="sm-block"><a href="#" className="m-l-10 m-r-10">Terms of use</a> | <a href="#" className="m-l-10">Privacy Policy</a></span>
+          </p>
+          <p className="small no-margin pull-right sm-pull-reset">
+            <a href="#">Hand-crafted</a> <span className="hint-text">&amp; Made with Love ®</span>
+          </p>
+          <div className="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  ]
+}
+
+module.exports = View;

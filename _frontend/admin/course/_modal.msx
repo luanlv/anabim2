@@ -1,0 +1,652 @@
+var Api = require('../_api.msx');
+
+
+var Modal = function(ctrl){
+  return [
+      <div id="myModal" className="modal " role="dialog">
+        <div className="modal-dialog modal-lg">
+          <div className="modal-content-wrapper"
+          >
+            {(ctrl.mode == "new")?(
+                  New(ctrl)
+                ):(
+                  Edit(ctrl)
+                )}
+        
+          </div>
+      
+        </div>
+      </div>,
+    <div class="modal fade slide-right" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content-wrapper">
+            <div class="modal-content">
+              {ctrl.courses().map(function(el){
+                return <div style={"min-height: 40px; line-height: 40px; border-bottom: 1px solid #ddd; cursor: pointer; padding: 3px;" + ((ctrl.mode !== "new")?(ctrl.selectedCourse.related.indexOf(el.id)>=0?"background: #ddd;":""):(ctrl.newCourse.related.indexOf(el.id)>=0?"background: #ddd;":""))}
+                  onclick={function(){
+                    if(ctrl.mode !== "new"){
+                      if(ctrl.selectedCourse.related.indexOf(el.id)<0) {
+                        ctrl.selectedCourse.related.push(el.id)
+                        ctrl.selectedCourse.related2.push(el)
+                      }
+                    } else {
+                      if(ctrl.newCourse.related.indexOf(el.id)<0) {
+                        ctrl.newCourse.related.push(el.id)
+                        ctrl.newCourse.related2.push(el)
+                      }
+                    }
+                    $('#modalSlideLeft').modal('toggle');
+                  }}
+                >
+                  {el.name}
+                </div>
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+  ]
+}
+
+
+var New = function(ctrl){
+  return (
+      <div className="modal-content">
+        <div className="modal-header clearfix text-left">
+          <button type="button" className="close" data-dismiss="modal" aria-hidden="true"><i className="pg-close fs-14"></i>
+          </button>
+      
+        </div>
+        <div className="modal-body">
+          <div className="row">
+            
+            <div className="col-sm-4 m-t-10 sm-m-t-10 pull-right">
+              
+              <button type="button" className="btn btn-primary btn-block m-t-5"
+                      onclick={function(){
+                        if(checkData(ctrl.newCourse)){
+                          console.log("before post new Course")
+                          console.log(ctrl.newCourse)
+                          $.ajax({
+                            type: "POST",
+                            url: "/admin/course/new",
+                            data: JSON.stringify(ctrl.newCourse),
+                            contentType: "application/json",
+                            dataType: "text",
+                            success: function(data){
+                              ctrl.initCourse();
+                              ctrl.request();
+                              $('#myModal').modal('toggle');
+                            },
+                            error: function(data){
+                              alert(data)
+                            }
+                          });
+                        } else {
+                          alert("Co loi, kem tra lai du lieu")
+                        }
+                      }}
+              >Thêm mới</button>
+            </div>
+  
+            <div className="col-sm-4 pull-left" style="cursor: pointer;">
+                <img src={"/image/get/" + ctrl.newCourse.cover.path} alt="" width="150" height="150" data-target="#modalSlideLeft" data-toggle="modal"/>
+            </div>
+            
+          </div>
+          <div className="panel panel-transparent ">
+      
+              <ul className="nav nav-tabs nav-tabs-fillup" data-init-reponsive-tabs="dropdownfx">
+                <li className="active">
+                  <a data-toggle="tab" href="#tab-fillup1"><span>Thông tin cơ bản</span></a>
+                </li>
+                <li>
+                  <a data-toggle="tab" href="#tab-fillup2"><span>Nội dung</span></a>
+                </li>
+                <li>
+                  <a data-toggle="tab" href="#tab-fillup3"><span>Tài liệu</span></a>
+                </li>
+                <li>
+                  <a data-toggle="tab" href="#tab-fillup4"><span>Khóa học liên quan</span></a>
+                </li>
+              </ul>
+              <div className="tab-content">
+                <div className="tab-pane active" id="tab-fillup1">
+                  <div className="row column-seperation">
+                    <br/>
+  
+                    <div className="form-group-attached">
+                      
+                      <div className="row">
+                        <div className="col-sm-12">
+                          <div className="form-group form-group-default">
+                            <label>Tên khóa học</label>
+                            <input type="name" className="form-control"
+                                   value={ctrl.newCourse.name}
+                                   oninput={function(e){
+                                     ctrl.newCourse.name = $(e.target).val()
+                                   }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="row">
+                        <div className="col-sm-12">
+                          <div className="form-group form-group-default">
+                            <div className="input-group">
+                              <input type="text" className="form-control" value={ctrl.newCourse.slug} placeholder="URL"
+                                     oninput={function(e){
+                                       ctrl.newCourse.slug = $(e.target).val()
+                                     }
+                                     }
+                              />
+                              <span className="input-group-addon primary" style="cursor: pointer"
+                                    onclick={function(){
+                                      ctrl.newCourse.slug = Api.slug(ctrl.newCourse.name);
+                                    }}
+                              >
+                                        <i className="fa  fa-refresh"></i>
+                                    </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="row">
+      
+                        <div className="col-sm-4">
+                          <div className="form-group form-group-default">
+                            <label>Cấp độ</label>
+                            <input type="number" className="form-control"
+                                   value={ctrl.newCourse.level}
+                                   onchange={function(e){
+                                     ctrl.newCourse.level = parseInt($(e.target).val())
+                                   }}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-sm-8">
+                          <div className="form-group form-group-default">
+                            <label>Tác giả</label>
+                            <input type="name" className="form-control"
+                                   value={ctrl.newCourse.author}
+                                   oninput={function(e){
+                                     ctrl.newCourse.author = $(e.target).val()
+                                   }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+  
+                      <div className="row">
+                        <div className="form-group form-group-default">
+                          <div className="col-sm-6">
+                            <select className="form-control full-width" multiple placeholder="Thuoc danh muc"
+                                    onchange={function(e){
+                                      ctrl.newCourse.cateID = [];
+                                      $(e.target).val().map(function(el){
+                                        ctrl.newCourse.cateID.push(parseInt(el, 10));
+                                      });
+                                    }}
+                            >
+                              {ctrl.cates().map(function(el){
+                                return (
+                                    <option value={el.id} selected={(ctrl.newCourse.cateID.indexOf(el.id) > -1 )?"selected":""}>{el.name}</option>
+                                )
+                              })}
+        
+                            </select>
+                          </div>
+  
+                          <div className="col-sm-6">
+                            <select className="form-control full-width" multiple placeholder="Thuoc danh muc"
+                                    onchange={function(e){
+                                      ctrl.newCourse.softID = [];
+                                      $(e.target).val().map(function(el){
+                                        ctrl.newCourse.softID.push(parseInt(el, 10));
+                                      });
+                                    }}
+                            >
+                              {ctrl.softs().map(function(el){
+                                return (
+                                    <option value={el.id} selected={(ctrl.newCourse.softID.indexOf(el.id) > -1 )?"selected":""}>{el.name}</option>
+                                )
+                              })}
+    
+                            </select>
+                          </div>
+                          
+                        </div>
+                      </div>
+  
+                    </div>
+                   
+                    <div className="form-group">
+                      <div className="row">
+                        <div className="col-sm-2">
+                          <label></label>
+                        </div>
+                        <div className="col-sm-10">
+                          <label>Tên phần</label>
+                        </div>
+                      </div>
+                      {ctrl.newCourse.section.map(function(el, index){
+                        return (
+                            <div className="row">
+                              <div className="col-sm-2">
+                                <div className="form-control" style="text-align: right; border: none;">
+                                  {"Phần " + (index + 1) + " :"}
+                                </div>
+                              </div>
+                              <div className="col-sm-10">
+                                <input type="text" className="form-control"
+                                       value={el}
+                                       oninput={function(e){
+                                         ctrl.newCourse.section[index] = $(e.target).val()
+                                         console.log(ctrl.newCourse)
+                                       }}
+                                />
+                              </div>
+                            </div>
+                        )
+                      })}
+    
+                      <div className="row">
+                        <div className="col-sm-3">
+                          <button className="btn btn-block m-t-5"
+                                  onclick={function(){
+                                    ctrl.newCourse.section.push("")
+                                  }}
+                          >Thêm phần mới</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+                <div className="tab-pane" id="tab-fillup2">
+                  <div className="row">
+                    <div className="summernote-wrapper"
+                    >
+                      <div className="summernote"
+                           config={function (el, isInited) {
+                             if (!isInited) {
+                               $(el).summernote({
+                                 callbacks: {
+                                   onChange: function (contents, $editable) {
+                                     console.log("on change!")
+                                     if(ctrl.mode === "new") {
+                                       ctrl.newCourse.description = contents;
+                                     } else {
+                                       ctrl.selectedCourse.description = contents;
+                                     }
+                                   }
+                                 }
+                               })
+                               }
+                             $(el).summernote('code', ctrl.newCourse.description)
+                             }
+                           }
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="tab-pane" id="tab-fillup3">
+                  <div className="row">
+                    <div className="summernote-wrapper"
+                    >
+                      <div className="summernote"
+                           config={function (el, isInited) {
+                             if (!isInited) {
+                               $(el).summernote({
+                                 callbacks: {
+                                   onChange: function (contents, $editable) {
+                                     if(ctrl.mode === "new") {
+                                       ctrl.newCourse.documents = contents;
+                                     } else {
+                                       ctrl.selectedCourse.documents = contents;
+                                     }
+                                   }
+                                 }
+                               })
+                             }
+                             $(el).summernote('code', ctrl.newCourse.documents)
+                            }
+                           }
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="tab-pane" id="tab-fillup4">
+                  <div className="row">
+                    <button className="btn btn-primary pull-right" data-toggle="modal" data-target="#modalSlideLeft">Thêm mới</button>
+                    <div
+                        style="margin-top: 50px; padding-right: 20px;"
+                    >
+                      {(ctrl.mode !== "new")?[listCourse(ctrl, ctrl.selectedCourse.related2)]:[listCourse(ctrl, ctrl.newCourse.related2)]}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+  )
+}
+
+
+var Edit = function(ctrl){
+  return (
+      <div className="modal-content">
+        <div className="modal-header clearfix text-left">
+          <button type="button" className="close" data-dismiss="modal" aria-hidden="true"><i className="pg-close fs-14"></i>
+          </button>
+        </div>
+        <div className="modal-body">
+          <div className="row">
+            <div className="col-sm-4 pull-left" style="cursor: pointer;">
+              <img src={"/image/get/" + ctrl.selectedCourse.cover.path} alt="" width="150" height="150" data-target="#modalSlideLeft" data-toggle="modal"/>
+            </div>
+            
+            <div className="col-sm-4 m-t-10 sm-m-t-10 pull-right">
+      
+              <button type="button" className="btn btn-primary btn-block m-t-5 pull-right"
+                      onclick={function(){
+                        if(checkData(ctrl.selectedCourse)) {
+                          console.log("before post edit Course")
+                          console.log(ctrl.selectedCourse)
+                          $.ajax({
+                            type: "POST",
+                            url: "/admin/course/edit/" + ctrl.selectedCourse.id,
+                            data: JSON.stringify(ctrl.selectedCourse),
+                            contentType: "application/json",
+                            dataType: "text",
+                            success: function (data) {
+                              ctrl.initCourse();
+                              ctrl.request();
+                              $('#myModal').modal('toggle');
+                            },
+                            error: function (data) {
+                              alert(data)
+                            }
+                          });
+                        } else {
+                          alert("Co loi, kem tra lai du lieu")
+                        }
+                      }
+                      }
+              >Cập nhập</button>
+            </div>
+  
+            <div className="col-sm-4 m-t-10 sm-m-t-10 pull-right">
+              <a className="btn btn-primary btn-block m-t-5 pull-right"
+                 href={"/admin/video?courseId=" + ctrl.selectedCourse.id}
+                 config={m.route}
+              >
+                Video khóa học
+              </a>
+            </div>
+          </div>
+          <div className="panel panel-transparent ">
+    
+            <ul className="nav nav-tabs nav-tabs-fillup" data-init-reponsive-tabs="dropdownfx">
+              <li className="active">
+                <a data-toggle="tab" href="#tab-fillup1"><span>Thông tin cơ bản</span></a>
+              </li>
+              <li>
+                <a data-toggle="tab" href="#tab-fillup2"><span>Nội dung</span></a>
+              </li>
+              <li>
+                <a data-toggle="tab" href="#tab-fillup3"><span>Tài liệu</span></a>
+              </li>
+              <li>
+                <a data-toggle="tab" href="#tab-fillup4"><span>Khóa học liên quan</span></a>
+              </li>
+            </ul>
+            <div className="tab-content">
+              <div className="tab-pane active" id="tab-fillup1">
+                <div className="row column-seperation">
+                  
+  
+                  <br/>
+  
+                  <div className="form-group-attached">
+                    
+                    <div className="row">
+                      <div className="col-sm-12">
+                        <div className="form-group form-group-default">
+                          <label>Tên khóa học</label>
+                          <input type="name" className="form-control"
+                                 value={ctrl.selectedCourse.name}
+                                 oninput={function(e){
+                                   ctrl.selectedCourse.name = $(e.target).val()
+                                 }}
+                          />
+                        </div>
+                      </div>
+  
+                      
+                      
+                    </div>
+                    <div className="row">
+                      <div className="col-sm-12">
+                        <div className="input-group">
+                          <input type="text" className="form-control" value={ctrl.selectedCourse.slug} placeholder="URL"
+                                 oninput={function(e){
+                                   ctrl.selectedCourse.slug = $(e.target).val()
+                                 }
+                                 }
+                          />
+                          <span className="input-group-addon primary" style="cursor: pointer"
+                                onclick={function(){
+                                  ctrl.selectedCourse.slug = Api.slug(ctrl.selectedCourse.name);
+                                }}
+                          >
+                                        <i className="fa  fa-refresh"></i>
+                                    </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-sm-4">
+                        <div className="form-group form-group-default">
+                          <label>Cấp độ</label>
+                          <input type="number" className="form-control"
+                                 value={ctrl.selectedCourse.level}
+                                 onchange={function(e){
+                                   ctrl.selectedCourse.level = parseInt($(e.target).val())
+                                 }}
+                          />
+                        </div>
+                      </div>
+      
+                      <div className="col-sm-8">
+                        <div className="form-group form-group-default">
+                          <label>Tác giả</label>
+                          <input type="text" className="form-control"
+                                 value={ctrl.selectedCourse.author}
+                                 oninput={function(e){
+                                   ctrl.selectedCourse.author = $(e.target).val()
+                                 }}
+                          />
+                        </div>
+                      </div>
+    
+                    </div>
+  
+                  </div>
+  
+                  <div className="row">
+                    <div className="form-group form-group-default">
+                      <div className="col-sm-6">
+                        <select className="form-control full-width" multiple placeholder="Thuoc danh muc"
+                                onchange={function(e){
+                                  ctrl.selectedCourse.cateID = [];
+                                  $(e.target).val().map(function(el){
+                                    ctrl.selectedCourse.cateID.push(parseInt(el, 10));
+                                  });
+                                }}
+                        >
+                          {ctrl.cates().map(function(el){
+                            return (
+                                <option value={el.id} selected={(ctrl.selectedCourse.cateID.indexOf(el.id) > -1 )?"selected":""}>{el.name}</option>
+                            )
+                          })}
+        
+                        </select>
+                      </div>
+  
+                      <div className="col-sm-6">
+                        <select className="form-control full-width" multiple placeholder="Thuoc danh muc"
+                                onchange={function(e){
+                                  ctrl.selectedCourse.softID = [];
+                                  $(e.target).val().map(function(el){
+                                    ctrl.selectedCourse.softID.push(parseInt(el, 10));
+                                  });
+                                }}
+                        >
+                          {ctrl.softs().map(function(el){
+                            return (
+                                <option value={el.id} selected={(ctrl.selectedCourse.softID.indexOf(el.id) > -1 )?"selected":""}>{el.name}</option>
+                            )
+                          })}
+    
+                        </select>
+                      </div>
+                      
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <div className="row">
+                      <div className="col-sm-2">
+                        <label></label>
+                      </div>
+                      <div className="col-sm-10">
+                        <label>Tên phần</label>
+                      </div>
+                    </div>
+                    {ctrl.selectedCourse.section.map(function(el, index){
+                      return (
+                          <div className="row">
+                            <div className="col-sm-2">
+                              <div className="form-control" style="text-align: right; border: none;">
+                                {"Phần " + (index + 1) + " :"}
+                              </div>
+                            </div>
+                            <div className="col-sm-10">
+                              <input type="text" className="form-control"
+                                     value={el}
+                                     oninput={function(e){
+                                       ctrl.selectedCourse.section[index] = $(e.target).val();
+                                     }}
+                              />
+                            </div>
+                          </div>
+                      )
+                    })}
+    
+                    <div className="row">
+                      <div className="col-sm-3">
+                        <button className="btn btn-block m-t-5"
+                                onclick={function(){
+                                  ctrl.selectedCourse.section.push("")
+                                }}
+                        >Thêm phần mới</button>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+              <div className="tab-pane" id="tab-fillup2">
+                <div className="row">
+                  <div className="summernote-wrapper"
+                  >
+                    <div className="summernote"
+                         config={function(el, isInited){
+                           if (isInited) {
+                             {/*$(el).summernote({*/}
+                               {/*callbacks: {*/}
+                                 {/*onChange: function (contents, $editable) {*/}
+                                   {/*ctrl.selectedCourse.description = contents;*/}
+                                 {/*}*/}
+                               {/*}*/}
+                             {/*})*/}
+                             {/*$(el).summernote('code', ctrl.selectedCourse.description)*/}
+                             $(el).summernote('code', ctrl.selectedCourse.description)
+                           }
+                         }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="tab-pane" id="tab-fillup3">
+                <div className="row">
+                  <div className="summernote-wrapper"
+                  >
+                    <div className="summernote"
+                         config={function (el, isInited) {
+                           if (!isInited) {
+                             $(el).summernote('code', ctrl.newCourse.documents);
+                            }
+                          }
+                         }
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="tab-pane" id="tab-fillup4">
+                <div className="row">
+                  <button className="btn btn-primary pull-right" data-toggle="modal" data-target="#modalSlideLeft">Thêm mới</button>
+                  <div
+                      style="margin-top: 50px; padding-right: 20px;"
+                  >
+                    {(ctrl.mode !== "new")?[listCourse(ctrl, ctrl.selectedCourse.related2)]:[listCourse(ctrl, ctrl.newCourse.related2)]}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+      
+        </div>
+      </div>
+  )
+}
+
+var listCourse = function(ctrl, list){
+  return [
+    list.map(function(el){
+      return <div style="min-height: 40px; line-height: 40px;">
+        {el.name} <button className="btn btn-primary pull-right"
+          onclick={function(){
+            if(ctrl.mode !== "new"){
+              ctrl.selectedCourse.related = ctrl.selectedCourse.related.filter(function(id){
+                return el.id !== id
+              })
+              ctrl.selectedCourse.related2 = ctrl.selectedCourse.related2.filter(function(el2){
+                return el.id !== el2.id
+              })
+            } else {
+              ctrl.newCourse.related = ctrl.newCourse.related.filter(function(id){
+                return el.id !== id
+              })
+              ctrl.newCourse.related2 = ctrl.newCourse.related2.filter(function(el2){
+                return el.id !== el2.id
+              })
+            }
+          }
+        }
+      >Delete</button>
+      </div>
+    })
+  ]
+}
+
+var checkData = function(data){
+  return data.name.length>0 && data.author.length>0 && data.section.length>0 && data.description.length>0
+}
+
+module.exports = Modal;

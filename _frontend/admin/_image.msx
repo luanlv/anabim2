@@ -1,0 +1,81 @@
+var API = require('./_api.msx');
+var Data = require('./_data.msx');
+
+var Images = function(ctrl){
+  return [
+      <div class="modal fade slide-right" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true"
+        config={function(el, isInited){
+          if(!isInited){
+            $('#modalSlideLeft').on('show.bs.modal', function (e) {
+              API.getImage(1)
+            })
+          }
+        }}
+      >
+        <div class="modal-dialog modal-sm" style="min-width: 50%; border-left: solid 3px #ddd;">
+          <div class="modal-content-wrapper">
+            <div class="modal-content">
+              <div className="container-fluid" style="padding-top: 10px">
+                <div className="row">
+                  <div className="btn btn-primary" data-target="#modalSlideLeft2" data-toggle="modal">Up Ảnh</div>
+                </div>
+                <div className="row" style="margin-top: 20px;">
+                  {Data.requestImg.ready()?(
+                    <div class="flex-container">
+                      {Data.imgs().map(function(el){
+                        return (
+                            <div class="block"
+                              onclick={function(){
+                                ctrl.selectImage(el)
+                                $('#modalSlideLeft').modal('hide');
+                              }}
+                            >
+                              <img src={"/image/get/" + el.path} alt={el.filename} width="150"/>
+                            </div>
+                        )
+                      })}
+                    </div>
+                      ):("loading...")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>,
+    
+    <div class="modal fade slide-right2" id="modalSlideLeft2" tabindex="0" role="dialog" aria-hidden="true" style="border: solid 3px  #000 !important; border-radius: 5px;"
+      config={function(el, isInited){
+        if(!isInited){
+          $('#modalSlideLeft2').on('hidden.bs.modal', function (e) {
+            API.getImage(1)
+          })
+        }
+      }}
+    >
+      <div class="modal-dialog modal-sm" style="min-width: 50%; border-left: solid 3px #ddd;">
+        <div class="modal-content-wrapper">
+          <div class="modal-content">
+          
+            <input id="input-700" name="file_data" type="file" multiple
+                   config={function(el, isInited){
+                     if(isInited){
+                       $(el).fileinput({
+                         uploadUrl: "/image/upload",
+                         uploadAsync: true,
+                         maxFileCount: 5,
+                         showBrowse: false,
+                         browseOnZoneClick: true
+                         })
+                     }
+                   }}
+            />
+        
+        
+          </div>
+        </div>
+      </div>
+    </div>
+  ]
+};
+
+module.exports = Images;

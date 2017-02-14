@@ -1,0 +1,130 @@
+
+GET         /authenticate/:provider               @controllers.SocialAuthController.authenticate(provider)
+POST         /authenticate/:provider               @controllers.SocialAuthController.authenticate(provider)
+
+GET /course/:slug         controllers.Course.index(slug: String)
+GET /course/:courseSlug/:videoSlug         controllers.Course.index2(courseSlug: String, videoSlug: String)
+GET /category/:categorySlug                controllers.Course.categoryIndex(categorySlug: String)
+
+GET /admin                 controllers.Application.admin
+GET /admin/membership      controllers.Application.admin
+GET /admin/membership/users      controllers.Application.admin
+GET /admin/membership2      controllers.Application.admin
+GET /admin/price      controllers.Application.admin
+GET /admin/price/get      controllers.Admin.getPrice
+POST /admin/price/update      controllers.Admin.setPrice
+GET /admin/subscribe/get   controllers.Admin.getSubs
+GET /admin/subscribe/getDone   controllers.Admin.getDoneSubs
+POST /admin/membership/action   controllers.Admin.action
+
+GET /admin/trangchu/khoahoc controllers.Application.admin
+GET /admin/setupIndexCourse/get controllers.Admin.getIndexCourses
+POST  /admin/indexCourse controllers.Admin.updateIndexCourses
+
+GET /admin/users           controllers.Application.admin
+POST /admin/users/updateEndDate           controllers.Admin.updateEndDate
+GET /admin/users/getMembership       controllers.Admin.getMembershipUsers
+GET /admin/course           controllers.Application.admin
+GET /admin/course/get       controllers.Admin.getCourses
+GET /admin/course/get/:courseId       controllers.Admin.getCourseById(courseId: Int)
+
+
+
+POST /admin/soft/new     controllers.Admin.newSoft
+POST /admin/soft/delete     controllers.Admin.deleteSoft
+POST /admin/soft/edit/:id     controllers.Admin.editSoft(id: Int)
+GET /admin/soft              controllers.Application.admin
+GET /admin/soft/get          controllers.Admin.getSofts
+GET /admin/soft/get/:cateId       controllers.Admin.getSoftById(cateId: Int)
+
+POST /admin/cate/new     controllers.Admin.newCate
+POST /admin/cate/delete     controllers.Admin.deleteCate
+POST /admin/cate/edit/:id     controllers.Admin.editCate(id: Int)
+GET /admin/cate              controllers.Application.admin
+GET /admin/cate/get          controllers.Admin.getCates
+GET /admin/cate/get/:cateId       controllers.Admin.getCateById(cateId: Int)
+
+POST  /activity/comment controllers.UserActivity.comment
+
+
+POST /image/upload     controllers.ImageController.upload
+GET /image/getList/:page     controllers.ImageController.getList(page: Int)
+GET /image/get/:id     controllers.ImageController.get(id: String)
+
+POST /admin/course/new     controllers.Admin.newCourse
+POST /admin/course/edit/:id     controllers.Admin.editCourse(id: Int)
+
+GET /admin/video           controllers.Application.admin
+POST /admin/video/new     controllers.Admin.newVideo
+POST /admin/video/delete     controllers.Admin.deleteVideo
+GET /admin/video/get/:courseId   controllers.Admin.getVideos(courseId: Int)
+POST /admin/video/edit     controllers.Admin.editVideo
+
+GET /admin/login           controllers.Application.adminLogin
+GET /                      controllers.Application.index
+
+POST /membership/subscribe    controllers.Membership.subscribe
+POST /membership/resubscribe    controllers.Membership.reSubscribe
+GET  /membership              controllers.Membership.getInfo
+
+GET /test2                  controllers.Test.test2
+GET /?                     controllers.Lobby.home
+GET /post/:postId          controllers.Application.post(postId: String)
+GET /qa                    controllers.Application.index
+GET /qa/new                controllers.Application.index
+
+GET /chatroom              controllers.Chat.chatRooms
+GET /chatroom/:id          controllers.Chat.chatRoom(id: String)
+GET /json                  controllers.Application.json
+GET /settings              controllers.Application.index
+
+GET /@/:username               controllers.Application.user(username: String)
+GET /@/:username/mini          controllers.User.showMini(username: String)
+
+
+GET   /socket                          controllers.Main.websocket
+
+
+
+GET   /login                           controllers.Auth.login
+POST  /login                           controllers.Auth.authenticate
+GET   /logout                          controllers.Auth.logout
+GET   /signup                          controllers.Auth.signup
+POST  /signup                          controllers.Auth.signupPost
+GET   /signup/check-your-email/:name   controllers.Auth.checkYourEmail(name: String)
+GET   /signup/confirm/:token           controllers.Auth.signupConfirmEmail(token: String)
+GET   /password/reset                  controllers.Auth.passwordReset
+POST  /password/reset/send             controllers.Auth.passwordResetApply
+GET   /password/reset/sent/:email      controllers.Auth.passwordResetSent(email: String)
+GET   /password/reset/confirm/:token   controllers.Auth.passwordResetConfirm(token: String)
+POST  /password/reset/confirm/:token   controllers.Auth.passwordResetConfirmApply(token: String)
+POST  /set-fingerprint/:hash/:ms       controllers.Auth.setFingerprint(hash: String, ms: Int)
+
+
+POST  /rel/follow/:userId              controllers.Relation.follow(userId: String)
+POST  /rel/unfollow/:userId            controllers.Relation.unfollow(userId: String)
+
+POST  /rel/unfriend/:userId            controllers.Relation.unfriend(userId: String)
+POST  /rel/reject/:userId              controllers.Relation.reject(userId: String)
+
+POST  /rel/block/:userId               controllers.Relation.block(userId: String)
+POST  /rel/unblock/:userId             controllers.Relation.unblock(userId: String)
+
+#POST    /settings                       controllers.API.getSelfInformation
+#POST    /settings/updateInfo            controllers.API.updateInformation
+
+#GET     /api/getUser/:user             controllers.API.getInformationUser(user: String)
+#GET     /api/listfollow/:userId        controllers.API.getListFollower(userId: String)
+#GET     /api/listfriend/:userId        controllers.API.getListFriend(userId: String)
+
+GET  /api/getCourse/:slug        controllers.API.getCourseBySlug(slug: String)
+GET  /api/getCourses/:cateSlug   controllers.API.getCoursesByCateSlug(cateSlug: String)
+GET  /api/categories/get         controllers.API.getCategories()
+GET  /api/courses/get            controllers.API.getCourses()
+GET  /api/indexCourse/get        controllers.API.getIndexCourse()
+GET  /api/comment/:kind/:id      controllers.API.getComment(kind: String, id: Int)
+
+# Assets
+GET   /anh/:filename                  controllers.FileController.getImage(filename: String)
+GET   /file/:filename                 controllers.FileController.getFile(filename: String)
+GET   /assets/*file                    controllers.Assets.at(path="/public", file)

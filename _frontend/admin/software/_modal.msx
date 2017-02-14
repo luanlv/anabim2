@@ -1,0 +1,237 @@
+
+var Modal = function(ctrl){
+  return (
+      <div id="myModal" class="modal " role="dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content-wrapper">
+            {(ctrl.mode == "new")?(
+                  New(ctrl)
+                ):(
+                  Edit(ctrl)
+                )}
+        
+          </div>
+      
+        </div>
+      </div>
+  )
+}
+
+
+var New = function(ctrl){
+  return (
+      <div class="modal-content">
+        <div class="modal-header clearfix text-left">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="pg-close fs-14"></i>
+          </button>
+      
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-sm-4 m-t-10 sm-m-t-10 pull-right">
+              <button type="button" class="btn btn-primary btn-block m-t-5"
+                      onclick={function(){
+                        console.log(ctrl.newSoft)
+                        if(checkData(ctrl.newSoft)){
+                          $.ajax({
+                            type: "POST",
+                            url: "/admin/soft/new",
+                            data: JSON.stringify(ctrl.newSoft),
+                            contentType: "application/json",
+                            dataType: "text",
+                            success: function(data){
+                              ctrl.initSoft();
+                              ctrl.reRequest();
+                              $('#myModal').modal('toggle');
+                            },
+                            error: function(data){
+                              alert(data)
+                            }
+                          });
+                        } else {
+                          alert("Co loi, kem tra lai du lieu")
+                        }
+                      }}
+              >Thêm mới</button>
+            </div>
+  
+            <div className="col-sm-4 pull-left" style="cursor: pointer;">
+              <img src={"/image/get/" + ctrl.newSoft.cover.path} alt="" width="150" height="150" data-target="#modalSlideLeft" data-toggle="modal"/>
+            </div>
+            
+            
+          </div>
+          <div class="panel panel-transparent ">
+            
+              <div class="tab-content">
+                  <div class="row column-seperation">
+                    <br/>
+  
+                    <div class="form-group-attached">
+                      
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <div class="form-group form-group-default">
+                            <label>Tên phần mềm</label>
+                            <input type="name" class="form-control"
+                                   value={ctrl.newSoft.name}
+                                   oninput={function(e){
+                                     ctrl.newSoft.name = $(e.target).val()
+                                   }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <div class="form-group form-group-default">
+                            <label>Địa chỉ URL</label>
+                            <input type="name" class="form-control"
+                                   value={ctrl.newSoft.slug}
+                                   oninput={function(e){
+                                     ctrl.newSoft.slug = $(e.target).val()
+                                   }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+      </div>
+  )
+}
+
+
+var Edit = function(ctrl){
+  return (
+      <div class="modal-content">
+        <div class="modal-header clearfix text-left">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="pg-close fs-14"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-sm-4 m-t-10 sm-m-t-10 pull-right">
+      
+              <button type="button" class="btn btn-primary btn-block m-t-5"
+                      onclick={function(){
+                        if(checkData(ctrl.selectedSoft)) {
+                          console.log(ctrl.selectedSoft);
+                          $.ajax({
+                            type: "POST",
+                            url: "/admin/soft/edit/" + ctrl.selectedSoft.id,
+                            data: JSON.stringify(ctrl.selectedSoft),
+                            contentType: "application/json",
+                            dataType: "text",
+                            success: function (data) {
+                              ctrl.initSoft();
+                              ctrl.reRequest();
+                              $('#myModal').modal('toggle');
+                            },
+                            error: function (data) {
+                              alert(data)
+                            }
+                          });
+                        } else {
+                          alert("Co loi, kem tra lai du lieu")
+                        }
+                      }
+                      }
+              >Cập nhập</button>
+              <button className="btn btn-primary btn-block"
+                      onclick={function(){
+                        var r = confirm("Xác nhận xóa!!");
+                        if(r){
+                          $.ajax({
+                            type: "POST",
+                            url: "/admin/soft/delete",
+                            data: JSON.stringify({id: ctrl.selectedSoft.id}),
+                            contentType: "application/json",
+                            dataType: "text",
+                            success: function(data){
+                              $('#myModal').modal('toggle');
+                              ctrl.reRequest();
+                              m.redraw();
+                            },
+                            error: function(data){
+                              alert(data)
+                            }
+                          });
+                        }
+                      }}
+              >
+                Xóa
+              </button>
+            </div>
+  
+            <div className="col-sm-4 pull-left" style="cursor: pointer;">
+              <img src={"/image/get/" + ctrl.selectedSoft.cover.path} alt="" width="150" height="150" data-target="#modalSlideLeft" data-toggle="modal"/>
+            </div>
+  
+            {/*<div className="col-sm-4 m-t-10 sm-m-t-10 pull-right">*/}
+              {/*<a class="btn btn-primary btn-block m-t-5 pull-right" href={"/admin/video?softId=" + ctrl.selectedSoft.id}*/}
+                 {/*config={m.route}*/}
+              {/*>*/}
+                {/*Các khóa học*/}
+              {/*</a>*/}
+            {/*</div>*/}
+          </div>
+          <div class="panel panel-transparent ">
+    
+           
+            <div class="tab-content">
+                <div class="row column-seperation">
+                  
+  
+                  <br/>
+  
+                  <div class="form-group-attached">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="form-group form-group-default">
+                          <label>Tên phần mềm</label>
+                          <input type="name" class="form-control"
+                                 value={ctrl.selectedSoft.name}
+                                 oninput={function(e){
+                                   ctrl.selectedSoft.name = $(e.target).val()
+                                 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="form-group form-group-default">
+                          <label>Địa chỉ URL</label>
+                          <input type="name" class="form-control"
+                                 value={ctrl.selectedSoft.slug}
+                                 oninput={function(e){
+                                   ctrl.selectedSoft.slug = $(e.target).val()
+                                 }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          
+      
+        </div>
+      </div>
+  )
+}
+
+var checkData = function(data){
+  return data.name.length>0 && data.slug.length>0
+}
+
+module.exports = Modal;

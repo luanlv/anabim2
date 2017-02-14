@@ -1,0 +1,31 @@
+var Sidebar = require('../_sidebar.msx');
+var Overlay = require('../_overlay.msx');
+var Quickview = require('../_quickview.msx');
+var Header = require('../_header.msx');
+var Main = require('./_partial.msx');
+
+var View = function(ctrl){
+  return [
+      Sidebar(ctrl),
+      <div class="page-container ">
+        {Header(ctrl)}
+        {Main(ctrl)}
+      </div>,
+      Quickview(ctrl),
+      Overlay(ctrl),
+      <div className="init"
+       config={function(el, isInited){
+         if(!isInited) {
+           $.Pages.init();
+           initScript();
+           initMobileView();
+           quickview();
+           parallaxApi();
+           sidebarApi();
+         }
+       }}
+      ></div>
+  ]
+};
+
+module.exports = View;

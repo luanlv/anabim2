@@ -1,0 +1,21 @@
+var API = require('../_api.msx');
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.page = 1;
+  ctrl.users = m.prop([]);
+  
+  ctrl.setupFetchUsers = function(){
+    console.log(ctrl.users())
+  };
+  ctrl.request = function(){
+    ctrl.fetchUsers = API.requestWithFeedback({method: "GET", url: "/admin/users/getMembership" }, ctrl.users, ctrl.setupFetchUsers);
+  };
+  ctrl.request();
+  ctrl.reRequest = function(){
+    API.requestWithFeedback({method: "GET", url: "/admin/users/getMembership" }, ctrl.users, ctrl.setupFetchUsers);
+  }
+};
+
+
+module.exports = Controller;

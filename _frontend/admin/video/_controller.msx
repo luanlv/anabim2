@@ -1,0 +1,71 @@
+var API = require('../_api.msx');
+
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.courseId = m.route.param("courseId");
+  ctrl.course = m.prop({});
+  
+  ctrl.setupFetchCourse = function(){
+    ctrl.newVideo = [];
+    ctrl.newVideoIntro = {
+      courseId: parseInt(ctrl.courseId),
+      stt: 0,
+      section: -1,
+      name: "Video giới thiệu",
+      url: "null",
+      link: "",
+      kind: "free",
+      source: "anabim",
+      time: 0
+    }
+    ctrl.course().section.map(function(el, index){
+      ctrl.newVideo.push({
+        courseId: parseInt(ctrl.courseId),
+        section: index,
+        name: "",
+        url: "",
+        link: "",
+        kind: "paid",
+        source: "anabim",
+        time: 0
+      })
+    })
+  };
+  
+  ctrl.videos = m.prop([]);
+  ctrl.setupFetchVideos = function(){
+    console.log(ctrl.videos())
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchCourse = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/course/get/" + ctrl.courseId
+    }, ctrl.course, ctrl.setupFetchCourse);
+  };
+  ctrl.reRequest = function() {
+    API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/course/get/" + ctrl.courseId
+    }, ctrl.course, ctrl.setupFetchCourse);
+  };
+  ctrl.request();
+  ctrl.request2 = function() {
+    ctrl.fetchVideos = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/video/get/" + ctrl.courseId
+    }, ctrl.videos, ctrl.setupFetchVideos);
+  };
+  ctrl.reRequest2 = function() {
+    API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/video/get/" + ctrl.courseId
+    }, ctrl.videos, ctrl.setupFetchVideos);
+  };
+  ctrl.request2();
+  $('#myModal').modal('hide');
+};
+
+
+module.exports = Controller;

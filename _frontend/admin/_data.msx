@@ -1,0 +1,10 @@
+var Data = {};
+
+Data.user = initData;
+
+Data.imgs = m.prop([]);
+Data.requestImg = {
+  ready: m.prop(false)
+};
+
+module.exports = Data;

@@ -1,0 +1,551 @@
+var Data = require('../_data.msx');
+var Api = require('../_api.msx');
+
+var View = function(ctrl){
+  return [
+    <div class="page-content-wrapper ">
+      
+      <div class="content ">
+        
+        <div class="jumbotron" data-pages="parallax">
+          <div class="container-fluid container-fixed-lg sm-p-l-20 sm-p-r-20">
+            <div class="inner">
+              <ul class="breadcrumb">
+                <li>
+                  <p>Anabim</p>
+                </li>
+                <li><a href="#" class="active">Video khóa học</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="container-fluid container-fluid2 container-fixed-lg" style="padding-left: 50px !important; padding-right: 50px !important">
+          {(ctrl.fetchCourse.ready() && ctrl.fetchVideos.ready())?(
+              <div className="row">
+                <div class="panel panel-transparent">
+                  <div class="panel-heading">
+                    <div class="panel-title">Tên khóa học : {ctrl.course().name}
+                    </div>
+                  </div>
+                  <div class="panel-heading">
+                    <div class="panel-title">Bao gồm : {ctrl.course().section.length} phần
+                    </div>
+                  </div>
+                </div>
+  
+                <div>
+                  <a href={"/course/" + ctrl.course().slug} target="_blank">
+                    <button class="ui primary button" style="color: red !important">
+                      Xem trước
+                    </button>
+                  </a></div>
+                
+                <div class="panel panel-transparent">
+  
+                  <div className="row" style="border: 1px solid #999; border-radius: 10px; padding: 15px; margin-top: 20px; background: rgba(0,0,0, 0.05);">
+                    <div >
+                      <div className="row">
+                        <div class="col-md-10">
+                          <p class="bold sm-p-t-20"><span style="color: red">Video giới thiệu</span></p>
+                        </div>
+        
+                        <div className="col-md-2">
+                          <p class="bold sm-p-t-20">.</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    
+                    <div className="row">
+                      {ctrl.videos().filter(function (el) {
+                        return el.section  < 0
+                      }).map(function(video){
+                        return [
+                          <div style="padding-bottom: 5px; border-bottom: 1px solid #ddd; margin-top: 15px; padding: 10px;">
+                            <div className="row" >
+                              <div class="col-md-1">
+                                <input type="text" class="form-control"  placeholder=""
+                                
+                                />
+                              </div>
+                              <div class="col-md-3">
+                                <input type="text" class="form-control" value={video.name} placeholder="Tên bài giảng"
+                                       oninput={function(e){
+                                         video.name = $(e.target).val()
+                                       }}
+                                />
+                              </div>
+                              <div class="col-md-3">
+                                <input type="text"  class="form-control" value={video.link} placeholder="Link video"
+                                       oninput={function(e){
+                                         video.link = $(e.target).val()
+                                       }}
+                                />
+                              </div>
+                              <div class="col-md-1">
+                                <input type="text" class="form-control" value={video.time}
+                                       onchange={function(e){
+                                         var time = $(e.target).val();
+                                         if(time.indexOf('p') > -1){
+                                           time = time.split('p');
+                                           time = parseInt(time[0])*60 + parseInt(0 + time[1]);
+            
+                                           video.time = parseInt(time);
+                                         } else {
+                                           video.time = parseInt($(e.target).val())
+                                         }
+                                       }}
+                                />
+                              </div>
+                              <div className="col-md-2">
+                                <select class=" full-width"
+                                        config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                        onchange={function(el){
+                                          video.kind = $(el)[0].val;
+                                        }}
+                                >
+                                  <option value="free" selected={(video.kind==="free")?"selected":""}>Miễn phí</option>
+        
+                                </select>
+                              </div>
+                              <div className="col-md-2">
+                                <select class=" full-width"
+                                        config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                        onchange={function(el){
+                                          
+                                          video.source = $(el)[0].val;
+                                        }}
+                                >
+                                  <option value="anabim" selected={(video.source==="anabim")?"selected":""}>Anabim</option>
+                                  <option value="youtube" selected={(video.source==="youtube")?"selected":""}>Youtube</option>
+                                </select>
+                              </div>
+                            </div>,
+                            <div className="row">
+                              
+                              <div className="col-md-2 pull-right">
+                                <button className="btn btn-primary pull-right"
+                                        onclick={function(){
+                                          console.log(video)
+                                          $.ajax({
+                                            type: "POST",
+                                            url: "/admin/video/edit",
+                                            data: JSON.stringify(video),
+                                            contentType: "application/json",
+                                            dataType: "text",
+                                            success: function(data){
+                                              {/*ctrl.fetchVideos = false;*/}
+                                              ctrl.reRequest2();
+                                              m.redraw();
+                                            },
+                                            error: function(data){
+                                              alert(data)
+                                            }
+                                          });
+                                        }}
+                                >Cập nhập</button>
+                              </div>
+                            </div>
+                          </div>
+                        ]
+                      })
+                      }
+                    </div>
+                    {ctrl.videos().filter(function (el) {
+                      return el.section  < 0
+                    }).length>0?"":[
+                          <div className="row" style="border-top: 1px solid #666; padding-top: 10px; margin-top: 10px; ">
+                            <div class="col-md-1">
+                              <input type="number" class="form-control"  placeholder=""
+                              
+                              />
+                            </div>
+                            <div class="col-md-3">
+                              <input type="text" class="form-control" value={ctrl.newVideoIntro.name} placeholder="Tên bài giảng" disabled
+                              />
+                            </div>
+                            <div class="col-md-3">
+                              <input type="text"  class="form-control" value={ctrl.newVideoIntro.link} placeholder="Link video"
+                                     oninput={function(e){
+                                       ctrl.newVideoIntro.link = $(e.target).val()
+                                     }}
+                              />
+                            </div>
+                            <div class="col-md-1">
+                              <input type="text" class="form-control" value={ctrl.newVideoIntro.time}
+                                     onchange={function(e){
+                                       var time = $(e.target).val();
+                                       if(time.indexOf('p') > -1){
+                                         time = time.split('p');
+                                         time = parseInt(time[0])*60 + parseInt(time[1]);
+              
+                                         ctrl.newVideoIntro.time = parseInt(time);
+                                       } else {
+                                         ctrl.newVideoIntro.time = parseInt($(e.target).val())
+                                       }
+                                     }}
+                              />
+                            </div>
+                            <div className="col-md-2">
+                              <select class=" full-width" disabled
+                                      config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                              >
+                                <option value="free" selected={(ctrl.newVideoIntro.kind==="free")?"selected":""}>Miễn phí</option>
+                              </select>
+                            </div>
+                            <div className="col-md-2">
+                              <select class=" full-width"
+                                      config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                      onchange={function(el){
+                                        ctrl.newVideoIntro.source = $(el)[0].val;
+                                      }}
+                              >
+                                <option value="anabim" selected={(ctrl.newVideoIntro.source==="anabim")?"selected":""}>Anabim</option>
+                                <option value="youtube" selected={(ctrl.newVideoIntro.source==="youtube")?"selected":""}>Youtube</option>
+                              </select>
+                            </div>
+                          </div>,
+                          <div className="row" style="margin-top: 15px;">
+                            
+                            <div className="col-md-2 pull-right">
+                              <button className="btn btn-complete pull-right"
+                                      onclick={function(){
+                                        console.log(ctrl.newVideoIntro)
+                                        $.ajax({
+                                          type: "POST",
+                                          url: "/admin/video/new",
+                                          data: JSON.stringify(ctrl.newVideoIntro),
+                                          contentType: "application/json",
+                                          dataType: "text",
+                                          success: function(data){
+                                            ctrl.newVideoIntro = {
+                                              courseId: parseInt(ctrl.courseId),
+                                              section: -1,
+                                              name: "Video giới thiệu",
+                                              url: "null",
+                                              link: "",
+                                              kind: "free",
+                                              source: "anabim",
+                                              time: 0
+                                            };
+                                            {/*ctrl.fetchVideos = false;*/}
+                                            ctrl.reRequest2();
+                                            m.redraw();
+                                          },
+                                          error: function(data){
+                                            alert(data)
+                                          }
+                                        });
+                                      }}
+                              >Thêm mới</button>
+                            </div>
+                          </div>
+                        ]}
+                    
+                   
+                    
+                  </div>
+                  
+                  
+                  
+                {ctrl.course().section.map(function(el, index){
+                  return (
+                      <div className="row" style="border: 1px solid #999; border-radius: 10px; padding: 15px; margin-top: 20px; background: rgba(0,0,0, 0.05);">
+                        <div >
+                          <div className="row">
+                            <div class="col-md-10">
+                              <p class="bold sm-p-t-20">Phần {index + 1}: <span style="color: red">{el}</span></p>
+                            </div>
+                            
+                            <div className="col-md-2">
+                              <p class="bold sm-p-t-20">.</p>
+                            </div>
+                          </div>
+                        </div>
+                        {ctrl.videos().filter(function(el){
+                          return el.section == index
+                        }) .map (function(video){
+                          return [
+                            <div style="padding-bottom: 5px; border-bottom: 1px solid #ddd; margin-top: 15px;">
+                              <div className="row" >
+                                <div class="col-md-1">
+                                  <input type="text" class="form-control" value={video.stt} placeholder="STT"
+                                         onchange={function(e){
+                                           video.stt = parseFloat($(e.target).val());
+                                         }}
+                                  />
+                                </div>
+                                <div class="col-md-3">
+                                  <input type="text" class="form-control" value={video.name} placeholder="Tên bài giảng"
+                                         oninput={function(e){
+                                           video.name = $(e.target).val()
+                                         }}
+                                  />
+                                </div>
+                                <div class="col-md-3">
+                                  <input type="text"  class="form-control" value={video.link} placeholder="Link video"
+                                         oninput={function(e){
+                                           video.link = $(e.target).val()
+                                         }}
+                                  />
+                                </div>
+                                <div class="col-md-1">
+                                  <input type="text" class="form-control" value={video.time}
+                                         onchange={function(e){
+                                           var time = $(e.target).val();
+                                           if(time.indexOf('p') > -1){
+                                             time = time.split('p');
+                                             time = parseInt(time[0])*60 + parseInt(0 + time[1]);
+  
+                                             video.time = parseInt(time);
+                                           } else {
+                                             video.time = parseInt($(e.target).val())
+                                           }
+                                         }}
+                                  />
+                                </div>
+                                <div className="col-md-2">
+                                  <select class=" full-width"
+                                          config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                          onchange={function(el){
+                                            video.kind = $(el)[0].val;
+                                          }}
+                                  >
+                                    <option value="paid" selected={(video.kind==="paid")?"selected":""}>Thành viên</option>
+                                    <option value="free" selected={(video.kind==="free")?"selected":""}>Miễn phí</option>
+    
+                                  </select>
+                                </div>
+                                <div className="col-md-2">
+                                  <select class=" full-width"
+                                          config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                          onchange={function(el){
+                                            video.source = $(el)[0].val;
+                                          }}
+                                  >
+                                    <option value="anabim" selected={(video.source==="anabim")?"selected":""}>Anabim</option>
+                                    <option value="youtube" selected={(video.source==="youtube")?"selected":""}>Youtube</option>
+                                  </select>
+                                </div>
+                              </div>,
+                              <div className="row">
+                                <div className="col-md-4">
+                                  <div class="input-group">
+                                    <input type="text" class="form-control" value={video.url} placeholder="url"
+                                           oninput={function(e){
+                                             video.url = $(e.target).val()
+                                           }
+                                           }
+                                    />
+                                    <span class="input-group-addon primary" style="cursor: pointer"
+                                          onclick={function(){
+                                            video.url= Api.slug(video.name);
+                                          }}
+                                    >
+                                        <i class="fa  fa-refresh"></i>
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="col-md-4 pull-right" style="text-align: right">
+                                  <a href={"/course/" + ctrl.course().slug + "/" + video.url} className="btn btn-primary" target="_blank"
+                                    style="margin: 0 5px"
+                                  >Xem </a>
+                                  <button className="btn btn-primary"
+                                        style="margin: 0 5px"
+                                        
+                                        onclick={function(){
+                                          
+                                          var r = confirm("Xác nhận xóa video?");
+                                          console.log({id: video.id})
+                                          if (r == true) {
+                                            $.ajax({
+                                              type: "POST",
+                                              url: "/admin/video/delete",
+                                              data: JSON.stringify({id: video.id}),
+                                              contentType: "application/json",
+                                              dataType: "text",
+                                              success: function(data){
+                                                ctrl.reRequest2();
+                                                m.redraw();
+                                              },
+                                              error: function(data){
+                                                alert(data)
+                                              }
+                                            });
+                                          }
+    
+    
+                                        }}
+                                  >Xóa</button>
+                                  <button className="btn btn-primary"
+                                          style="margin: 0 5px;"
+                                          onclick={function(){
+                                            console.log(video)
+                                            $.ajax({
+                                              type: "POST",
+                                              url: "/admin/video/edit",
+                                              data: JSON.stringify(video),
+                                              contentType: "application/json",
+                                              dataType: "text",
+                                              success: function(data){
+                                                {/*ctrl.fetchVideos = false;*/}
+                                                ctrl.reRequest2();
+                                                m.redraw();
+                                              },
+                                              error: function(data){
+                                                alert(data)
+                                              }
+                                            });
+                                          }}
+                                  >Cập nhập</button>
+                                </div>
+                              </div>
+                            </div>
+                            
+                          ]
+                        })}
+                        <div className="row" style="border-top: 1px solid #666; padding-top: 10px; margin-top: 10px; ">
+                          <div class="col-md-1">
+                            <input type="number" class="form-control" value={ctrl.newVideo[index].stt?ctrl.newVideo[index].stt:""} placeholder="STT"
+                                   onchange={function(e){
+                                     ctrl.newVideo[index].stt = parseFloat($(e.target).val());
+                                   }}
+                            />
+                          </div>
+                         <div class="col-md-3">
+                          <input type="text" class="form-control" value={ctrl.newVideo[index].name} placeholder="Tên bài giảng"
+                             oninput={function(e){
+                               ctrl.newVideo[index].name = $(e.target).val()
+                             }}
+                           />
+                          </div>
+                          <div class="col-md-3">
+                            <input type="text"  class="form-control" value={ctrl.newVideo[index].link} placeholder="Link video"
+                               oninput={function(e){
+                                 ctrl.newVideo[index].link = $(e.target).val()
+                               }}
+                            />
+                          </div>
+                          <div class="col-md-1">
+                            <input type="text" class="form-control" value={ctrl.newVideo[index].time}
+                               onchange={function(e){
+                                 var time = $(e.target).val();
+                                 if(time.indexOf('p') > -1){
+                                    time = time.split('p');
+                                    time = parseInt(time[0])*60 + parseInt(time[1]);
+                                    
+                                   ctrl.newVideo[index].time = parseInt(time);
+                                 } else {
+                                   ctrl.newVideo[index].time = parseInt($(e.target).val())
+                                 }
+                               }}
+                             />
+                          </div>
+                          <div className="col-md-2">
+                            <select class=" full-width"
+                                    config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                    onchange={function(el){
+                                      ctrl.newVideo[index].kind = $(el)[0].val;
+                                    }}
+                            >
+                              <option value="paid" selected={(ctrl.newVideo[index].kind==="paid")?"selected":""}>Thành viên</option>
+                              <option value="free" selected={(ctrl.newVideo[index].kind==="free")?"selected":""}>Miễn phí</option>
+                            </select>
+                          </div>
+                          <div className="col-md-2">
+                            <select class=" full-width"
+                                    config={function(el){$(el).select2({minimumResultsForSearch: -1})}}
+                                    onchange={function(el){
+                                      ctrl.newVideo[index].source = $(el)[0].val;
+                                    }}
+                            >
+                              <option value="anabim" selected={(ctrl.newVideo[index].source==="anabim")?"selected":""}>Anabim</option>
+                              <option value="youtube" selected={(ctrl.newVideo[index].source==="youtube")?"selected":""}>Youtube</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        
+                        
+                        <div className="row" style="margin-top: 15px;">
+                          <div className="col-md-4">
+                            <div class="input-group">
+                              <input type="text" class="form-control" value={ctrl.newVideo[index].url} placeholder="url"
+                                     oninput={function(e){
+                                       ctrl.newVideo[index].url = $(e.target).val()
+                                     }
+                                     }
+                              />
+                              <span class="input-group-addon primary" style="cursor: pointer"
+                                    onclick={function(){
+                                      ctrl.newVideo[index].url = Api.slug(ctrl.newVideo[index].name);
+                                    }}
+                              >
+                                        <i class="fa  fa-refresh"></i>
+                                    </span>
+                            </div>
+                          </div>
+                          <div className="col-md-2 pull-right">
+                            <button className="btn btn-complete pull-right"
+                                    onclick={function(){
+                                      console.log(ctrl.newVideo[index])
+                                      $.ajax({
+                                        type: "POST",
+                                        url: "/admin/video/new",
+                                        data: JSON.stringify(ctrl.newVideo[index]),
+                                        contentType: "application/json",
+                                        dataType: "text",
+                                        success: function(data){
+                                          ctrl.newVideo[index] = {
+                                            courseId: parseInt(ctrl.courseId),
+                                            section: index,
+                                            name: "",
+                                            url: "",
+                                            link: "",
+                                            kind: "paid",
+                                            source: "anabim",
+                                            time: 0
+                                          };
+                                          {/*ctrl.fetchVideos = false;*/}
+                                          ctrl.reRequest2();
+                                          m.redraw();
+                                        },
+                                        error: function(data){
+                                          alert(data)
+                                        }
+                                      });
+                                    }}
+                            >Thêm mới</button>
+                          </div>
+                          
+                        </div>
+                      </div>
+                  )
+                })}
+                </div>
+                
+              </div>
+              ):("Loading ...")}
+        </div>
+      </div>
+      <div class="container-fluid container-fixed-lg footer">
+        <div class="copyright sm-text-center">
+          <p class="small no-margin pull-left sm-pull-reset">
+            <span class="hint-text">Copyright &copy; 2014 </span>
+            <span class="font-montserrat">REVOX</span>.
+            <span class="hint-text">All rights reserved. </span>
+            <span class="sm-block"><a href="#" class="m-l-10 m-r-10">Terms of use</a> | <a href="#" class="m-l-10">Privacy Policy</a></span>
+          </p>
+          <p class="small no-margin pull-right sm-pull-reset">
+            <a href="#">Hand-crafted</a> <span class="hint-text">&amp; Made with Love ®</span>
+          </p>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  ]
+}
+
+module.exports = View;

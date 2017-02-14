@@ -1,0 +1,124 @@
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+
+var View = function(ctrl){
+  return [
+    <div className="page-content-wrapper ">
+    
+      <div className="content ">
+      
+        <div className="jumbotron" data-pages="parallax">
+          <div className="container-fluid  container-fixed-lg sm-p-l-20 sm-p-r-20">
+            <div className="inner">
+              <ul className="breadcrumb">
+                <li>
+                  <p>Anabim</p>
+                </li>
+                <li><a href="#" className="active">Membership</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      
+      
+        <div className="container-fluid container-fluid2 container-fixed-lg">
+          <div className="panel panel-transparent">
+            <div className="panel-body">
+              <table className="table table-hover demo-table-search" id="tableWithSearch" style="border: 1px solid #ddd;">
+                <thead>
+                <tr>
+                  <th>Tên</th>
+                  <th>Email</th>
+                  <th>Số điện thoại</th>
+                  <th>Thời gian</th>
+                  <th>Thành tiền</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {ctrl.fetchSubs.ready()?[
+                      ctrl.subs().map(function(sub){
+                        return (
+                            <tr style="">
+                              <td className="v-align-middle">
+                                <p>{sub.name}</p>
+                              </td>
+                              <td className="v-align-middle">
+                                <p>{sub.email}</p>
+                              </td>
+                              <td className="v-align-middle">
+                                <p>{sub.phone}</p>
+                              </td>
+                              <td className="v-align-middle">
+                                <p>{sub.month} Tháng</p>
+                              </td>
+                              <td className="v-align-middle">
+                                <p>{API.numberWithCommas(sub.price)} đ</p>
+                              </td>
+                              <td style="min-width: 150px">
+                                <p>{API.time(sub.createAt)}</p>
+                              </td>
+                              <td style="min-width: 150px">
+                                <button className="ui button"
+                                  onclick={function(){
+                                    sub.action = true;
+                                    $.ajax({
+                                      type: "POST",
+                                      url: "/admin/membership/action",
+                                      data: JSON.stringify(sub),
+                                      contentType: "application/json",
+                                      dataType: "text",
+                                      success: function(data){
+                                        {/*ctrl.initCate();*/}
+                                        ctrl.request();
+                                        {/*$('#myModal').modal('toggle');*/}
+                                      },
+                                      error: function(data){
+                                        alert(data)
+                                      }
+                                    });
+                                  }}
+                                >Duyệt</button>
+                                |
+                                <button className="ui button"
+                                  onclick={function(){
+                                  
+                                  }}
+                                >Hủy</button>
+                              </td>
+                            </tr>
+                        )
+                      })
+                    ]:(
+                        <tr>
+            
+                        </tr>
+                    )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+      <div className="container-fluid container-fixed-lg footer">
+        <div className="copyright sm-text-center">
+          <p className="small no-margin pull-left sm-pull-reset">
+            <span className="hint-text">Copyright &copy; 2014 </span>
+            <span className="font-montserrat">REVOX</span>.
+            <span className="hint-text">All rights reserved. </span>
+            <span className="sm-block"><a href="#" className="m-l-10 m-r-10">Terms of use</a> | <a href="#" className="m-l-10">Privacy Policy</a></span>
+          </p>
+          <p className="small no-margin pull-right sm-pull-reset">
+            <a href="#">Hand-crafted</a> <span className="hint-text">&amp; Made with Love ®</span>
+          </p>
+          <div className="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  ]
+}
+
+module.exports = View;

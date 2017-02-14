@@ -1,0 +1,90 @@
+var API = require('../_api.msx');
+
+var Controller = function(){
+  var ctrl = this;
+  
+  ctrl.mode = "new"
+  ctrl.initCourse = function() {
+    ctrl.newCourse = {
+      name: "",
+      cover: {
+        contentType: "image/jpeg",
+        createAt: 1484816738107,
+        filename: "courseDefault.jpg",
+        id: 0,
+        path: "courseDefault.jpg"
+      },
+      slug: "",
+      cateID: [],
+      softID: [],
+      level: 1,
+      author: "",
+      section: [
+          ""
+      ],
+      description: "",
+      documents: "",
+      related: [],
+      related2: [],
+    };
+  },
+  ctrl.initCourse();
+  
+  ctrl.page = 1;
+  ctrl.courses = m.prop([]);
+  ctrl.cates = m.prop([]);
+  ctrl.softs = m.prop([]);
+  ctrl.selectedCourse = {
+    related: []
+  };
+  ctrl.setupFetchCourses = function(){
+    console.log("courses: ")
+    console.log(ctrl.courses())
+  };
+  
+  ctrl.setupFetchCates = function(){
+    console.log(ctrl.cates())
+  };
+  ctrl.setupFetchSofts = function(){
+    console.log(ctrl.cates())
+  };
+  ctrl.request = function() {
+    ctrl.fetchCourses = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/course/get"
+    }, ctrl.courses, ctrl.setupFetchCourses);
+  
+    ctrl.fetchCates = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/cate/get"
+    }, ctrl.cates, ctrl.setupFetchCates);
+  
+    ctrl.fetchSofts = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/soft/get"
+    }, ctrl.softs, ctrl.setupFetchCates);
+  }
+  
+  ctrl.selectImage = function(img){
+    if(ctrl.mode === "new"){
+      ctrl.newCourse.cover = img;
+    } else {
+      ctrl.selectedCourse.cover = img;
+    }
+  }
+  
+  ctrl.request();
+  ctrl.mapRelated = function(related, courses){
+    if(related === undefined) related = [];
+    var result = [];
+    console.log(related)
+    related.forEach(function(el){
+      var pos = API.findPosByID(courses, el);
+      if(pos >=0 ) result.push(courses[pos])
+    })
+    return result;
+  }
+};
+
+
+module.exports = Controller;

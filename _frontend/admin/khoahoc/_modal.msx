@@ -1,0 +1,82 @@
+var Api = require('../_api.msx');
+
+var Modal = function(ctrl){
+  return [
+    <div id="myModal" class="modal " role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content-wrapper">
+          {New(ctrl)}
+        </div>
+      </div>
+    </div>,
+    <div id="myModal2" class="modal " role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content-wrapper">
+          {New2(ctrl)}
+        </div>
+      </div>
+    </div>
+  ]
+}
+
+
+var New = function(ctrl){
+  return (
+      <div class="modal-content">
+        <div class="modal-header clearfix text-left">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="pg-close fs-14"></i>
+          </button>
+      
+        </div>
+        <div class="modal-body">
+          {ctrl.fetchCates.ready()? <div>
+            {ctrl.cates().map(function(el){
+            return <div className="select-list" style="padding: 10px; border-bottom: 1px solid #ddd;"
+                onclick={function(){
+                  ctrl.categories.categories().push({
+                    category: el,
+                    courses: []
+                  })
+                  ctrl.data({ value: ctrl.categories.categories()});
+                  $('#myModal').modal('hide');
+                }
+                }
+            >{el.name}</div>
+          })}
+          </div>:"Loading .."}
+        </div>
+      </div>
+  )
+}
+
+var New2 = function(ctrl){
+  return (
+      <div class="modal-content">
+        <div class="modal-header clearfix text-left">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="pg-close fs-14"></i>
+          </button>
+        
+        </div>
+        <div class="modal-body">
+          {ctrl.fetchCourses.ready()? <div>
+                {ctrl.coursesData().map(function(el){
+                  return <div className="select-list" style="padding: 10px; border-bottom: 1px solid #ddd;"
+                              onclick={function(){
+                                ctrl.courses.courses().push(el);
+                                ctrl.categories.categories()[ctrl.selectedCateID].courses = ctrl.courses.courses();
+                                ctrl.data({ value: ctrl.categories.categories()});
+                                $('#myModal2').modal('hide');
+                              }
+                              }
+                  >{el.name}</div>
+                })}
+              </div>:"Loading .."
+          }
+        </div>
+      </div>
+  )
+}
+
+
+
+module.exports = Modal;

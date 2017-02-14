@@ -1,0 +1,30 @@
+var API = require('../_api.msx');
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.page = 1;
+  ctrl.price = m.prop({});
+  ctrl.setupFetchPrice = function(){
+    console.log(ctrl.price())
+    if(ctrl.price() === null){
+      ctrl.price = m.prop({
+        one: 0,
+        three: 0,
+        six: 0,
+        twelve: 0
+      });
+    }
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchPrice = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/price/get"
+    }, ctrl.price, ctrl.setupFetchPrice);
+  };
+  ctrl.request();
+  
+};
+
+
+module.exports = Controller;

@@ -1,0 +1,31 @@
+@(subscribe: lila.anabim.Subscribe)
+
+<div>
+  <h3>Đang chờ xét duyệt Membership với các thông tin sau</h3>
+  <table class="ui celled striped table">
+    <tr>
+      <td>Số tháng đăng ký</td>
+      <td>@subscribe.month tháng</td>
+    </tr>
+    <tr>
+      <td>Số điện thoại liên hệ</td>
+      <td>@subscribe.phone</td>
+    </tr>
+    <tr>
+      <td>Thành tiền</td>
+      <td>@subscribe.price đ</td>
+    </tr>
+
+  </table>
+  <div class="row">
+    <p>
+      Mọi thắc mắc xin liên hệ theo số: 0975 622 789 - 0949 958 898
+    </p>
+  </div>
+  <div class="row">
+    Thông tin đăng ký chưa đúng?
+      <form action="/membership/resubscribe" method="POST" style="display: inline">
+        <button type="submit" class="ui small violet basic button">Đăng ký lại</button>
+      </form>
+  </div>
+</div>

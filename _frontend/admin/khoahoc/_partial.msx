@@ -1,0 +1,170 @@
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+var Modal = require('./_modal.msx');
+
+var View = function(ctrl){
+  return [
+    <div className="page-content-wrapper ">
+    
+      <div className="content ">
+      
+        <div className="jumbotron" data-pages="parallax">
+          <div className="container-fluid  container-fixed-lg sm-p-l-20 sm-p-r-20">
+            <div className="inner">
+              <ul className="breadcrumb">
+                <li>
+                  <p>Anabim</p>
+                </li>
+                <li><a href="#" className="active">Hiển thị khóa học trên trang chủ</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      
+      
+        <div className="container-fluid container-fluid2 container-fixed-lg">
+          <div className="panel panel-transparent">
+            <div className="panel-body">
+              <div className="row" style="margin-bottom: 50px; padding-right: 50px;">
+                <button type="button" class="btn btn-primary pull-right"
+                  onclick={function(){
+                    $.ajax({
+                      type: "POST",
+                      url: "/admin/indexCourse",
+                      data: JSON.stringify(ctrl.data()),
+                      contentType: "application/json",
+                      dataType: "text",
+                      success: function(data){
+                        "Cập nhập thành công"
+                      },
+                      error: function(data){
+                        alert("Co loi")
+                        console.log(data)
+                      }
+                    });
+                  }}
+                >
+                  Cập nhập
+                </button>
+              </div>
+              {ctrl.fetchData.ready()?(
+                      <div className="row" style="">
+                        <div className="col-md-4">
+                          <div className="row" style="padding-left: 20px; margin-bottom: 20px;">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"
+                            
+                            >
+                              Thêm danh mục
+                            </button>
+                          </div>
+                          
+                          <div className="drag-n-drop clearfix">
+                            <ol>
+                              {ctrl.categories.categories().map(function(item, i) {
+                                  var dragging = (i == ctrl.categories.dragging()) ? 'dragging' : '';
+                                  return m('li.clearfix' + ((i === ctrl.selectedCateID)?".active":""), {
+                                    onclick: function(){
+                                      ctrl.selectedCateID = i;
+                                      ctrl.courses.courses(item.courses);
+                                    },
+                                    'data-id': i,
+                                    class: dragging,
+                                    draggable: 'true',
+                                    ondragstart: ctrl.dragStart.bind(ctrl),
+                                    ondragover: ctrl.dragOver.bind(ctrl),
+                                    ondragend: ctrl.dragEnd.bind(ctrl)
+                                  }, [ <span className="name"
+                                  >{i}. {item.category.name}</span>,
+                                    <div className="pull-right">
+                                    </div>
+                                  ])
+                                }
+                                )
+                              }
+                            </ol>
+                          </div>
+                        </div>
+                        <div className="col-md-8">
+                          {(ctrl.selectedCateID >= 0)?(
+                                  <div>
+                                    <div className="row" style="padding-left: 20px; margin-bottom: 20px;">
+                                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal2"
+                                      >
+                                        Thêm khóa học
+                                      </button>
+                                      <button type="button" class="btn btn-primary"  style="margin-left: 10px"
+                                              onclick={function(){
+                                                ctrl.data().value = ctrl.categories.categories().filter(function(el, index){
+                                                  return ctrl.selectedCateID !== index;
+                                                });
+                                                ctrl.categories.categories(ctrl.data().value);
+                                                ctrl.selectedCateID = -1;
+                                              }}
+                                      >
+                                        Xóa danh mục
+                                      </button>
+                                    </div>
+                                    <div className="drag-n-drop clearfix">
+                                      <ol>
+                                        {ctrl.courses.courses().map(function(item, i) {
+                                              var dragging = (i == ctrl.courses.dragging()) ? 'dragging' : '';
+                                              return m('li.clearfix', {
+                                                onclick: function(){
+                                              
+                                                },
+                                                'data-id': i,
+                                                class: dragging,
+                                                draggable: 'true',
+                                                ondragstart: ctrl.dragStart2.bind(ctrl),
+                                                ondragover: ctrl.dragOver2.bind(ctrl),
+                                                ondragend: ctrl.dragEnd2.bind(ctrl)
+                                              }, [ <span className="name"
+                                              >{i}. {item.name}</span>,
+                                                <div className="pull-right">
+                                                  <button className="btn btn-primary" style="margin-bottom: 10px"
+                                                    onclick={function(){
+                                                      ctrl.courses.courses(ctrl.courses.courses().filter(function(el, index){
+                                                        return index !== i;
+                                                      }));
+                                                      ctrl.categories.categories()[ctrl.selectedCateID].courses = ctrl.courses.courses();
+                                                    }}
+                                                  >Xóa</button>
+                                                </div>
+                                              ])
+                                            }
+                                        )
+                                        }
+                                      </ol>
+                                    </div>
+                                  </div>
+                              ):("")}
+                        </div>
+                      </div>
+                  ):("Loading ... ")}
+                
+            </div>
+          </div>
+      
+        </div>
+      </div>
+      <div className="container-fluid container-fixed-lg footer">
+        <div className="copyright sm-text-center">
+          <p className="small no-margin pull-left sm-pull-reset">
+            <span className="hint-text">Copyright &copy; 2014 </span>
+            <span className="font-montserrat">REVOX</span>.
+            <span className="hint-text">All rights reserved. </span>
+            <span className="sm-block"><a href="#" className="m-l-10 m-r-10">Terms of use</a> | <a href="#" className="m-l-10">Privacy Policy</a></span>
+          </p>
+          <p className="small no-margin pull-right sm-pull-reset">
+            <a href="#">Hand-crafted</a> <span className="hint-text">&amp; Made with Love ®</span>
+          </p>
+          <div className="clearfix"></div>
+        </div>
+      </div>
+    </div>,
+    Modal(ctrl)
+  ]
+}
+
+module.exports = View;

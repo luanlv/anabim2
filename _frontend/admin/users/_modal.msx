@@ -1,0 +1,72 @@
+var API = require('../_api.msx');
+var Modal = function(ctrl){
+  return (
+      <div id="myModal" class="modal " role="dialog" >
+        <div class="modal-dialog modal-lg" style="width: 400px">
+          <div class="modal-content-wrapper">
+            {ctrl.selected?(Edit(ctrl)):""}
+          </div>
+        
+        </div>
+      </div>
+  )
+};
+
+var Edit = function(ctrl){
+  return (
+      <div class="modal-content">
+        <div class="modal-header clearfix text-left">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="pg-close fs-14"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div className="row">
+            Email: <span style="color: red; font-weight: bold">{ctrl.selected.email}</span>
+            <br/>
+            Tên: <span style="color: red; font-weight: bold">{ctrl.selected.name}</span>
+          </div>
+          <div class="row">
+            Ngày hết hạn:
+            <button className="btn btn-primary pull-right" style="margin-top: 20px;"
+                    onclick={function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/users/updateEndDate",
+                        data: JSON.stringify({email: ctrl.selected.email, date: ctrl.selected.info.end}),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function(data){
+                          ctrl.reRequest();
+                          $('#myModal').modal('toggle');
+                        },
+                        error: function(data){
+                          alert(data)
+                        }
+                      });
+                    }}
+            >Cập nhập</button>
+            <div id="datepicker-component" className="input-group date col-sm-8" style="width: 150px"
+                 config={function(){
+                   $('#datepicker-component').datepicker({
+                     format: 'yyyy-mm-dd'
+                   });
+                 }}
+            >
+              <input type="text" class="form-control" value={API.date2(ctrl.selected.info.end)}
+                     onchange={function(e){
+                       var time = (new Date($(e.target).val())).getTime();
+                       ctrl.selected.info.end = time;
+                       console.log(time)
+                     }}
+              /><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            </div>
+          </div>
+        
+        
+        </div>
+      </div>
+  )
+}
+
+
+module.exports = Modal;

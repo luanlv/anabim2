@@ -1,0 +1,125 @@
+var API = require('../_api.msx');
+
+var Sortable = {};
+
+Sortable.ListItems = function() {
+  this.dragging = m.prop(undefined);
+  this.categories = m.prop([
+  
+  ]);
+};
+
+Sortable.ListItems2 = function() {
+  this.dragging = m.prop(undefined);
+  this.name = m.prop("");
+  this.courses = m.prop([
+  ]);
+};
+
+
+var Controller = function(){
+  var ctrl = this;
+  
+  ctrl.categories = new Sortable.ListItems();
+  ctrl.courses = new Sortable.ListItems2();
+  ctrl.data = m.prop({});
+  ctrl.cates = m.prop([]);
+  ctrl.coursesData = m.prop([]);
+  ctrl.selectedCateID = -100;
+  // ==============================
+  this.sort = function(colors, dragging) {
+    this.categories.categories(colors);
+    this.categories.dragging(dragging);
+  };
+  this.dragStart = function(e) {
+    this.dragged = Number(e.currentTarget.dataset.id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', null);
+  };
+  this.dragOver = function(e) {
+    e.preventDefault();
+    var over = e.currentTarget,
+        dragging = this.categories.dragging(),
+        from = isFinite(dragging) ? dragging : this.dragged,
+        to = Number(over.dataset.id);
+    if((e.clientY - over.offsetTop) > (over.offsetHeight / 2)) to++;
+    if(from < to) to--;
+    
+    var colors = this.categories.categories();
+    colors.splice(to, 0, colors.splice(from, 1)[0]);
+    this.sort(colors, to);
+  };
+  this.dragEnd = function() {
+    this.sort(this.categories.categories(), undefined);
+    ctrl.data({ value: this.categories.categories()})
+  };
+  // ==============================
+  
+  
+  // ==============================
+  this.sort2 = function(colors, dragging) {
+    this.courses.courses(colors);
+    this.courses.dragging(dragging);
+  };
+  this.dragStart2 = function(e) {
+    this.dragged = Number(e.currentTarget.dataset.id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', null);
+  };
+  this.dragOver2 = function(e) {
+    e.preventDefault();
+    var over = e.currentTarget,
+        dragging = this.courses.dragging(),
+        from = isFinite(dragging) ? dragging : this.dragged,
+        to = Number(over.dataset.id);
+    if((e.clientY - over.offsetTop) > (over.offsetHeight / 2)) to++;
+    if(from < to) to--;
+    
+    var colors = this.courses.courses();
+    colors.splice(to, 0, colors.splice(from, 1)[0]);
+    this.sort2(colors, to);
+  };
+  this.dragEnd2 = function() {
+    this.sort2(this.courses.courses(), undefined);
+    ctrl.categories.categories()[ctrl.selectedCateID].courses = ctrl.courses.courses();
+    ctrl.data({ value: ctrl.categories.categories()});
+    console.log(ctrl.data())
+  };
+  
+  // ==============================
+  
+  ctrl.setupFetchData = function(){
+    if(ctrl.data()){
+      ctrl.categories.categories(ctrl.data().value)
+    } else {
+      ctrl.data({
+        value: []
+      });
+    }
+  };
+  ctrl.request = function() {
+    ctrl.fetchData = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/setupIndexCourse/get"
+    }, ctrl.data, ctrl.setupFetchData);
+  };
+  ctrl.request();
+  
+  ctrl.requestCate = function() {
+    ctrl.fetchCates = API.requestWithFeedback({
+      method: "GET",
+      url: "/api/categories/get"
+    }, ctrl.cates);
+  };
+  ctrl.requestCate();
+  ctrl.requestCourses = function() {
+    ctrl.fetchCourses = API.requestWithFeedback({
+      method: "GET",
+      url: "/api/courses/get"
+    }, ctrl.coursesData);
+  };
+  ctrl.requestCourses();
+};
+
+
+module.exports = Controller;

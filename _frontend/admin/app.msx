@@ -1,0 +1,30 @@
+
+var Home = require("./home/main.msx");
+var Users = require("./users/main.msx");
+var Course = require("./course/main.msx");
+var Cate = require("./cate/main.msx");
+var Soft = require("./software/main.msx");
+var Video = require("./video/main.msx");
+var Membership = require("./membership/main.msx");
+var Membership2 = require("./membership2/main.msx");
+var Price = require("./price/main.msx");
+var Khoahoc = require("./khoahoc/main.msx");
+
+// var NewQuestion = require("./newquestion/main.msx");
+// var EditQuestion = require("./editquestion/main.msx");
+
+m.route.mode = 'pathname';
+
+m.route(document.body, "/", {
+  "/admin": Home,
+  "/admin/users": Users,
+  "/admin/course": Course,
+  "/admin/video": Video,
+  "/admin/cate": Cate,
+  "/admin/soft": Soft,
+  "/admin/membership": Membership,
+  "/admin/membership2": Membership2,
+  "/admin/membership/users": Users,
+  "/admin/price": Price,
+  "/admin/trangchu/khoahoc": Khoahoc
+});

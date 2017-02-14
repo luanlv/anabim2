@@ -1,0 +1,35 @@
+@(signInForm: Form[forms.SignInForm.Data], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: RequestHeader, messages: Messages)
+@import com.mohiva.play.silhouette.impl.providers.oauth2.ClefProvider
+
+@main(Messages("sign.in.title")) {
+  @if(socialProviders.providers.nonEmpty) {
+    <div class="social-providers">
+      <div>
+      @for(p <- socialProviders.providers if p.id != "clef") {
+        <form action="@routes.SocialAuthController.authenticate(p.id)" method="post">
+          <h2>@Messages(p.id)</h2>
+          <input type="submit" value="Submit">
+        </form>
+        <a href="#" onclick="javascript:submit('@routes.SocialAuthController.authenticate(p.id)')">@p.id</a>
+        @*<a href="@routes.SocialAuthController.authenticate(p.id)" class="provider @p.id">@Messages(p.id)</a>*@
+      }
+      </div>
+    </div>
+  }
+
+  <script >
+    var submit = function(url) {
+      $.ajax({
+        type : 'GET',
+        url : url,
+//        data : {},
+        success : function(data) {
+          console.log(data)
+        },
+        error : function(data) {
+          console.log("error:" + data)
+        }
+      });
+    }
+  </script>
+}

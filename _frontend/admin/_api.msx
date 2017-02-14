@@ -1,0 +1,107 @@
+var Api = {};
+var Data = require('./_data.msx');
+Api.requestWithFeedback = function(args, bind, fn, fnError) {
+  
+  var data = m.prop();
+  var completed = m.prop(false);
+  var complete = function() {
+    completed(true)
+  };
+  args.background = true;
+  args.config = function(xhr) {
+    xhr.timeout = 4000;
+    xhr.ontimeout = function() {
+      complete();
+      m.redraw();
+    }
+  };
+  return {
+    request: m.request(args).then(data).then(function(data){
+      if(bind !== undefined) bind(data);
+      if(fn !== undefined) fn();
+      complete();
+      m.redraw();
+    }, function(error){
+      if(fnError !== undefined)  fnError()
+    }),
+    data: data,
+    ready: completed
+  }
+};
+
+Api.time = function(timestamp){
+  // return moment.unix(timestamp/1000).fromNow();
+  return moment.unix(timestamp/1000).format("DD/MM/YYYY");
+};
+
+Api.date = function(timestamp){
+  return moment.unix(timestamp/1000).format("DD/MM/YYYY");
+};
+
+Api.date2 = function(timestamp){
+  return moment.unix(timestamp/1000).format("YYYY-MM-DD");
+};
+
+Api.numberWithCommas = function(x) {
+  var parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+};
+
+Api.getImage = function(page){
+  Data.requestImg.ready(false);
+  Data.requestImg = Api.requestWithFeedback({
+    method: "GET",
+    url: "/image/getList/" + page
+  }, Data.imgs);
+}
+
+Api.slug = function(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.toLowerCase();
+  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
+  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
+  str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
+  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
+  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
+  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
+  str = str.replace(/đ/g, 'd');
+  // remove accents, swap ñ for n, etc
+  var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+  var to   = "aaaaaeeeeeiiiiooooouuuunc------";
+  for (var i=0, l=from.length ; i<l ; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+  
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+      .replace(/\s+/g, '-') // collapse whitespace and replace by -
+      .replace(/-+/g, '-'); // collapse dashes
+  
+  return str;
+};
+
+
+Api.findPos = function(list, id){
+  var len = list.length;
+  for(var i = 0; i< len; i++){
+    if(list[i].category.id === id) return i
+  }
+  return -1
+};
+
+Api.findPosByID = function(list, id){
+  var len = list.length;
+  for(var i = 0; i< len; i++){
+    if(list[i].id === id) return i
+  }
+  return -1
+};
+
+Api.removeById = function(list, id){
+  list = list.filter(function(el){
+    return el.id !== id;
+  })
+  return list;
+}
+
+module.exports = Api;

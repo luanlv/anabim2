@@ -1,0 +1,49 @@
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+
+var View = function(ctrl){
+  return [
+    <div class="page-content-wrapper ">
+    
+      <div class="content ">
+      
+        <div class="jumbotron" data-pages="parallax">
+          <div class="container-fluid container-fixed-lg sm-p-l-20 sm-p-r-20">
+            <div class="inner">
+              <ul class="breadcrumb">
+                <li>
+                  <p>Anabim</p>
+                </li>
+                <li><a href="#" class="active">Trang chủ</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      
+      
+        <div class="container-fluid container-fixed-lg">
+      
+      
+      
+        </div>
+      </div>
+      <div class="container-fluid container-fixed-lg footer">
+        <div class="copyright sm-text-center">
+          <p class="small no-margin pull-left sm-pull-reset">
+            <span class="hint-text">Copyright &copy; 2014 </span>
+            <span class="font-montserrat">REVOX</span>.
+            <span class="hint-text">All rights reserved. </span>
+            <span class="sm-block"><a href="#" class="m-l-10 m-r-10">Terms of use</a> | <a href="#" class="m-l-10">Privacy Policy</a></span>
+          </p>
+          <p class="small no-margin pull-right sm-pull-reset">
+            <a href="#">Hand-crafted</a> <span class="hint-text">&amp; Made with Love ®</span>
+          </p>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  ]
+}
+
+module.exports = View;

@@ -1,0 +1,23 @@
+var API = require('../_api.msx');
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.page = 1;
+  ctrl.subs = m.prop([]);
+  
+  ctrl.setupFetchSubs = function(){
+    console.log("setup fetch Subscribe");
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchSubs = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/subscribe/get"
+    }, ctrl.subs, ctrl.setupFetchSubs);
+  }
+  ctrl.request();
+  
+};
+
+
+module.exports = Controller;
