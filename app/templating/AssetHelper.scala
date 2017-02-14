@@ -38,7 +38,7 @@ trait AssetHelper { self: I18nHelper =>
   def jsTag(name: String) = jsAt("javascripts/" + name)
   def jsTagName(name: String) = staticUrl + "/assets/javascripts/" + name + "?v=" + assetVersion
   def jsLib(name: String) = staticUrl + "/assets/lib/" + name + "?v=" + assetVersion
-  def jsDev(name: String) = staticUrl + "/file/" + name + "?v=" + scala.util.Random.nextInt(10000)
+  def jsDev(name: String) = staticUrl + "/file/" + name + "?dev=" + scala.util.Random.nextInt(10000)
 
   def jsTagCompiled(name: String) = if (isProd) jsAt("compiled/" + name) else jsTag(name)
 

@@ -72,6 +72,12 @@ object SoftwareRepo {
       .gather[List]()
   }
 
+  def getBySlug(slug: String) = {
+    coll.find(BSONDocument("slug" -> slug))
+      .cursor[Software]()
+      .headOption
+  }
+
 }
 
 

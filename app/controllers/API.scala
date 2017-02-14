@@ -48,6 +48,19 @@ object API extends LilaController {
     }
   }
 
+  def getCoursesBySoftSlug(softSlug: String) = Open { implicit ctx =>
+    for {
+      software <- SoftwareRepo.getBySlug(softSlug)
+      courses <- CourseRepo.getCourseBySoftID(software.get.id)
+    } yield {
+      Ok(Json.obj(
+        "software" -> Json.toJson(software),
+        "courses" -> Json.toJson(courses)
+      )
+      )
+    }
+  }
+
   def getCategories() = Open { implicit ctx =>
     CateRepo.allCates() map {
       cates => Ok(Json.toJson(cates))

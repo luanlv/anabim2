@@ -5,6 +5,7 @@ POST         /authenticate/:provider               @controllers.SocialAuthContro
 GET /course/:slug         controllers.Course.index(slug: String)
 GET /course/:courseSlug/:videoSlug         controllers.Course.index2(courseSlug: String, videoSlug: String)
 GET /category/:categorySlug                controllers.Course.categoryIndex(categorySlug: String)
+GET /software/:softwareSlug                controllers.Course.softwareIndex(softwareSlug: String)
 
 GET /admin                 controllers.Application.admin
 GET /admin/membership      controllers.Application.admin
@@ -119,6 +120,7 @@ POST  /rel/unblock/:userId             controllers.Relation.unblock(userId: Stri
 
 GET  /api/getCourse/:slug        controllers.API.getCourseBySlug(slug: String)
 GET  /api/getCourses/:cateSlug   controllers.API.getCoursesByCateSlug(cateSlug: String)
+GET  /api/getCourses2/:softSlug   controllers.API.getCoursesBySoftSlug(softSlug: String)
 GET  /api/categories/get         controllers.API.getCategories()
 GET  /api/courses/get            controllers.API.getCourses()
 GET  /api/indexCourse/get        controllers.API.getIndexCourse()

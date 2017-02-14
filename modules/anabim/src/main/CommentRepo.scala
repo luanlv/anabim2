@@ -28,7 +28,7 @@ object CommentRepo {
   }
 
   def getComment(kind: String, id: Int) : Future[List[Comment]] = {
-    coll.find(BSONDocument())
+    coll.find(BSONDocument("kind" -> kind, "parentID" -> id))
       .sort(BSONDocument("_id" -> 1))
       .cursor[Comment]()
       .gather[List]()

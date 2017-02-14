@@ -176,10 +176,10 @@ export default class Home extends Component {
 															{window.softs.map(function(el, index){
 																if(index%3 === 0){
 																	return (
-																		<div className="item centerInside" style="height: 35px; ">
+																		<Link to={"/software/" + el.slug} className="item centerInside" style="height: 35px; ">
 																			<img src={"/image/get/" + el.cover.path} alt="" width={35} height={35} style="margin-right: 5px; float: left"/>
 																			<span style="line-height: 35px; font-size: 20px">{el.name}</span>
-																		</div>
+																		</Link>
 																	)
 																} else {
 																	return ""
@@ -193,10 +193,10 @@ export default class Home extends Component {
 															{window.softs.map(function(el, index){
 																if(index%3 === 1){
 																	return (
-																		<div className="item centerInside" style="height: 35px; ">
+																		<Link to={"/software/" + el.slug} className="item centerInside" style="height: 35px; ">
 																			<img src={"/image/get/" + el.cover.path} alt="" width={35} height={35} style="margin-right: 5px; float: left"/>
 																			<span style="line-height: 35px; font-size: 20px">{el.name}</span>
-																		</div>
+																		</Link>
 																	)
 																} else {
 																	return ""
@@ -210,10 +210,10 @@ export default class Home extends Component {
 															{window.softs.map(function(el, index){
 																if(index%3 === 2){
 																	return (
-																		<div className="item centerInside" style="height: 35px; ">
+																		<Link to={"/software/" + el.slug} className="item centerInside" style="height: 35px; ">
 																			<img src={"/image/get/" + el.cover.path} alt="" width={35} height={35} style="margin-right: 5px; float: left"/>
 																			<span style="line-height: 35px; font-size: 20px">{el.name}</span>
-																		</div>
+																		</Link>
 																	)
 																} else {
 																	return ""

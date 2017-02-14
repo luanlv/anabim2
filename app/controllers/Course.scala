@@ -42,4 +42,16 @@ object Course extends LilaController {
     }
   }
 
+  def softwareIndex(softwareSlug: String) = Open { implicit  ctx =>
+    for {
+      software <- SoftwareRepo.getBySlug(softwareSlug)
+      courses <- CourseRepo.getCourseBySoftID(software.get.id)
+    } yield {
+      software match {
+        case Some(software) => Ok(views.html.index.software(Json.toJson(software).toString, Json.toJson(courses).toString))
+        case _ => Redirect("/")
+      }
+    }
+  }
+
 }

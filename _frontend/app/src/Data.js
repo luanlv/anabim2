@@ -29,6 +29,8 @@ export default {
 	
 	category: window.category,
 	
+	software: window.software,
+	
 	courses: window.courses,
 	
 	indexCourse: window.indexCourse

@@ -1633,7 +1633,7 @@ var Modal = function(ctrl){
       
         ]}
       ]},
-    {tag: "div", attrs: {class:"modal fade slide-right", id:"modalSlideLeft", tabindex:"-1", role:"dialog", "aria-hidden":"true"}, children: [
+    {tag: "div", attrs: {class:"modal fade slide-right", id:"modalSlideLeft2", tabindex:"-1", role:"dialog", "aria-hidden":"true"}, children: [
         {tag: "div", attrs: {class:"modal-dialog modal-sm"}, children: [
           {tag: "div", attrs: {class:"modal-content-wrapper"}, children: [
             {tag: "div", attrs: {class:"modal-content"}, children: [
@@ -1651,7 +1651,7 @@ var Modal = function(ctrl){
                         ctrl.newCourse.related2.push(el)
                       }
                     }
-                    $('#modalSlideLeft').modal('toggle');
+                    $('#modalSlideLeft2').modal('toggle');
                   }
                 }, children: [
                   el.name
@@ -1936,7 +1936,7 @@ var New = function(ctrl){
                 ]}, 
                 {tag: "div", attrs: {className:"tab-pane", id:"tab-fillup4"}, children: [
                   {tag: "div", attrs: {className:"row"}, children: [
-                    {tag: "button", attrs: {className:"btn btn-primary pull-right", "data-toggle":"modal", "data-target":"#modalSlideLeft"}, children: ["Thêm mới"]}, 
+                    {tag: "button", attrs: {className:"btn btn-primary pull-right", "data-toggle":"modal", "data-target":"#modalSlideLeft2"}, children: ["Thêm mới"]}, 
                     {tag: "div", attrs: {
                         style:"margin-top: 50px; padding-right: 20px;"
                     }, children: [
@@ -2215,7 +2215,7 @@ var Edit = function(ctrl){
               ]}, 
               {tag: "div", attrs: {className:"tab-pane", id:"tab-fillup4"}, children: [
                 {tag: "div", attrs: {className:"row"}, children: [
-                  {tag: "button", attrs: {className:"btn btn-primary pull-right", "data-toggle":"modal", "data-target":"#modalSlideLeft"}, children: ["Thêm mới"]}, 
+                  {tag: "button", attrs: {className:"btn btn-primary pull-right", "data-toggle":"modal", "data-target":"#modalSlideLeft2"}, children: ["Thêm mới"]}, 
                   {tag: "div", attrs: {
                       style:"margin-top: 50px; padding-right: 20px;"
                   }, children: [

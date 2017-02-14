@@ -1,5 +1,5 @@
 @import play.api.libs.json.JsValue
-  @(category: String, courses: String)(implicit ctx: Context)
+  @(software: String, courses: String)(implicit ctx: Context)
 
 <!doctype html>
 <html lang="en">
@@ -219,7 +219,8 @@
 
       window.initIndexCourse = false;
 			window.indexCourse = {};
-      window.category = @Html(category)
+      window.category = {};
+      window.software = @Html(software);
       window.courses = @Html(courses)
       window.course = {};
       window.videos = [];

@@ -17,7 +17,7 @@ var Modal = function(ctrl){
       
         </div>
       </div>,
-    <div class="modal fade slide-right" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade slide-right" id="modalSlideLeft2" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-sm">
           <div class="modal-content-wrapper">
             <div class="modal-content">
@@ -35,7 +35,7 @@ var Modal = function(ctrl){
                         ctrl.newCourse.related2.push(el)
                       }
                     }
-                    $('#modalSlideLeft').modal('toggle');
+                    $('#modalSlideLeft2').modal('toggle');
                   }}
                 >
                   {el.name}
@@ -320,7 +320,7 @@ var New = function(ctrl){
                 </div>
                 <div className="tab-pane" id="tab-fillup4">
                   <div className="row">
-                    <button className="btn btn-primary pull-right" data-toggle="modal" data-target="#modalSlideLeft">Thêm mới</button>
+                    <button className="btn btn-primary pull-right" data-toggle="modal" data-target="#modalSlideLeft2">Thêm mới</button>
                     <div
                         style="margin-top: 50px; padding-right: 20px;"
                     >
@@ -599,7 +599,7 @@ var Edit = function(ctrl){
               </div>
               <div className="tab-pane" id="tab-fillup4">
                 <div className="row">
-                  <button className="btn btn-primary pull-right" data-toggle="modal" data-target="#modalSlideLeft">Thêm mới</button>
+                  <button className="btn btn-primary pull-right" data-toggle="modal" data-target="#modalSlideLeft2">Thêm mới</button>
                   <div
                       style="margin-top: 50px; padding-right: 20px;"
                   >

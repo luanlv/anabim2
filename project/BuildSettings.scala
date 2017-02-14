@@ -8,7 +8,7 @@ object BuildSettings {
   val globalScalaVersion = "2.11.8"
 
   def buildSettings = Defaults.coreDefaultSettings ++ Seq(
-    organization := "com.goenglishtime",
+    organization := "com.anabim.edu",
     scalaVersion := globalScalaVersion,
     resolvers ++= Dependencies.Resolvers.commons,
     parallelExecution in Test := false,
@@ -33,7 +33,7 @@ object BuildSettings {
       file("modules/" + name),
       dependencies = deps,
       settings = Seq(
-        version := "2.0",
+        version := "3.0",
         libraryDependencies := defaultDeps
       ) ++ buildSettings ++ srcMain
     )

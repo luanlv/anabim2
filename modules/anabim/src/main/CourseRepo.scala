@@ -79,6 +79,12 @@ object CourseRepo {
      .gather[List]()
   }
 
+ def getCourseBySoftID(softID: Int) = {
+   coll.find(BSONDocument("softID" -> softID))
+     .cursor[Course]()
+     .gather[List]()
+  }
+
   def getRelatedCourse(cateID: List[Int]) = {
     coll.find(BSONDocument("cateID" -> BSONDocument("$in" -> cateID)))
       .cursor[Course]()

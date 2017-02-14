@@ -514,3 +514,12 @@ body {
 .text-center {
 	text-align: center !important;
 }
+
+.ui.breadcrumb.white a {
+	color: white !important;
+}
+
+.comments {
+	max-height: 500px;
+	overflow-y: auto;
+}

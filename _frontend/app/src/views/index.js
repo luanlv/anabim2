@@ -10,6 +10,7 @@ import Course from './pages/course';
 import Video from './pages/course';
 import Layout3 from './pages/layout3';
 import Category from './pages/category';
+import Software from './pages/software';
 
 export default (
 	<Route component={ Layout }>
@@ -17,6 +18,7 @@ export default (
 		<Route path="/course/:courseId" component={ Course } />
 		<Route path="/course/:courseId/:videoId" component={ Video } />
 		<Route path="/category/:cateID" component={ Category } />
+		<Route path="/software/:softID" component={ Software } />
 		<Route path="/layout3" component={ Layout3 } />
 		<Route path="/blog/:title" component={ Article } />
 		<Route path="*" component={ Error404 } />

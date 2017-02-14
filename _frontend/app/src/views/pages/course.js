@@ -16,7 +16,6 @@ export default class Blog extends Component {
 				list: []
 			}
 		};
-		var that = this;
 		
 		this.redraw = this.redraw.bind(this);
 		this.getCourse = this.getCourse.bind(this)
@@ -24,6 +23,10 @@ export default class Blog extends Component {
 		if(this.props.params.courseId === Data.course.slug){
 			this.state.ready = true;
 		} else {
+			this.state.comments = {
+				init: false,
+				list:[]
+			}
 			this.getCourse(this.props.params.courseId)
 		}
 	}
@@ -31,6 +34,13 @@ export default class Blog extends Component {
 	
 	shouldComponentUpdate(nextProps, nextState) {
 		
+		if(nextProps.params.videoId !== this.props.params.videoId) {
+			this.setState({comments: {
+				init: false,
+				list: []
+			}})
+		} else {
+		}
 		if(nextProps.params.courseId !== this.props.params.courseId) {
 			this.getCourse(nextProps.params.courseId)
 		}
@@ -353,10 +363,10 @@ export default class Blog extends Component {
 							<div class="ui column  grid">
 								<div class="sixteen wide column">
 									<div class="ui breadcrumb">
-										<Link to="/" className="section">Trang chủ</Link>
+										<Link to="/" >Trang chủ</Link>
 										<div class="divider"> /</div>
-										{category.map(function (el) {
-											return [<Link to={"/category/" + el.slug} class="section"> [{el.name}] </Link>]
+										Danh mục: {category.map(function (el) {
+											return [<Link to={"/category/" + el.slug} > [{el.name}] </Link>]
 										})
 										}
 									</div>
@@ -486,9 +496,8 @@ export default class Blog extends Component {
 														if(!this2.state.comments.init){
 															$.ajax({
 																type: "GET",
-																url: "/api/comment/index/" + Data.course.id,
+																url: this2.props.params.videoId?("/api/comment/video/" + videoBySlug.id):("/api/comment/index/" + Data.course.id),
 																success: function(data){
-																	console.log(data)
 																	this2.setState({
 																		comments: {
 																			init: true,
@@ -501,6 +510,11 @@ export default class Blog extends Component {
 																}
 															});
 														}
+														setTimeout(function(){
+															var el = document.getElementsByClassName("comments")[0];
+															el.scrollTop = el.scrollHeight - el.scrollTop;
+														}, 500);
+														
 													}}
 												>Bình luận</a>
 											</div>
@@ -544,7 +558,8 @@ export default class Blog extends Component {
 											</div>
 											<div class="ui bottom attached tab segment" data-tab="second">
 												{!this2.state.comments.init?("Loading"):(
-														<div class="ui threaded comments">
+														<div class="ui threaded comments"
+														>
 															<h3 class="ui dividing header">Comments</h3>
 															{this2.state.comments.list.map(function(el){
 																return (
@@ -577,10 +592,10 @@ export default class Blog extends Component {
 																	
 																			 if(this2.state.comment.trim().length>5){
 																				 var newComment = {
-																					 parentID : Data.course.id,
+																					 parentID : (this2.props.params.videoId?(videoBySlug.id):(Data.course.id)),
 																					 comment : this2.state.comment.trim(),
-																					 kind : "index"
-																				 }
+																					 kind : (this2.props.params.videoId?"video":"index")
+																				 };
 																		
 																				 $.ajax({
 																					 type: "POST",
@@ -590,17 +605,17 @@ export default class Blog extends Component {
 																					 dataType: "text",
 																					 success: function(data){
 																					 	newComment.id = parseInt(data);
+																					 	newComment.time = new Date().getTime();
 																					 	var list = this2.state.comments.list;
 																					  list.push(newComment);
 																						 var newComments = {
 																							 init: true,
 																							 list: list
-																						 }
-																						 console.log(newComments)
+																						 };
 																						 this2.setState({
 																							 comment: "",
 																							 comments: newComments
-																						 })
+																						 });
 																					 },
 																					 error: function(data){
 																						 alert("Co loi")

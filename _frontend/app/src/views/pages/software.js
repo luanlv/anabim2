@@ -4,7 +4,7 @@ import { Link } from 'inferno-router';
 import Data from '../../Data'
 import fn from '../../fn'
 
-export default class Category extends Component {
+export default class Software extends Component {
 
 	constructor(props) {
 		super(props)
@@ -13,19 +13,19 @@ export default class Category extends Component {
 		};
 		
 		this.redraw = this.redraw.bind(this);
-		this.getCategory = this.getCategory.bind(this);
-		if(this.props.params.cateID === Data.category.slug){
+		this.getSoftware = this.getSoftware.bind(this);
+		if(this.props.params.softID === Data.software.slug){
 			this.state.ready = true;
 		} else {
-			this.getCategory(this.props.params.cateID)
+			this.getSoftware(this.props.params.softID)
 		}
 		
 	}
 	
 	shouldComponentUpdate(nextProps, nextState) {
 		
-		if(nextProps.params.cateID !== this.props.params.cateID) {
-			this.getCategory(nextProps.params.cateID)
+		if(nextProps.params.softID !== this.props.params.softID) {
+			this.getSoftware(nextProps.params.softID)
 		}
 	}
 	
@@ -33,15 +33,15 @@ export default class Category extends Component {
 		this.setState({});
 	}
 	
-	getCategory(cateID){
+	getSoftware(softID){
 		var this2 = this;
-		if(cateID !== Data.category.slug) {
+		if(softID !== Data.software.slug) {
 			this2.setState({ready: false});
 			$.ajax({
 				type: "GET",
-				url: "/api/getCourses/" + cateID,
+				url: "/api/getCourses2/" + softID,
 				success: function(data){
-					Data.category = data.category;
+					Data.software = data.software;
 					Data.courses = data.courses;
 					this2.setState({ready: true});
 				},
@@ -304,21 +304,18 @@ export default class Category extends Component {
 							<div className="ui container ">
 								<div className="ui two column stackable grid" style="color: white !important; height: 250px;">
 									<div className="column">
-										<div className="ui breadcrumb white" >
+										<div className="ui breadcrumb white">
 											<Link to="/" className="section" >Trang chủ</Link>
-											<div class="divider"> /</div>
-											Danh mục: [ <Link to={"/category/" + Data.category.slug } className="section" >{Data.category.name}</Link> ]
-										</div>
-										{/*<h3 className="ui header" style="color: white !important">Web Training and Tutorials</h3>*/}
-										<div style="color: white !important" dangerouslySetInnerHTML={{__html: Data.category.description}}>
-										
+											<div class="divider" style="display: inline; color: white !important"> / </div>
+											Phần mềm: [ <Link to={"/software/" + Data.software.slug } className="section" >{Data.software.name}</Link> ]
+											
 										</div>
 										<div className="row " style="padding-top: 10px;">
 											{button}
 										</div>
 									</div>
 									<div className="column noPa"
-											 style={'background-image: url("/image/get/' + Data.category.cover.path + '");'}>
+											 style={'background-image: url("/image/get/' + Data.software.cover.path + '");'}>
 										<div
 											style="background: linear-gradient(to right, #1485bd 0%, transparent 30% , transparent 49%, transparent 70%, #1485bd 100%); width: 100%; height: 100%"></div>
 									</div>
@@ -329,7 +326,7 @@ export default class Category extends Component {
 							<div className="ui container">
 								<div className="ui segment noBor noSha noPa" style="margin: 30px auto">
 									<div id="context2">
-										<h2 className="header">Các video có trong danh mục <span style="color: red"> {Data.category.name} </span>:</h2>
+										<h2 className="header">Các video có trong danh mục <span style="color: red"> {Data.software.name} </span>:</h2>
 										<hr/>
 										<div className="ui active tab " data-tab="1">
 											<div className="ui special stackable cards index-card">
@@ -373,7 +370,7 @@ export default class Category extends Component {
 							<div className="ui container">
 								<div className="ui stackable grid">
 									<div className="twelve wide column grid noPa"
-											 style='background: url("https://cdn.lynda.com/static/images/category/free-trial.png") no-repeat center black; background-size:100% 100%; height: 350px; overflow: hidden'>
+											 style='background: url("https://cdn.lynda.com/static/images/software/free-trial.png") no-repeat center black; background-size:100% 100%; height: 350px; overflow: hidden'>
 										<div
 											style="width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0, 0.9) 10%, rgba(0,0,0, 0.4)); /* Standard syntax */">
 											<div className="ui header"
