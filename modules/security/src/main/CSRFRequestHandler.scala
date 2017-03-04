@@ -10,28 +10,28 @@ final class CSRFRequestHandler(domain: String, enabled: Boolean) {
 
   def check(req: RequestHeader): Boolean = {
 
-//    if (isXhr(req) || (isSafe(req) && !isSocket(req))) true
-//    else origin(req).orElse(referer(req) flatMap refererToOrigin) match {
-//      case None =>
-//        lila.mon.http.csrf.missingOrigin()
-//        logger.debug(print(req))
-//        true
-//      case Some("file://") =>
-//        true
-//      case Some(o) if isSubdomain(o) =>
-//        true
-//      case Some(_) =>
-//        if (isSocket(req)) {
-//          lila.mon.http.csrf.websocket()
-//          logger.info(s"WS ${print(req)}")
-//        }
-//        else {
-//          lila.mon.http.csrf.forbidden()
-//          logger.info(print(req))
-//        }
-////        !enabled // ignore if disabled
-//        true
-//    }
+    //    if (isXhr(req) || (isSafe(req) && !isSocket(req))) true
+    //    else origin(req).orElse(referer(req) flatMap refererToOrigin) match {
+    //      case None =>
+    //        lila.mon.http.csrf.missingOrigin()
+    //        logger.debug(print(req))
+    //        true
+    //      case Some("file://") =>
+    //        true
+    //      case Some(o) if isSubdomain(o) =>
+    //        true
+    //      case Some(_) =>
+    //        if (isSocket(req)) {
+    //          lila.mon.http.csrf.websocket()
+    //          logger.info(s"WS ${print(req)}")
+    //        }
+    //        else {
+    //          lila.mon.http.csrf.forbidden()
+    //          logger.info(print(req))
+    //        }
+    ////        !enabled // ignore if disabled
+    //        true
+    //    }
     true
 
   }
@@ -48,6 +48,6 @@ final class CSRFRequestHandler(domain: String, enabled: Boolean) {
   private val RefererToOriginRegex = """^([^:]+://[^/]+).*""".r // a.k.a. pokemon face regex
   private def refererToOrigin(r: String): Option[String] = r match {
     case RefererToOriginRegex(origin) => origin.some
-    case _                            => none
+    case _ => none
   }
 }

@@ -12,7 +12,8 @@ private[api] final class UserApi(
     jsonView: lila.user.JsonView,
     relationApi: lila.relation.RelationApi,
     prefApi: lila.pref.PrefApi,
-    makeUrl: String => String) {
+    makeUrl: String => String
+) {
 
   def pager(pag: Paginator[User]): JsObject =
     Json.obj("paginator" -> PaginatorJson(pag.mapResults { u =>

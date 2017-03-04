@@ -11,9 +11,10 @@ import lila.user.User
 import reactivemongo.bson._
 
 final class PrefApi(
-                     coll: Coll,
-                     cacheTtl: Duration,
-                     bus: lila.common.Bus) {
+    coll: Coll,
+    cacheTtl: Duration,
+    bus: lila.common.Bus
+) {
 
   private implicit val prefBSONHandler = new BSON[Pref] {
 
@@ -57,7 +58,8 @@ final class PrefApi(
       keyboardMove = r.getD("keyboardMove", Pref.default.keyboardMove),
       pieceNotation = r.getD("pieceNotation", Pref.default.pieceNotation),
       moveEvent = r.getD("moveEvent", Pref.default.moveEvent),
-      tags = r.getD("tags", Pref.default.tags))
+      tags = r.getD("tags", Pref.default.tags)
+    )
 
     def writes(w: BSON.Writer, o: Pref) = BSONDocument(
       "_id" -> o._id,
@@ -95,7 +97,8 @@ final class PrefApi(
       "keyboardMove" -> o.keyboardMove,
       "moveEvent" -> o.moveEvent,
       "pieceNotation" -> o.pieceNotation,
-      "tags" -> o.tags)
+      "tags" -> o.tags
+    )
   }
 
   def followable(userId: String): Fu[Boolean] =

@@ -26,7 +26,7 @@ object CourseRepo {
   }
 
   def update(newCourse: Course): Future[WriteResult] = {
-
+    println(newCourse.documents)
     coll.update(
       BSONDocument("_id" -> newCourse.id),
       BSONDocument(
@@ -46,17 +46,17 @@ object CourseRepo {
           "authorId" -> newCourse.author,
           "section" -> newCourse.section,
           "description" -> newCourse.description,
-          "documents" -> newCourse.documents,
-          "related" -> newCourse.related
+          "documents" -> newCourse.documents.getOrElse(""),
+          "related" -> newCourse.related.getOrElse(List())
         )
-       )
+      )
     )
   }
 
   def getCourse(page: Int, nb: Int = 100): Fu[List[Course]] = {
     coll.find(BSONDocument())
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*nb)
+      .skip((page - 1) * nb)
       .cursor[Course]()
       .gather[List](nb)
   }
@@ -73,20 +73,20 @@ object CourseRepo {
       .headOption
   }
 
- def getCourseByCateID(cateID: Int) = {
-   coll.find(BSONDocument("cateID" -> cateID))
-     .cursor[Course]()
-     .gather[List]()
+  def getCourseByCateID(cateID: Int) = {
+    coll.find(BSONDocument("cateID" -> cateID))
+      .cursor[Course]()
+      .gather[List]()
   }
 
- def getCourseBySoftID(softID: Int) = {
-   coll.find(BSONDocument("softID" -> softID))
-     .cursor[Course]()
-     .gather[List]()
+  def getCourseBySoftID(softID: Int) = {
+    coll.find(BSONDocument("softID" -> softID))
+      .cursor[Course]()
+      .gather[List]()
   }
 
-  def getRelatedCourse(cateID: List[Int]) = {
-    coll.find(BSONDocument("cateID" -> BSONDocument("$in" -> cateID)))
+  def getRelatedCourse(related: List[Int]) = {
+    coll.find(BSONDocument("_id" -> BSONDocument("$in" -> related)))
       .cursor[Course]()
       .gather[List]()
   }
@@ -98,7 +98,8 @@ object CourseRepo {
   }
 
   def getCoursesWithUser(userId: String, page: Int, nb: Int = 100): Fu[List[Course]] = {
-    coll.find(BSONDocument(),
+    coll.find(
+      BSONDocument(),
       BSONDocument(
         "_id" -> 1,
         "name" -> 1,
@@ -113,10 +114,10 @@ object CourseRepo {
         "vote" -> 1,
         "numVote" -> 1,
         "voter" -> BSONDocument("$elemMatch" -> BSONDocument("$eq" -> userId))
-    )
+      )
     )
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*nb)
+      .skip((page - 1) * nb)
       .cursor[Course]()
       .gather[List](nb)
   }
@@ -127,7 +128,7 @@ object CourseRepo {
 
       BSONDocument("_id" -> courseID, "likes" -> BSONDocument("$ne" -> userId)),
       BSONDocument(
-        "$set" -> BSONDocument("vote" -> (course.get.vote + num)/(course.get.numVote + 1)),
+        "$set" -> BSONDocument("vote" -> (course.get.vote + num) / (course.get.numVote + 1)),
         "$inc" -> BSONDocument("numVote" -> 1),
         "$push" -> BSONDocument("likes" -> userId)
       )
@@ -145,6 +146,5 @@ object CourseRepo {
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

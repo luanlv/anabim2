@@ -8,6 +8,8 @@ var Video = require("./video/main.msx");
 var Membership = require("./membership/main.msx");
 var Membership2 = require("./membership2/main.msx");
 var Price = require("./price/main.msx");
+var Coupon = require("./coupon/main.msx");
+var ActiveCode = require("./activeCode/main.msx");
 var Khoahoc = require("./khoahoc/main.msx");
 
 // var NewQuestion = require("./newquestion/main.msx");
@@ -26,5 +28,7 @@ m.route(document.body, "/", {
   "/admin/membership2": Membership2,
   "/admin/membership/users": Users,
   "/admin/price": Price,
+  "/admin/coupon": Coupon,
+  "/admin/activecode": ActiveCode,
   "/admin/trangchu/khoahoc": Khoahoc
 });

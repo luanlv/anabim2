@@ -14,7 +14,7 @@ var View = function(ctrl){
                 <li>
                   <p>Anabim</p>
                 </li>
-                <li><a href="#" className="active">Membership</a>
+                <li><a href="#" className="active">Bảng giá</a>
                 </li>
               </ul>
             </div>

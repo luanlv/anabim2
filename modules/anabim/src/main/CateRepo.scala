@@ -53,7 +53,7 @@ object CateRepo {
   def getCates(page: Int, nb: Int = 100): Fu[List[Cate]] = {
     coll.find(BSONDocument())
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*nb)
+      .skip((page - 1) * nb)
       .cursor[Cate]()
       .gather[List](nb)
   }
@@ -77,6 +77,5 @@ object CateRepo {
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

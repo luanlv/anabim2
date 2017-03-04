@@ -9,7 +9,8 @@ import lila.socket.actorApi.NbMembers
 import play.api.libs.json.JsNumber
 
 private final class KamonPusher(
-    countUsers: () => Int) extends Actor {
+    countUsers: () => Int
+) extends Actor {
 
   import KamonPusher._
 

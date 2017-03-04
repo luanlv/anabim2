@@ -4,14 +4,13 @@ import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
 
-
 case class Image(
-                                       id: Int,
-                                       filename: String,
-                                       contentType: Option[String],
-                                       path: String,
-                                       createAt: DateTime = DateTime.now()
-                                     )
+  id: Int,
+  filename: String,
+  contentType: Option[String],
+  path: String,
+  createAt: DateTime = DateTime.now()
+)
 
 object Image {
 

@@ -16,10 +16,11 @@ import lila.db.dsl._
 import lila.db.BSON.BSONJodaDateTimeHandler
 
 final class Firewall(
-                      coll: Coll,
-                      cookieName: Option[String],
-                      enabled: Boolean,
-                      cachedIpsTtl: Duration) {
+    coll: Coll,
+    cookieName: Option[String],
+    enabled: Boolean,
+    cachedIpsTtl: Duration
+) {
 
   private def ipOf(req: RequestHeader) =
     lila.common.HTTPRequest lastRemoteAddress req
@@ -30,8 +31,7 @@ final class Firewall(
     } addEffect { v =>
       if (v) lila.mon.security.firewall.block()
     }
-  }
-  else fuccess(false)
+  } else fuccess(false)
 
   def accepts(req: RequestHeader): Fu[Boolean] = blocks(req) map (!_)
 

@@ -14,12 +14,12 @@ import lila.db.BSON._
 import lila.memo.{ ExpireSetMemo, MongoCache }
 
 final class Cached(
-                    nbTtl: FiniteDuration,
-                    mongoCache: MongoCache.Builder) {
+    nbTtl: FiniteDuration,
+    mongoCache: MongoCache.Builder
+) {
 
   private def oneWeekAgo = DateTime.now minusWeeks 1
 
   private val cache: Cache[Int] = LruCache(timeToLive = 1 hour)
-
 
 }

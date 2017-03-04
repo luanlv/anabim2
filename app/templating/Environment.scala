@@ -39,7 +39,8 @@ object Environment
 
   implicit val LilaHtmlMonoid = scalaz.Monoid.instance[Html](
     (a, b) => Html(a.body + b.body),
-    Html(""))
+    Html("")
+  )
 
   type FormWithCaptcha = (play.api.data.Form[_], lila.common.Captcha)
 
@@ -58,7 +59,6 @@ object Environment
 
   def contactEmailLink = Html(s"""<a href="mailto:$contactEmail">$contactEmail</a>""")
 
-
   val openingBrace = "{"
   val closingBrace = "}"
 
@@ -66,6 +66,5 @@ object Environment
     // val dev = Html("&#xe000;")
     val mod = Html("&#xe002;")
   }
-
 
 }

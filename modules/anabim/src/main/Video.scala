@@ -4,19 +4,18 @@ import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
 
-
 private[anabim] case class Video(
-                                   id: Int,
-                                   stt: Double,
-                                   courseId: Int,
-                                   section: Int,
-                                   name: String,
-                                   link: String,
-                                   kind: String,
-                                   url: String,
-                                   source: String,
-                                   time: Int
-                                 )
+  id: Int,
+  stt: Double,
+  courseId: Int,
+  section: Int,
+  name: String,
+  link: String,
+  kind: String,
+  url: String,
+  source: String,
+  time: Int
+)
 
 private[anabim] object Video {
 

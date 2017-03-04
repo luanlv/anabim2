@@ -17,7 +17,8 @@ final class Env(
     getLightUser: String => Option[lila.common.LightUser],
     appPath: String,
     isProd: Boolean,
-    scheduler: lila.common.Scheduler) {
+    scheduler: lila.common.Scheduler
+) {
 
   private val settings = new {
     val CachedNbTtl = config duration "cached.nb.ttl"
@@ -36,10 +37,9 @@ final class Env(
   }
   import settings._
 
-//  val MandatorySecondsToMove = config getInt "mandatory.seconds_to_move"
+  //  val MandatorySecondsToMove = config getInt "mandatory.seconds_to_move"
 
   private[game] lazy val gameColl = db(CollectionGame)
-
 
   lazy val gameJs = new GameJs(path = jsPath, useCache = isProd)
 
@@ -50,11 +50,10 @@ final class Env(
 
   import akka.pattern.ask
 
-//  def testCaptcher ={
-//    import makeTimeout.large
-//    (captcher ? SayHello("luan")).mapTo[String]
-//  }
-
+  //  def testCaptcher ={
+  //    import makeTimeout.large
+  //    (captcher ? SayHello("luan")).mapTo[String]
+  //  }
 
   private def jsPath =
     "%s/%s".format(appPath, isProd.fold(JsPathCompiled, JsPathRaw))
@@ -70,5 +69,6 @@ object Env {
     getLightUser = lila.user.Env.current.lightUser,
     appPath = play.api.Play.current.path.getCanonicalPath,
     isProd = lila.common.PlayApp.isProd,
-    scheduler = lila.common.PlayApp.scheduler)
+    scheduler = lila.common.PlayApp.scheduler
+  )
 }

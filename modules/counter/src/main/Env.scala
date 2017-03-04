@@ -4,32 +4,34 @@ import akka.actor._
 import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
-import lila.memo.{ExpireSetMemo, MongoCache}
+import lila.memo.{ ExpireSetMemo, MongoCache }
 import scala.concurrent.duration._
 
 final class Env(
-                 config: Config,
-                 db: lila.db.Env,
-                 hub: lila.hub.Env,
-                 mongoCache: MongoCache.Builder,
-                 scheduler: lila.common.Scheduler,
-                 system: ActorSystem) {
+    config: Config,
+    db: lila.db.Env,
+    hub: lila.hub.Env,
+    mongoCache: MongoCache.Builder,
+    scheduler: lila.common.Scheduler,
+    system: ActorSystem
+) {
 
   private val settings = new {
     val collectionCounters = config getString "collection.counter"
-    val CachedNbTtl = 10 second  //config duration "cached.nb.ttl"
+    val CachedNbTtl = 10 second //config duration "cached.nb.ttl"
     val OnlineTtl = 10 second //config duration "online.ttl"
   }
   import settings._
-  
+
   lazy val cached = new Cached(
     nbTtl = CachedNbTtl,
-    mongoCache = mongoCache)
+    mongoCache = mongoCache
+  )
 
   lazy val api = new Api(
     cached = cached,
-    bus = system.lilaBus)
-
+    bus = system.lilaBus
+  )
 
   private[counter] lazy val counterColl = db(collectionCounters)
 
@@ -43,5 +45,6 @@ object Env {
     hub = lila.hub.Env.current,
     mongoCache = lila.memo.Env.current.mongoCache,
     scheduler = lila.common.PlayApp.scheduler,
-    system = lila.common.PlayApp.system)
+    system = lila.common.PlayApp.system
+  )
 }

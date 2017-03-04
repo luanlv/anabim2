@@ -5,7 +5,8 @@ import scala.concurrent.duration._
 
 final class MultiThrottler(
     executionTimeout: Option[FiniteDuration] = None,
-    logger: lila.log.Logger) extends Actor {
+    logger: lila.log.Logger
+) extends Actor {
 
   var executions = Map.empty[String, Unit]
 
@@ -40,7 +41,8 @@ object MultiThrottler {
     id: String,
     run: () => Funit,
     delay: Option[FiniteDuration],
-    timeout: Option[FiniteDuration])
+    timeout: Option[FiniteDuration]
+  )
 
   case class Done(id: String)
 
@@ -48,6 +50,7 @@ object MultiThrottler {
     id: String,
     run: => Funit,
     delay: Option[FiniteDuration] = None,
-    timeout: Option[FiniteDuration] = None) =
+    timeout: Option[FiniteDuration] = None
+  ) =
     Work(id, () => run, delay, timeout)
 }

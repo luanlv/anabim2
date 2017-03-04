@@ -8,7 +8,8 @@ final class Env(
     config: Config,
     val scheduler: lila.common.Scheduler,
     system: ActorSystem,
-    appPath: String) {
+    appPath: String
+) {
 
   val CliUsername = config getString "cli.username"
 
@@ -41,8 +42,8 @@ object Env {
     config = lila.common.PlayApp.loadConfig,
     scheduler = lila.common.PlayApp.scheduler,
     system = lila.common.PlayApp.system,
-    appPath = lila.common.PlayApp withApp (_.path.getCanonicalPath))
-
+    appPath = lila.common.PlayApp withApp (_.path.getCanonicalPath)
+  )
 
   def db = lila.db.Env.current
   def user = lila.user.Env.current
@@ -61,6 +62,5 @@ object Env {
   def anabim = lila.anabim.Env.current
   def image = lila.image.Env.current
   def api = lila.api.Env.current
-
 
 }

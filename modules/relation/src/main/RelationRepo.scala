@@ -37,7 +37,8 @@ private[relation] object RelationRepo {
   private def save(u1: ID, u2: ID, relation: Relation): Funit = coll.update(
     $id(makeId(u1, u2)),
     $doc("u1" -> u1, "u2" -> u2, "r" -> relation),
-    upsert = true).void
+    upsert = true
+  ).void
 
   def remove(u1: ID, u2: ID): Funit = coll.remove($id(makeId(u1, u2))).void
 
@@ -49,10 +50,10 @@ private[relation] object RelationRepo {
       .hint($doc("u1" -> 1))
       .cursor[Bdoc]()
       .gather[List](nb).map {
-      _.flatMap { _.getAs[String]("_id") }
-    } flatMap { ids =>
-      coll.remove($inIds(ids)).void
-    }
+        _.flatMap { _.getAs[String]("_id") }
+      } flatMap { ids =>
+        coll.remove($inIds(ids)).void
+      }
 
   def makeId(u1: String, u2: String) = s"$u1/$u2"
 }

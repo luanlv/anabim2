@@ -8,16 +8,16 @@ import lila.common.HTTPRequest
 final class I18nRequestHandler(
     pool: I18nPool,
     protocol: String,
-    cdnDomain: String) {
+    cdnDomain: String
+) {
 
   def apply(req: RequestHeader): Option[Handler] =
     if (HTTPRequest.isRedirectable(req) &&
       req.host != cdnDomain &&
-      pool.domainLang(req).isEmpty){
+      pool.domainLang(req).isEmpty) {
       println("=== Redirect")
-        Some(Action(Redirect(redirectUrl(req))))
-    }
-    else {
+      Some(Action(Redirect(redirectUrl(req))))
+    } else {
       println(" case none")
       None
     }

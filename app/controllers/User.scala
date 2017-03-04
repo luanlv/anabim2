@@ -41,11 +41,11 @@ object User extends LilaController {
       (ctx.userId ?? { relationApi.fetchBlocks(user.id, _) }) zip
         (ctx.isAuth ?? { Env.pref.api.followable(user.id) }) zip
         (ctx.userId ?? { relationApi.fetchRelation(_, user.id) }) zip
-        (ctx.userId ?? { relationApi.fetchRelation(user.id, _) })map {
-        case (((blocked, followable), relation), relation2)=>
-          Ok(html.user.mini(user, blocked, followable, relation, relation2))
-            .withHeaders(CACHE_CONTROL -> "max-age=0")
-      }
+        (ctx.userId ?? { relationApi.fetchRelation(user.id, _) }) map {
+          case (((blocked, followable), relation), relation2) =>
+            Ok(html.user.mini(user, blocked, followable, relation, relation2))
+              .withHeaders(CACHE_CONTROL -> "max-age=0")
+        }
     }
   }
 

@@ -1,0 +1,162 @@
+var API = require('../_api.msx');
+var Tab = function(ctrl, index){
+  return (
+      <div>
+          <div className="row">
+            <div className="col-md-3">
+              <div class="form-group form-group-default required">
+                <label>Mã giảm giá</label>
+                <input type="text" class="form-control"
+                       value={ctrl.coupons()[index].code}
+                       onchange={function(e){
+                         ctrl.coupons()[index].code = $(e.target).val();
+                       }}
+                />
+              </div>
+            </div>
+            
+            <div className="col-md-2">
+              <div class="form-group form-group-default required">
+                <label>Giá giảm</label>
+                <input type="number" class="form-control"
+                       value={ctrl.coupons()[index].price}
+                       onchange={function(e){
+                         ctrl.coupons()[index].price = parseInt($(e.target).val());
+                       }}
+                />
+              </div>
+            </div>
+  
+            <div className="col-md-2">
+              <div class="form-group form-group-default required">
+                <label>Tháng áp dụng</label>
+                <input type="text" class="form-control" value={ctrl.coupons()[index].month.join(',')}
+                       onchange={function(e){
+                         console.log($(e.target).val())
+                         ctrl.coupons()[index].month = ctrl.textToList($(e.target).val());
+                       }}
+                />
+              </div>
+            </div>
+  
+            <div className="col-md-3">
+              <div className="form-group form-group-default required">
+                <div id="datepicker-component2" className="input-group date "
+                     config={function(el){
+                       $(el).datepicker({
+                         format: 'yyyy-mm-dd'
+                       });
+                     }}
+                >
+                  <label>Hạn cuối</label>
+                  <input type="text" class="form-control" value={API.date2(ctrl.coupons()[index].endTime)}
+                         onchange={function(e){
+                           var time = (new Date($(e.target).val())).getTime();
+                           ctrl.coupons()[index].endTime = time;
+                         }}
+                  /><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+              </div>
+            </div>
+  
+            <div className="col-md-2">
+              <div class="form-group form-group-default required">
+                <label>Số lượng</label>
+                <input type="number" class="form-control"
+                       value={ctrl.coupons()[index].quantity}
+                       onchange={function(e){
+                         ctrl.coupons()[index].quantity = parseInt($(e.target).val());
+                       }}
+                />
+              </div>
+            </div>
+            
+          </div>
+          <div className="row" style="text-align: right">
+            <div style="float: right">
+              <button className="btn " style="margin-right: 30px;"
+                onclick={function(){
+                  $.ajax({
+                    type: "POST",
+                    url: "/admin/coupon/delete",
+                    data: JSON.stringify({
+                      id: ctrl.coupons()[index].id
+                    }),
+                    contentType: "application/json",
+                    dataType: "text",
+                    success: function (data) {
+                      ctrl.request()
+                      alert("Đã xóa");
+                    },
+                    error: function (data) {
+                      console.log(data)
+                      alert(data)
+                    }
+                  });
+                }}
+              >
+                Xóa
+              </button>
+              <button className="btn " style="margin-right: 30px;"
+                      onclick={function(){
+                        $.ajax({
+                          type: "POST",
+                          url: "/admin/coupon/update",
+                          data: JSON.stringify({
+                            id: ctrl.coupons()[index].id,
+                            kind: 1,
+                            code: ctrl.coupons()[index].code,
+                            percent: ctrl.coupons()[index].percent,
+                            month: ctrl.coupons()[index].month,
+                            endTime: ctrl.coupons()[index].endTime,
+                            active: !ctrl.coupons()[index].active,
+                            quantity: ctrl.coupons()[index].quantity
+                          }),
+                          contentType: "application/json",
+                          dataType: "text",
+                          success: function (data) {
+                            ctrl.request()
+                          },
+                          error: function (data) {
+                            console.log(data)
+                            alert(data)
+                          }
+                        });
+                      }}
+              >
+                {ctrl.coupons()[index].active?"Tạm dừng":"Tiếp tục"}
+              </button>
+              <button className="btn" style="margin-right: 30px;"
+                      onclick={function(){
+                        $.ajax({
+                          type: "POST",
+                          url: "/admin/coupon/update",
+                          data: JSON.stringify({
+                            id: ctrl.coupons()[index].id,
+                            kind: 2,
+                            code: ctrl.coupons()[index].code,
+                            price: ctrl.coupons()[index].price,
+                            month: ctrl.coupons()[index].month,
+                            endTime: ctrl.coupons()[index].endTime,
+                            active: ctrl.coupons()[index].active,
+                            quantity: ctrl.coupons()[index].quantity
+                          }),
+                          contentType: "application/json",
+                          dataType: "text",
+                          success: function (data) {
+                            ctrl.request()
+                          },
+                          error: function (data) {
+                            console.log(data)
+                            alert(data)
+                          }
+                        });
+                      }}
+              >Cập nhập</button>
+            </div>
+          </div>
+        </div>
+  )
+}
+
+module.exports = Tab;

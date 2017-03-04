@@ -21,7 +21,6 @@ object SubscribeRepo {
 
   private lazy val coll = Env.current.subscribeColl
 
-
   def insert(data: Subscribe): Future[WriteResult] = {
     coll.insert(data)
   }
@@ -36,18 +35,17 @@ object SubscribeRepo {
     coll.remove(BSONDocument("email" -> userId))
   }
 
-
   def getSubs(page: Int, nb: Int = 100): Fu[List[Subscribe]] = {
     coll.find(BSONDocument("done" -> false))
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*nb)
+      .skip((page - 1) * nb)
       .cursor[Subscribe]()
       .gather[List](nb)
   }
   def getDoneSubs(page: Int, nb: Int = 100): Fu[List[Subscribe]] = {
     coll.find(BSONDocument("done" -> true))
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*nb)
+      .skip((page - 1) * nb)
       .cursor[Subscribe]()
       .gather[List](nb)
   }
@@ -76,6 +74,5 @@ object SubscribeRepo {
     )
   }
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

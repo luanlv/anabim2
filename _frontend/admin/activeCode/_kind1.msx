@@ -1,0 +1,137 @@
+var API = require('../_api.msx');
+var Tab = function(ctrl, index){
+  return (
+      <div className="tab-pane active" id="tab-fillup1">
+        <div className="row">
+          
+          <div className="col-md-3">
+            <div class="form-group form-group-default required">
+              <label>Mã kích hoạt</label>
+              <input type="text" class="form-control"
+                     value={ctrl.activeCodes()[index].code}
+                     onchange={function(e){
+                       ctrl.activeCodes()[index].code = $(e.target).val();
+                     }}
+              />
+            </div>
+          </div>
+          
+          <div className="col-md-2">
+            <div class="form-group form-group-default required">
+              <label>Số ngày</label>
+              <input type="number" class="form-control"
+                     value={ctrl.activeCodes()[index].day}
+                     onchange={function(e){
+                       ctrl.activeCodes()[index].day = parseInt($(e.target).val());
+                     }}
+              />
+            </div>
+          </div>
+          {ctrl.activeCodes()[index].all?(
+              <div className="col-md-3">
+                <div class="form-group form-group-default required">
+                  <label>Cho tất cả</label>
+                  <input type="checkbox" name="vehicle1" value="1" checked={ctrl.activeCodes()[index].all?"checked":""}
+                         onchange={function(){
+                           ctrl.activeCodes()[index].all = !ctrl.activeCodes()[index].all
+                         }}
+                  ></input>
+                </div>
+              </div>
+          ):(
+              <div className="col-md-3">
+                <div class="form-group form-group-default required">
+                  <label>Email áp dụng</label>
+                  <input type="text" class="form-control" value={ctrl.activeCodes()[index].all?"":ctrl.activeCodes()[index].email}
+                         disabled={ctrl.activeCodes()[index].all?"true":""}
+                         onchange={function(e){
+                           ctrl.activeCodes()[index].email = $(e.target).val();
+                         }}
+                  />
+                </div>
+              </div>
+          )}
+
+          <div className="col-md-2">
+            <div class="form-group form-group-default required">
+              <label>Số lượng</label>
+              <input type="number" class="form-control"
+                     value={ctrl.activeCodes()[index].quantity}
+                     onchange={function(e){
+                       ctrl.activeCodes()[index].quantity = parseInt($(e.target).val());
+                     }}
+              />
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div class="form-group form-group-default required">
+              <label>Trạng thái</label>
+              {ctrl.activeCodes()[index].used?(
+                  <div style="color: blue">Đã sử dụng</div>
+              ):(
+                  <div style="color: red">Chưa sử dụng</div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="row" style="text-align: right">
+          <div style="float: right">
+            <button className="btn " style="margin-right: 30px;"
+                    onclick={function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/activecode/delete",
+                        data: JSON.stringify({
+                          id: ctrl.activeCodes()[index].id
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request()
+                          alert("Đã xóa");
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }}
+            >
+              Xóa
+            </button>
+            <button className="btn btn-primary" style="margin-right: 30px;"
+                    onclick={function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/activecode/update",
+                        data: JSON.stringify({
+                          id: ctrl.activeCodes()[index].id,
+                          code: ctrl.activeCodes()[index].code,
+                          day: ctrl.activeCodes()[index].day,
+                          email: ctrl.activeCodes()[index].email,
+                          all: ctrl.activeCodes()[index].all,
+                          quantity: ctrl.activeCodes()[index].quantity,
+                          used: false
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          // ctrl.init();
+                          ctrl.request();
+                          alert("Đã cập nhập")
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }}
+            >Cập nhập</button>
+          </div>
+        </div>
+      </div>
+  )
+}
+
+module.exports = Tab;

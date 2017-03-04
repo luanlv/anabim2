@@ -23,11 +23,11 @@ case class User(
     createdAt: DateTime,
     seenAt: Option[DateTime],
     lang: Option[String]
-    ) extends Ordered[User] {
+) extends Ordered[User] {
 
   override def equals(other: Any) = other match {
     case u: User => id == u.id
-    case _       => false
+    case _ => false
   }
 
   override def toString =
@@ -47,12 +47,9 @@ case class User(
 
   def disabled = !enabled
 
-
   def titleUsername = title.fold(username)(t => s"$t $username")
 
-
   def profileOrDefault = profile | Profile.default
-
 
   def hasTitle = title.isDefined
 
@@ -61,9 +58,6 @@ case class User(
   def timeNoSee: Duration = seenAt.fold[Duration](Duration.Inf) { s =>
     (nowMillis - s.getMillis).millis
   }
-
-
-
 
 }
 
@@ -77,7 +71,6 @@ object User {
   }
 
   val anonymous = "Anonymous"
-
 
   case class LightCount(user: LightUser, count: Int)
 
@@ -113,7 +106,8 @@ object User {
     "CM" -> "Candidate Master",
     "WCM" -> "Woman Candidate Master",
     "WNM" -> "Woman National Master",
-    "LM" -> "Lichess Master")
+    "LM" -> "Lichess Master"
+  )
 
   val titlesMap = titles.toMap
 
@@ -166,7 +160,7 @@ object User {
       name = r str name,
       member = r str member,
       time = r dateO time
-      )
+    )
 
     def writes(w: BSON.Writer, o: User) = BSONDocument(
       id -> o.id,

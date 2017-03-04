@@ -1,0 +1,101 @@
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+var tab1 = require('./_tab1.msx');
+var kind1 = require('./_kind1.msx');
+var tab2 = require('./_tab2.msx');
+var kind2 = require('./_kind2.msx');
+var tab3 = require('./_tab3.msx');
+var kind3 = require('./_kind3.msx');
+var View = function(ctrl){
+  return [
+    <div className="page-content-wrapper ">
+    
+      <div className="content ">
+      
+        <div className="jumbotron" data-pages="parallax">
+          <div className="container-fluid  container-fixed-lg sm-p-l-20 sm-p-r-20">
+            <div className="inner">
+              <ul className="breadcrumb">
+                <li>
+                  <p>Anabim</p>
+                </li>
+                <li><a href="#" className="active">Mã giảm giá</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      
+      
+        <div className="container-fluid container-fluid2 container-fixed-lg">
+          <div className="panel panel-transparent">
+            <div className="panel-body">
+              
+              <ul className="nav nav-tabs nav-tabs-fillup" data-init-reponsive-tabs="dropdownfx">
+                <li className="active">
+                  <a data-toggle="tab" href="#tab-fillup1"><span>Theo %</span></a>
+                </li>
+                <li className="">
+                  <a data-toggle="tab" href="#tab-fillup2"
+                    onclick={function(){
+                      $('#datepicker-component2').datepicker({
+                        format: 'yyyy-mm-dd'
+                      });
+                    }}
+                  ><span>Theo giá tiền</span></a>
+                </li>
+                <li className="">
+                  <a data-toggle="tab" href="#tab-fillup3"
+                    onclick={function(){
+                      $('#datepicker-component3').datepicker({
+                        format: 'yyyy-mm-dd'
+                      });
+                    }}
+                  ><span>Thêm ngày</span></a>
+                </li>
+              </ul>
+              
+              <div className="tab-content">
+                {tab1(ctrl)}
+                {tab2(ctrl)}
+                {tab3(ctrl)}
+              </div>
+              
+              <div>
+                <div>Các mã giảm giá</div>
+                {
+                  ctrl.coupons().map(function(coupon, index) {
+                    if (coupon.kind === 1) {
+                      return kind1(ctrl, index)
+                    } else if (coupon.kind === 2) {
+                      return kind2(ctrl, index)
+                    } else {
+                      return kind3(ctrl, index)
+                    }
+                  })
+                }
+              </div>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+      <div className="container-fluid container-fixed-lg footer">
+        <div className="copyright sm-text-center">
+          <p className="small no-margin pull-left sm-pull-reset">
+            <span className="hint-text">Copyright &copy; 2014 </span>
+            <span className="font-montserrat">REVOX</span>.
+            <span className="hint-text">All rights reserved. </span>
+            <span className="sm-block"><a href="#" className="m-l-10 m-r-10">Terms of use</a> | <a href="#" className="m-l-10">Privacy Policy</a></span>
+          </p>
+          <p className="small no-margin pull-right sm-pull-reset">
+            <a href="#">Hand-crafted</a> <span className="hint-text">&amp; Made with Love ®</span>
+          </p>
+          <div className="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  ]
+}
+
+module.exports = View;

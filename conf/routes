@@ -14,6 +14,20 @@ GET /admin/membership2      controllers.Application.admin
 GET /admin/price      controllers.Application.admin
 GET /admin/price/get      controllers.Admin.getPrice
 POST /admin/price/update      controllers.Admin.setPrice
+
+GET /admin/activecode      controllers.Application.admin
+POST /admin/activecode/new      controllers.Admin.newActiveCode()
+POST /admin/activecode/update      controllers.Admin.updateActiveCode()
+POST /admin/activecode/delete  controllers.Admin.deleteActiveCode()
+GET /admin/activecode/get  controllers.Admin.getActiveCodes()
+
+GET /admin/coupon      controllers.Application.admin
+POST /admin/coupon/update      controllers.Admin.updateCoupon()
+POST /admin/coupon/new  controllers.Admin.newCoupon()
+POST /admin/coupon/delete  controllers.Admin.deleteCoupon()
+GET /admin/coupon/get  controllers.Admin.getCoupons()
+GET /coupon/get/:code  controllers.Admin.getCouponByCode(code: String)
+
 GET /admin/subscribe/get   controllers.Admin.getSubs
 GET /admin/subscribe/getDone   controllers.Admin.getDoneSubs
 POST /admin/membership/action   controllers.Admin.action
@@ -25,6 +39,7 @@ POST  /admin/indexCourse controllers.Admin.updateIndexCourses
 GET /admin/users           controllers.Application.admin
 POST /admin/users/updateEndDate           controllers.Admin.updateEndDate
 GET /admin/users/getMembership       controllers.Admin.getMembershipUsers
+
 GET /admin/course           controllers.Application.admin
 GET /admin/course/get       controllers.Admin.getCourses
 GET /admin/course/get/:courseId       controllers.Admin.getCourseById(courseId: Int)
@@ -68,6 +83,8 @@ POST /membership/subscribe    controllers.Membership.subscribe
 POST /membership/resubscribe    controllers.Membership.reSubscribe
 GET  /membership              controllers.Membership.getInfo
 
+POST /membership/activebycode/:code controllers.Membership.activeByCode(code: String)
+
 GET /test2                  controllers.Test.test2
 GET /?                     controllers.Lobby.home
 GET /post/:postId          controllers.Application.post(postId: String)
@@ -90,7 +107,8 @@ GET   /socket                          controllers.Main.websocket
 GET   /login                           controllers.Auth.login
 POST  /login                           controllers.Auth.authenticate
 GET   /logout                          controllers.Auth.logout
-GET   /signup                          controllers.Auth.signup
+#GET   /signup                          controllers.Auth.signup
+GET   /signup                          controllers.Application.index
 POST  /signup                          controllers.Auth.signupPost
 GET   /signup/check-your-email/:name   controllers.Auth.checkYourEmail(name: String)
 GET   /signup/confirm/:token           controllers.Auth.signupConfirmEmail(token: String)

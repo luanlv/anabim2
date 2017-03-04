@@ -1,9 +1,11 @@
-@(endDate: java.util.Date)
+@(user: User)
 
 <div>
   <h3>Bạn đang là thành viên membership của Anabim</h3>
 
   <div>
-    Ngày hết hạn: <span style="color: red">@{(new java.text.SimpleDateFormat("MM-dd-yyyy")).format(endDate)}</span>
+    Ngày bắt đầu: <span style="color: red">@{(new java.text.SimpleDateFormat("MM-dd-yyyy")).format(user.info.get.start.toDate)}</span>
+      <br>
+    Ngày hết hạn: <span style="color: red">@{(new java.text.SimpleDateFormat("MM-dd-yyyy")).format(user.info.get.end.toDate)}</span>
   </div>
 </div>

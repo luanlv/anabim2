@@ -21,11 +21,9 @@ object VideoRepo {
 
   private lazy val coll = Env.current.videoColl
 
-
   def insert(newVideo: Video): Future[WriteResult] = {
     coll.insert(newVideo)
   }
-
 
   def removeById(videoID: Int): Future[WriteResult] = {
     coll.remove(
@@ -33,7 +31,7 @@ object VideoRepo {
     )
   }
 
-//
+  //
   def update(newCourse: Video): Future[WriteResult] = {
 
     coll.update(
@@ -63,6 +61,5 @@ object VideoRepo {
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

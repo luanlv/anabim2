@@ -15,7 +15,8 @@ final class MongoCache[K, V: MongoCache.Handler] private (
     cache: Cache[V],
     coll: Coll,
     f: K => Fu[V],
-    keyToString: K => String) {
+    keyToString: K => String
+) {
 
   def apply(k: K): Fu[V] = cache(k) {
     coll.find(select(k)).uno[Entry] flatMap {
@@ -57,25 +58,29 @@ object MongoCache {
       initialCapacity: Int = 64,
       timeToLive: FiniteDuration,
       timeToLiveMongo: Option[FiniteDuration] = None,
-      keyToString: K => String): MongoCache[K, V] = new MongoCache[K, V](
+      keyToString: K => String
+    ): MongoCache[K, V] = new MongoCache[K, V](
       prefix = prefix,
       expiresAt = expiresAt(timeToLiveMongo | timeToLive),
       cache = LruCache(maxCapacity, initialCapacity, timeToLive),
       coll = coll,
       f = f,
-      keyToString = keyToString)
+      keyToString = keyToString
+    )
 
     def single[V: Handler](
       prefix: String,
       f: => Fu[V],
       timeToLive: FiniteDuration,
-      timeToLiveMongo: Option[FiniteDuration] = None) = new MongoCache[Boolean, V](
+      timeToLiveMongo: Option[FiniteDuration] = None
+    ) = new MongoCache[Boolean, V](
       prefix = prefix,
       expiresAt = expiresAt(timeToLiveMongo | timeToLive),
       cache = LruCache(timeToLive = timeToLive),
       coll = coll,
       f = _ => f,
-      keyToString = _.toString)
+      keyToString = _.toString
+    )
   }
 
   def apply(coll: Coll) = new Builder(coll)

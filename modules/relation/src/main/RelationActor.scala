@@ -1,7 +1,7 @@
 package lila.relation
 
-import akka.actor.{Actor, ActorSelection}
-import akka.pattern.{ask, pipe}
+import akka.actor.{ Actor, ActorSelection }
+import akka.pattern.{ ask, pipe }
 import lila.memo.ExpireSetMemo
 import play.api.libs.json.Json
 
@@ -10,13 +10,14 @@ import actorApi._
 import lila.common.LightUser
 import lila.hub.actorApi.relation._
 import lila.hub.actorApi.userMessage.PingVersion
-import lila.hub.actorApi.{SendTo, SendTos}
+import lila.hub.actorApi.{ SendTo, SendTos }
 import makeTimeout.short
 
 private[relation] final class RelationActor(
     getOnlineUserIds: () => Set[String],
     lightUser: String => Option[LightUser],
-    api: RelationApi) extends Actor {
+    api: RelationApi
+) extends Actor {
 
   private val bus = context.system.lilaBus
 
@@ -29,7 +30,7 @@ private[relation] final class RelationActor(
     context.system.lilaBus.subscribe(self, 'finishGame)
   }
 
-  override def postStop() : Unit = {
+  override def postStop(): Unit = {
     super.postStop()
     context.system.lilaBus.unsubscribe(self)
   }
@@ -69,8 +70,8 @@ private[relation] final class RelationActor(
       onlines = onlines -- leaveIds ++ enters.map(e => e.id -> e)
 
       val friendsEntering = enters.map(makeFriendEntering)
-//      notifyFollowersFriendEnters(friendsEntering)
-//      notifyFollowersFriendLeaves(leaves)
+      //      notifyFollowersFriendEnters(friendsEntering)
+      //      notifyFollowersFriendLeaves(leaves)
       notifyFollowers(enters, "following_enters")
       notifyFollowers(leaves, "following_leaves")
   }
@@ -93,7 +94,6 @@ private[relation] final class RelationActor(
       ids.flatMap(onlines.get).toList
     }
 
-
   private def filterFriendsPlaying(friends: List[LightUser]): Set[String] = {
     friends.filter(p => onlinePlayings.get(p.id)).map(_.id).toSet
   }
@@ -114,12 +114,11 @@ private[relation] final class RelationActor(
 
   private def notifyFollowers(users: List[LightUser], message: String) {
     users foreach { user =>
-      api fetchFriends  user.id map (_ filter onlines.contains) foreach { ids =>
+      api fetchFriends user.id map (_ filter onlines.contains) foreach { ids =>
         if (ids.nonEmpty) bus.publish(SendTos(ids.toSet, message, user), 'users)
       }
     }
   }
-
 
   private def notifyFollowersGameStateChanged(userIds: Traversable[String], message: String) =
     userIds foreach { userId =>

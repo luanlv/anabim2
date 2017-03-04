@@ -9,11 +9,13 @@ case class Note(
   to: String,
   text: String,
   troll: Boolean,
-  date: DateTime)
+  date: DateTime
+)
 
 final class NoteApi(
     coll: Coll,
-    timeline: akka.actor.ActorSelection) {
+    timeline: akka.actor.ActorSelection
+) {
 
   import reactivemongo.bson._
   import lila.db.BSON.BSONJodaDateTimeHandler

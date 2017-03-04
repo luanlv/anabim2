@@ -8,10 +8,11 @@ import lila.db.dsl._
 import lila.user.{ User, UserRepo }
 
 case class UserSpy(
-                    ips: List[UserSpy.IPData],
-                    uas: List[String],
-                    usersSharingIp: List[User],
-                    usersSharingFingerprint: List[User]) {
+    ips: List[UserSpy.IPData],
+    uas: List[String],
+    usersSharingIp: List[User],
+    usersSharingFingerprint: List[User]
+) {
 
   import UserSpy.OtherUser
 
@@ -51,11 +52,12 @@ object UserSpy {
     sharingFingerprint ← exploreSimilar("fp")(user)(coll)
   } yield UserSpy(
     ips = ips zip blockedIps zip locations map {
-      case ((ip, blocked), location) => IPData(ip, blocked, location)
-    },
+    case ((ip, blocked), location) => IPData(ip, blocked, location)
+  },
     uas = infos.map(_.ua).distinct,
     usersSharingIp = (sharingIp + user).toList.sortBy(-_.createdAt.getMillis),
-    usersSharingFingerprint = (sharingFingerprint + user).toList.sortBy(-_.createdAt.getMillis))
+    usersSharingFingerprint = (sharingFingerprint + user).toList.sortBy(-_.createdAt.getMillis)
+  )
 
   private def exploreSimilar(field: String)(user: User)(implicit coll: Coll): Fu[Set[User]] =
     nextValues(field)(user) flatMap { nValues =>
@@ -67,18 +69,19 @@ object UserSpy {
       $doc("user" -> user.id),
       $doc(field -> true)
     ).cursor[Bdoc]().gather[List]() map {
-      _.flatMap(_.getAs[Value](field)).toSet
-    }
+        _.flatMap(_.getAs[Value](field)).toSet
+      }
 
   private def nextUsers(field: String)(values: Set[Value], user: User)(implicit coll: Coll): Fu[Set[User]] =
     values.nonEmpty ?? {
-      coll.distinct[String, Set]("user",
+      coll.distinct[String, Set](
+        "user",
         $doc(
           field $in values,
           "user" $ne user.id
         ).some
       ) flatMap { userIds =>
-        userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)
-      }
+          userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)
+        }
     }
 }

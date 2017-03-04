@@ -1,0 +1,56 @@
+var API = require('../_api.msx');
+
+function randomString() {
+  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+  var string_length = 5;
+  var randomstring = '';
+  for (var i=0; i<string_length; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    randomstring += chars.substring(rnum,rnum+1);
+  }
+  return randomstring;
+}
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.coupons = m.prop([]);
+  ctrl.init = function() {
+    ctrl.initValue = {
+      code: randomString(),
+      price: 0,
+      percent: 0,
+      day: 0,
+      month: [1, 3, 6, 12],
+      quantity: 1000,
+      endTime: (new Date()).getTime()
+    };
+    console.log(ctrl.initValue)
+  }
+  ctrl.init();
+  ctrl.setupFetchCoupon = function(){
+    console.log(ctrl.coupons());
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchCoupon = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/coupon/get"
+    }, ctrl.coupons, ctrl.setupFetchCoupon);
+  };
+  ctrl.request();
+  
+  ctrl.textToList = function(text){
+    var list = text.split(',');
+    result = [];
+    list.map(function(el){
+      if(!isNaN(parseInt(el))) {
+        result.push(parseInt(el))
+      }
+    });
+    return result;
+  }
+  
+};
+
+
+module.exports = Controller;

@@ -15,55 +15,47 @@ object Relation extends LilaController {
   private def env = Env.relation
 
   private def renderActions(userId: String, mini: Boolean)(implicit ctx: Context) =
-      (ctx.userId ?? { env.api.fetchRelation(_, userId) }) zip
+    (ctx.userId ?? { env.api.fetchRelation(_, userId) }) zip
       (ctx.userId ?? { env.api.fetchRelation(userId, _) }) zip
       (ctx.isAuth ?? { Env.pref.api followable userId }) zip
       (ctx.userId ?? { env.api.fetchBlocks(userId, _) }) flatMap {
-      case (((relation, relation2), followable), blocked) => {
-        negotiate(
-          html = fuccess(Ok(mini.fold(
-            html.relation.mini(userId, blocked = blocked, followable = followable, relation = relation, relation2 = relation2 ),
-            html.relation.actions2(userId, relation = relation, relation2 = relation2, followable = followable, blocked = blocked)
-          ))),
-          api = _ => fuccess(Ok(Json.obj(
-            "followable" -> followable,
-            "following" -> relation.exists(true ==),
-            "blocking" -> relation.exists(false ==)
-          )))
-        )
+        case (((relation, relation2), followable), blocked) => {
+          negotiate(
+            html = fuccess(Ok(mini.fold(
+              html.relation.mini(userId, blocked = blocked, followable = followable, relation = relation, relation2 = relation2),
+              html.relation.actions2(userId, relation = relation, relation2 = relation2, followable = followable, blocked = blocked)
+            ))),
+            api = _ => fuccess(Ok(Json.obj(
+              "followable" -> followable,
+              "following" -> relation.exists(true ==),
+              "blocking" -> relation.exists(false ==)
+            )))
+          )
+        }
       }
-    }
 
-
-  def follow(userId: String) = Auth { implicit ctx =>
-    me =>
-      env.api.follow(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
+  def follow(userId: String) = Auth { implicit ctx => me =>
+    env.api.follow(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
   }
 
-
-  def unfollow(userId: String) = Auth { implicit ctx =>
-    me =>
-      env.api.unfollow(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
+  def unfollow(userId: String) = Auth { implicit ctx => me =>
+    env.api.unfollow(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
   }
 
-  def reject(userId: String) = Auth { implicit ctx =>
-    me =>
-      env.api.unfollow(userId, me.id).nevermind
+  def reject(userId: String) = Auth { implicit ctx => me =>
+    env.api.unfollow(userId, me.id).nevermind
   }
 
-  def unfriend(userId: String) = Auth { implicit ctx =>
-    me =>
-      env.api.unfollow(me.id, userId).nevermind >> env.api.unfollow(userId, me.id).nevermind >> renderActions(userId, getBool("mini"))
+  def unfriend(userId: String) = Auth { implicit ctx => me =>
+    env.api.unfollow(me.id, userId).nevermind >> env.api.unfollow(userId, me.id).nevermind >> renderActions(userId, getBool("mini"))
   }
 
-  def block(userId: String) = Auth { implicit ctx =>
-    me =>
-      env.api.block(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
+  def block(userId: String) = Auth { implicit ctx => me =>
+    env.api.block(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
   }
 
-  def unblock(userId: String) = Auth { implicit ctx =>
-    me =>
-      env.api.unblock(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
+  def unblock(userId: String) = Auth { implicit ctx => me =>
+    env.api.unblock(me.id, userId).nevermind >> renderActions(userId, getBool("mini"))
   }
 
   //  def following(username: String) = Open { implicit ctx =>

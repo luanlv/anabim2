@@ -28,7 +28,7 @@ trait PackageObject extends Steroids with WithFuture {
   implicit final def runOptionT[F[+_], A](ot: OptionT[F, A]): F[Option[A]] = ot.run
 
   // from scalaz. We don't want to import all OptionTFunctions, because of the clash with `some`
-  def optionT[M[_]] = new (({ type λ[α] = M[Option[α]] })#λ ~>({ type λ[α] = OptionT[M, α] })#λ) {
+  def optionT[M[_]] = new (({ type λ[α] = M[Option[α]] })#λ ~> ({ type λ[α] = OptionT[M, α] })#λ) {
     def apply[A](a: M[Option[A]]) = new OptionT[M, A](a)
   }
 
@@ -48,8 +48,8 @@ trait PackageObject extends Steroids with WithFuture {
 
     def fold[B](fe: Exception => B, fa: A => B): B = v match {
       case scala.util.Failure(e: Exception) => fe(e)
-      case scala.util.Failure(e)            => throw e
-      case scala.util.Success(a)            => fa(a)
+      case scala.util.Failure(e) => throw e
+      case scala.util.Success(a) => fa(a)
     }
 
     def future: Fu[A] = fold(Future.failed, fuccess)
@@ -57,15 +57,13 @@ trait PackageObject extends Steroids with WithFuture {
 
   def parseIntOption(str: String): Option[Int] = try {
     Some(java.lang.Integer.parseInt(str))
-  }
-  catch {
+  } catch {
     case e: NumberFormatException => None
   }
 
   def parseFloatOption(str: String): Option[Float] = try {
     Some(java.lang.Float.parseFloat(str))
-  }
-  catch {
+  } catch {
     case e: NumberFormatException => None
   }
 
@@ -133,7 +131,7 @@ trait WithPlay { self: PackageObject =>
   implicit final class LilaPimpedFutureZero[A: Zero](fua: Fu[A]) {
 
     def nevermind: Fu[A] = fua recover {
-      case e: lila.common.LilaException             => zero[A]
+      case e: lila.common.LilaException => zero[A]
       case e: java.util.concurrent.TimeoutException => zero[A]
     }
   }

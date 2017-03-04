@@ -2,16 +2,16 @@ package lila.common
 
 import lila.common.PimpedJson._
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{ Json, OWrites }
 
 case class LightUser(
-                      id: String,
-                      name: String,
-                      title: Option[String],
-                      avatar: String,
-                      member: String,
-                      time: Option[DateTime] = None
-                    ) {
+    id: String,
+    name: String,
+    title: Option[String],
+    avatar: String,
+    member: String,
+    time: Option[DateTime] = None
+) {
 
   def titleName = title.fold(name)(_ + " " + name)
   def titleNameHtml = title.fold(name)(_ + "&nbsp;" + name)

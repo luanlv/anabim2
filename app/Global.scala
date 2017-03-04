@@ -19,7 +19,7 @@ object Global extends GlobalSettings {
   override def onRouteRequest(req: RequestHeader): Option[Handler] = {
     lila.mon.http.request.all()
     if (req.remoteAddress contains ":") lila.mon.http.request.ipv6()
-//    Env.i18n.requestHandler(req) orElse
+    //    Env.i18n.requestHandler(req) orElse
     super.onRouteRequest(req)
   }
 
@@ -38,16 +38,13 @@ object Global extends GlobalSettings {
     else if (niceError(req)) {
       lila.mon.http.response.code400()
       controllers.Lobby.handleStatus(req, Results.BadRequest)
-    }
-    else fuccess(BadRequest(error))
+    } else fuccess(BadRequest(error))
 
   override def onError(req: RequestHeader, ex: Throwable) =
     if (niceError(req)) {
       if (lila.common.PlayApp.isProd) {
         lila.mon.http.response.code500()
         fuccess(InternalServerError(views.html.base.errorPage(ex)(lila.api.Context(req))))
-      }
-      else super.onError(req, ex)
-    }
-    else fuccess(InternalServerError(ex.getMessage))
+      } else super.onError(req, ex)
+    } else fuccess(InternalServerError(ex.getMessage))
 }

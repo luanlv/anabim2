@@ -3,24 +3,24 @@ package controllers
 import ornicar.scalalib.Zero
 import play.api.data.Form
 import play.api.http._
-import play.api.libs.iteratee.{Enumerator, Iteratee}
-import play.api.libs.json.{JsArray, JsObject, JsValue, Json, Writes}
+import play.api.libs.iteratee.{ Enumerator, Iteratee }
+import play.api.libs.json.{ JsArray, JsObject, JsValue, Json, Writes }
 import play.api.mvc._
 import Results._
 import play.api.mvc.WebSocket.FrameFormatter
 import play.twirl.api.Html
 
 import scalaz.Monoid
-import lila.api.{BodyContext, Context, HeaderContext, PageData, TokenBucket}
+import lila.api.{ BodyContext, Context, HeaderContext, PageData, TokenBucket }
 import lila.app._
-import lila.common.{ApiVersion, HTTPRequest, LilaCookie}
-import lila.security.{FingerprintedUser, Granter, Permission}
-import lila.user.{UserContext, User => UserModel}
+import lila.common.{ ApiVersion, HTTPRequest, LilaCookie }
+import lila.security.{ FingerprintedUser, Granter, Permission }
+import lila.user.{ UserContext, User => UserModel }
 
 import scala.concurrent.Future
 
 private[controllers] trait LilaController
-  extends Controller
+    extends Controller
     with ContentTypes
     with RequestGetter
     with ResponseWriter
@@ -43,7 +43,8 @@ private[controllers] trait LilaController
   protected implicit def LilaFunitToResult(funit: Funit)(implicit ctx: Context): Fu[Result] =
     negotiate(
       html = fuccess(Ok("ok")),
-      api = _ => fuccess(Ok(Json.obj("ok" -> true)) as JSON))
+      api = _ => fuccess(Ok(Json.obj("ok" -> true)) as JSON)
+    )
 
   implicit def lang(implicit req: RequestHeader) = Env.i18n.pool lang req
 
@@ -64,7 +65,7 @@ private[controllers] trait LilaController
   protected def SocketOption[A: FrameFormatter](f: Context => Fu[Option[(Iteratee[A, _], Enumerator[A])]]) =
     WebSocket.tryAccept[A] { req =>
       reqToCtx(req, sameOriginAuth = true) flatMap f map {
-        case None       => Left(NotFound(jsonError("socket resource not found")))
+        case None => Left(NotFound(jsonError("socket resource not found")))
         case Some(pair) => Right(pair)
       }
     }
@@ -72,7 +73,7 @@ private[controllers] trait LilaController
   protected def SocketOptionLimited[A: FrameFormatter](consumer: TokenBucket.Consumer, name: String)(f: Context => Fu[Option[(Iteratee[A, _], Enumerator[A])]]) =
     rateLimitedSocket[A](consumer, name) { ctx =>
       f(ctx) map {
-        case None       => Left(NotFound(jsonError("socket resource not found")))
+        case None => Left(NotFound(jsonError("socket resource not found")))
         case Some(pair) => Right(pair)
       }
     }
@@ -132,21 +133,18 @@ private[controllers] trait LilaController
     Secure(BodyParsers.parse.anyContent)(perm)(f)
 
   protected def Secure[A](p: BodyParser[A])(perm: Permission)(f: Context => UserModel => Fu[Result]): Action[A] =
-    Auth(p) { implicit ctx =>
-      me =>
-        isGranted(perm).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
+    Auth(p) { implicit ctx => me =>
+      isGranted(perm).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
     }
 
   protected def SecureF(s: UserModel => Boolean)(f: Context => UserModel => Fu[Result]): Action[AnyContent] =
-    Auth(BodyParsers.parse.anyContent) { implicit ctx =>
-      me =>
-        s(me).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
+    Auth(BodyParsers.parse.anyContent) { implicit ctx => me =>
+      s(me).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
     }
 
   protected def SecureBody[A](p: BodyParser[A])(perm: Permission)(f: BodyContext[A] => UserModel => Fu[Result]): Action[A] =
-    AuthBody(p) { implicit ctx =>
-      me =>
-        isGranted(perm).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
+    AuthBody(p) { implicit ctx => me =>
+      isGranted(perm).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
     }
 
   protected def SecureBody(perm: Permission.type => Permission)(f: BodyContext[_] => UserModel => Fu[Result]): Action[AnyContent] =
@@ -164,37 +162,36 @@ private[controllers] trait LilaController
       Unauthorized(views.html.auth.tor()).fuccess
     else res
 
+  //  protected def NoPlayban(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  //    ctx.userId.??(Env.playban.api.currentBan) flatMap {
+  //      _.fold(a) { ban =>
+  //        negotiate(
+  //          html = Lobby.renderHome(Results.Forbidden),
+  //          api = _ => fuccess {
+  //            Forbidden(jsonError(
+  //              s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
+  //            )) as JSON
+  //          }
+  //        )
+  //      }
+  //    }
 
-//  protected def NoPlayban(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-//    ctx.userId.??(Env.playban.api.currentBan) flatMap {
-//      _.fold(a) { ban =>
-//        negotiate(
-//          html = Lobby.renderHome(Results.Forbidden),
-//          api = _ => fuccess {
-//            Forbidden(jsonError(
-//              s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
-//            )) as JSON
-//          }
-//        )
-//      }
-//    }
+  //  protected def NoCurrentGame(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  //    ctx.me.??(mashup.Preload.currentGame(Env.user.lightUser)) flatMap {
+  //      _.fold(a) { current =>
+  //        negotiate(
+  //          html = Lobby.renderHome(Results.Forbidden),
+  //          api = _ => fuccess {
+  //            Forbidden(jsonError(
+  //              s"You are already playing ${current.opponent}"
+  //            )) as JSON
+  //          }
+  //        )
+  //      }
+  //    }
 
-//  protected def NoCurrentGame(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-//    ctx.me.??(mashup.Preload.currentGame(Env.user.lightUser)) flatMap {
-//      _.fold(a) { current =>
-//        negotiate(
-//          html = Lobby.renderHome(Results.Forbidden),
-//          api = _ => fuccess {
-//            Forbidden(jsonError(
-//              s"You are already playing ${current.opponent}"
-//            )) as JSON
-//          }
-//        )
-//      }
-//    }
-
-//  protected def NoPlaybanOrCurrent(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-//    NoPlayban(NoCurrentGame(a))
+  //  protected def NoPlaybanOrCurrent(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  //    NoPlayban(NoCurrentGame(a))
 
   protected def JsonOk[A: Writes](fua: Fu[A]) = fua map { a =>
     Ok(Json toJson a) as JSON
@@ -213,7 +210,8 @@ private[controllers] trait LilaController
   protected def FormResult[A](form: Form[A])(op: A => Fu[Result])(implicit req: Request[_]): Fu[Result] =
     form.bindFromRequest.fold(
       form => fuccess(BadRequest(form.errors mkString "\n")),
-      op)
+      op
+    )
 
   protected def FormFuResult[A, B: Writeable: ContentTypeOf](form: Form[A])(err: Form[A] => Fu[B])(op: A => Fu[Result])(implicit req: Request[_]) =
     form.bindFromRequest.fold(
@@ -247,8 +245,8 @@ private[controllers] trait LilaController
 
   def notFound(implicit ctx: Context): Fu[Result] = negotiate(
     html =
-      if (HTTPRequest isSynchronousHttp ctx.req) Main notFound ctx.req
-      else fuccess(Results.NotFound("Resource not found")),
+    if (HTTPRequest isSynchronousHttp ctx.req) Main notFound ctx.req
+    else fuccess(Results.NotFound("Resource not found")),
     api = _ => notFoundJson("Resource not found")
   )
 
@@ -274,7 +272,8 @@ private[controllers] trait LilaController
     negotiate(
       html = fuccess {
         implicit val req = ctx.req
-        Redirect(routes.Auth.signup) withCookies LilaCookie.session(Env.security.api.AccessUri, req.uri)
+        //        Redirect(routes.Auth.signup) withCookies LilaCookie.session(Env.security.api.AccessUri, req.uri)
+        Redirect(routes.Application.index) withCookies LilaCookie.session(Env.security.api.AccessUri, req.uri)
       },
       api = _ => unauthorizedApiResult.fuccess
     )
@@ -286,12 +285,13 @@ private[controllers] trait LilaController
   protected def ensureSessionId(req: RequestHeader)(res: Result): Result =
     req.session.data.contains(LilaCookie.sessionId).fold(
       res,
-      res withCookies LilaCookie.makeSessionId(req))
+      res withCookies LilaCookie.makeSessionId(req)
+    )
 
   protected def negotiate(html: => Fu[Result], api: ApiVersion => Fu[Result])(implicit ctx: Context): Fu[Result] =
     (lila.api.Mobile.Api.requestVersion(ctx.req) match {
       case Some(v) => api(v) map (_ as JSON)
-      case _       => html
+      case _ => html
     }) map (_.withHeaders("Vary" -> "Accept"))
 
   protected def reqToCtx(req: RequestHeader, sameOriginAuth: Boolean = false): Fu[HeaderContext] = {
@@ -311,23 +311,23 @@ private[controllers] trait LilaController
   import lila.hub.actorApi.relation._
   private def pageDataBuilder(ctx: UserContext, hasFingerprint: Boolean): Fu[PageData] =
     Future(PageData.default)
-//    ctx.me.fold(fuccess(PageData anon blindMode(ctx))) { me =>
-//      val isPage = HTTPRequest.isSynchronousHttp(ctx.req)
-//      (Env.pref.api getPref me) zip {
-//        if (isPage) getOnlineFriends(me) zip
-//          Env.team.api.nbRequests(me.id) zip
-//          Env.challenge.api.countInFor(me.id) zip
-//          Env.notifyModule.api.unreadCount(Notifies(me.id)).map(_.value)
-//        else fuccess {
-//          (((OnlineFriends.empty, 0), 0), 0)
-//        }
-//      } map {
-//        case (pref, (((onlineFriends, teamNbRequests), nbChallenges), nbNotifications)) =>
-//          PageData(onlineFriends, teamNbRequests, nbChallenges, nbNotifications, pref,
-//            blindMode = blindMode(ctx),
-//            hasFingerprint = hasFingerprint)
-//      }
-//    }
+  //    ctx.me.fold(fuccess(PageData anon blindMode(ctx))) { me =>
+  //      val isPage = HTTPRequest.isSynchronousHttp(ctx.req)
+  //      (Env.pref.api getPref me) zip {
+  //        if (isPage) getOnlineFriends(me) zip
+  //          Env.team.api.nbRequests(me.id) zip
+  //          Env.challenge.api.countInFor(me.id) zip
+  //          Env.notifyModule.api.unreadCount(Notifies(me.id)).map(_.value)
+  //        else fuccess {
+  //          (((OnlineFriends.empty, 0), 0), 0)
+  //        }
+  //      } map {
+  //        case (pref, (((onlineFriends, teamNbRequests), nbChallenges), nbNotifications)) =>
+  //          PageData(onlineFriends, teamNbRequests, nbChallenges, nbNotifications, pref,
+  //            blindMode = blindMode(ctx),
+  //            hasFingerprint = hasFingerprint)
+  //      }
+  //    }
 
   private def getOnlineFriends(me: UserModel): Fu[OnlineFriends] = {
     import akka.pattern.ask
@@ -358,7 +358,6 @@ private[controllers] trait LilaController
 
   protected def Reasonable(page: Int, max: Int = 40, errorPage: => Fu[Result] = BadRequest("resource too old").fuccess)(result: => Fu[Result]): Fu[Result] =
     if (page < max) result else errorPage
-
 
   protected def NotForBots(res: => Fu[Result])(implicit ctx: Context) =
     if (HTTPRequest.isBot(ctx.req)) notFound else res

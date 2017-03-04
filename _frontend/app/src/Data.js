@@ -1,6 +1,7 @@
 
 export default {
-	
+	// baseUrl: "http://localhost:9000",
+	baseUrl: "",
 	user: {
 		id: $('body').attr('id'),
 		name: $('body').attr('name'),
@@ -13,15 +14,19 @@ export default {
 	membership: {
 		phone: "",
 		month: 1,
+		bonusDay: 0,
 		info: "",
 	},
 	
 	price: {
-		1: 799000,
-		3: 1200000,
-		6: 1789000,
-		12: 2499000
+		1: window.price.one || 0,
+		3: window.price.three || 0,
+		6: window.price.six || 0,
+		12: window.price.twelve || 0
 	},
+	
+	inputCourse: "",
+	inputVideo: "",
 	
 	course: window.course,
 	
@@ -32,6 +37,8 @@ export default {
 	software: window.software,
 	
 	courses: window.courses,
+	
+	relatedCourses: window.relatedCourses,
 	
 	indexCourse: window.indexCourse
 }

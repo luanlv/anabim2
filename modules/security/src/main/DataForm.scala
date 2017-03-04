@@ -4,13 +4,14 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints
 import lila.common.LameName
-import lila.user.{User, UserRepo}
+import lila.user.{ User, UserRepo }
 
 import scala.concurrent.Future
 
 final class DataForm(
     val captcher: akka.actor.ActorSelection,
-    emailAddress: EmailAddress) extends lila.hub.CaptchedForm {
+    emailAddress: EmailAddress
+) extends lila.hub.CaptchedForm {
 
   import DataForm._
 
@@ -20,8 +21,7 @@ final class DataForm(
     "gameId" -> nonEmptyText,
     "move" -> nonEmptyText
   )(Empty.apply)(_ => None)
-    .verifying(captchaFailMessage, validateCaptcha _)
-  )
+    .verifying(captchaFailMessage, validateCaptcha _))
 
   def emptyWithCaptcha = withCaptcha(empty)
 
@@ -30,7 +30,6 @@ final class DataForm(
   private def acceptableUniqueEmail(forUser: Option[User]) =
     acceptableEmail.verifying(emailAddress uniqueConstraint forUser)
 
-
   object signup {
 
     private val username = nonEmptyText.verifying(
@@ -38,10 +37,12 @@ final class DataForm(
       Constraints maxLength 20,
       Constraints.pattern(
         regex = User.usernameRegex,
-        error = "Invalid username. Please use only letters, numbers, underscore and dash"),
+        error = "Invalid username. Please use only letters, numbers, underscore and dash"
+      ),
       Constraints.pattern(
         regex = """^[^\d].+$""".r,
-        error = "The username must not start with a number")
+        error = "The username must not start with a number"
+      )
     ).verifying("This user already exists", u => !UserRepo.nameExists(u).awaitSeconds(2))
       .verifying("This username is not acceptable", u => !LameName(u))
 
@@ -66,8 +67,6 @@ final class DataForm(
       "answer" -> nonEmptyText
     )(SignupData2.apply)(_ => None))
 
-
-
     val mobile = Form(mapping(
       "username" -> username,
       "password" -> text(minLength = 4),
@@ -87,8 +86,7 @@ final class DataForm(
     "gameId" -> nonEmptyText,
     "move" -> nonEmptyText
   )(PasswordReset.apply)(_ => None)
-    .verifying(captchaFailMessage, validateCaptcha _)
-  )
+    .verifying(captchaFailMessage, validateCaptcha _))
 
   def passwordResetWithCaptcha = withCaptcha(passwordReset)
 
@@ -124,32 +122,37 @@ object DataForm {
       username: String,
       password: String,
       email: String,
-      `g-recaptcha-response`: Option[String]) {
+      `g-recaptcha-response`: Option[String]
+  ) {
     def recaptchaResponse = `g-recaptcha-response`
   }
 
   case class SignupData3(
-                         name: String,
-                         email: String,
-                         password: String) {
+      name: String,
+      email: String,
+      password: String
+  ) {
   }
 
   case class SignupData2(
-                          username: String,
-                          password: String,
-                          email: String,
-                          qId: String,
-                          solution: String)
+    username: String,
+    password: String,
+    email: String,
+    qId: String,
+    solution: String
+  )
 
   case class MobileSignupData(
     username: String,
     password: String,
-    email: Option[String])
+    email: Option[String]
+  )
 
   case class PasswordReset(
     email: String,
     gameId: String,
-    move: String)
+    move: String
+  )
 
   case class ChangeEmail(email: String, passwd: String)
 }

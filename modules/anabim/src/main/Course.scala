@@ -3,25 +3,25 @@ package lila.anabim
 import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
-import lila.image.{Image => ImageModel}
+import lila.image.{ Image => ImageModel }
 
 private[anabim] case class Course(
-                                       id: Int,
-                                       name: String,
-                                       cover: ImageModel,
-                                       slug: String,
-                                       cateID: List[Int],
-                                       softID: List[Int],
-                                       level: Int,
-                                       author: String,
-                                       section: List[String],
-                                       description: String,
-                                       documents: Option[String] = None,
-                                       related: Option[List[Int]] = None,
-                                       vote: Int = 0,
-                                       numVote: Int = 0,
-                                       voter: Option[List[String]] = Option(List())
-                                     )
+  id: Int,
+  name: String,
+  cover: ImageModel,
+  slug: String,
+  cateID: List[Int],
+  softID: List[Int],
+  level: Int,
+  author: String,
+  section: List[String],
+  description: String,
+  documents: Option[String] = None,
+  related: Option[List[Int]] = None,
+  vote: Int = 0,
+  numVote: Int = 0,
+  voter: Option[List[String]] = Option(List())
+)
 
 private[anabim] object Course {
 

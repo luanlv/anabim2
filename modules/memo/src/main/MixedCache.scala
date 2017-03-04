@@ -9,12 +9,12 @@ final class MixedCache[K, V] private (
     cache: SyncCache[K, V],
     default: K => V,
     val invalidate: K => Funit,
-    logger: lila.log.Logger) {
+    logger: lila.log.Logger
+) {
 
   def get(k: K): V = try {
     cache get k
-  }
-  catch {
+  } catch {
     case e: java.util.concurrent.ExecutionException =>
       // logger.debug(e.getMessage)
       default(k)
@@ -34,23 +34,27 @@ object MixedCache {
     timeToLive: Duration = Duration.Inf,
     awaitTime: FiniteDuration = 10.milliseconds,
     default: K => V,
-    logger: lila.log.Logger): MixedCache[K, V] = {
+    logger: lila.log.Logger
+  ): MixedCache[K, V] = {
     val async = AsyncCache(f, maxCapacity = 10000, timeToLive = 1 minute)
     val sync = Builder.cache[K, V](
       timeToLive,
-      (k: K) => async(k) await makeTimeout(awaitTime))
+      (k: K) => async(k) await makeTimeout(awaitTime)
+    )
     new MixedCache(sync, default, invalidate(async, sync) _, logger branch "MixedCache")
   }
 
   def fromAsync[K, V](
-    async: AsyncCache[K,V],
+    async: AsyncCache[K, V],
     timeToLive: Duration = Duration.Inf,
     awaitTime: FiniteDuration = 10.milliseconds,
     default: K => V,
-    logger: lila.log.Logger): MixedCache[K, V] = {
+    logger: lila.log.Logger
+  ): MixedCache[K, V] = {
     val sync = Builder.cache[K, V](
       timeToLive,
-      (k: K) => async(k) await makeTimeout(awaitTime))
+      (k: K) => async(k) await makeTimeout(awaitTime)
+    )
     new MixedCache(sync, default, invalidate(async, sync) _, logger branch "MixedCache")
   }
 
@@ -59,11 +63,13 @@ object MixedCache {
     timeToLive: Duration = Duration.Inf,
     awaitTime: FiniteDuration = 5.milliseconds,
     default: V,
-    logger: lila.log.Logger): MixedCache[Boolean, V] = {
+    logger: lila.log.Logger
+  ): MixedCache[Boolean, V] = {
     val async = AsyncCache.single(f, timeToLive = 1 minute)
     val sync = Builder.cache[Boolean, V](
       timeToLive,
-      (_: Boolean) => async(true) await makeTimeout(awaitTime))
+      (_: Boolean) => async(true) await makeTimeout(awaitTime)
+    )
     new MixedCache(sync, _ => default, invalidate(async, sync) _, logger branch "MixedCache")
   }
 }

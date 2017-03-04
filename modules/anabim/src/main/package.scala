@@ -2,7 +2,7 @@ package lila
 
 package object anabim extends PackageObject with WithPlay {
 
-  private[anabim] type ID = String
+  private[anabim]type ID = String
 
   object tube {
     // expose user tube

@@ -13,10 +13,11 @@ import lila.db.dsl._
 import lila.user.{ User, UserRepo }
 
 final class Api(
-                 coll: Coll,
-                 firewall: Firewall,
-                 geoIP: GeoIP,
-                 emailAddress: EmailAddress) {
+    coll: Coll,
+    firewall: Firewall,
+    geoIP: GeoIP,
+    emailAddress: EmailAddress
+) {
 
   val AccessUri = "access_uri"
 
@@ -33,28 +34,32 @@ final class Api(
     "username" -> nonEmptyText,
     "password" -> nonEmptyText
   )(authenticateCandidate(candidate))(_.map(u => (u.username, "")))
-    .verifying("Invalid username or password", _.isDefined)
-  )
+    .verifying("Invalid username or password", _.isDefined))
 
   def loadLoginForm(str: String): Fu[Form[Option[User]]] = {
     emailAddress.validate(str) match {
-      case Some(email)                       => UserRepo.checkPasswordByEmail(email)
+      case Some(email) => UserRepo.checkPasswordByEmail(email)
       case None if User.couldBeUsername(str) => UserRepo.checkPasswordById(User normalize str)
-      case _                                 => fuccess(none)
+      case _ => fuccess(none)
     }
   } map loadedLoginForm _
 
   private def authenticateCandidate(candidate: Option[User.LoginCandidate])(username: String, password: String): Option[User] =
     candidate ?? { _(password) }
 
-  def saveAuthentication(userId: String, apiVersion: Option[ApiVersion])(implicit req: RequestHeader): Fu[String] =
+  def saveAuthentication(userId: String, apiVersion: Option[ApiVersion])(implicit req: RequestHeader): Fu[String] = {
+    println("run save Authentication")
     UserRepo mustConfirmEmail userId flatMap {
-      case true => fufail(Api MustConfirmEmail userId)
+      case true => {
+        println("case true ____________")
+        fufail(Api MustConfirmEmail userId)
+      }
       case false =>
+        println("case false ____________")
         val sessionId = Random nextStringUppercase 12
         Store.save(sessionId, userId, req, apiVersion) inject sessionId
     }
-
+  }
   def restoreUser(req: RequestHeader): Fu[Option[FingerprintedUser]] =
     firewall accepts req flatMap {
       _ ?? {

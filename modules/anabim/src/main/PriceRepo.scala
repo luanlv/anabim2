@@ -21,7 +21,6 @@ object PriceRepo {
 
   private lazy val coll = Env.current.priceColl
 
-
   def update(price: Price): Future[WriteResult] = {
     coll.update(
       selector = BSONDocument("_id" -> 1),
@@ -38,12 +37,11 @@ object PriceRepo {
   }
 
   def get = {
-     coll.find(BSONDocument("_id" -> 1))
+    coll.find(BSONDocument("_id" -> 1))
       .cursor[Price]()
       .headOption
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

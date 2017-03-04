@@ -224,9 +224,9 @@ trait dsl extends LowPriorityDsl {
   //**********************************************************************************************//
 
   /**
-    * Represents the inital state of the expression which has only the name of the field.
-    * It does not know the value of the expression.
-    */
+   * Represents the inital state of the expression which has only the name of the field.
+   * It does not know the value of the expression.
+   */
   trait ElementBuilder {
     def field: String
     def append(value: BSONDocument): BSONDocument = value
@@ -253,16 +253,16 @@ trait dsl extends LowPriorityDsl {
     extends Expression[V]
 
   /**
-    * Expressions of this type can be cascaded. Examples:
-    *
-    * {{{
-    *  "age" $gt 50 $lt 60
-    *  "age" $gte 50 $lte 60
-    * }}}
-    *
-    */
+   * Expressions of this type can be cascaded. Examples:
+   *
+   * {{{
+   *  "age" $gt 50 $lt 60
+   *  "age" $gte 50 $lte 60
+   * }}}
+   *
+   */
   case class CompositeExpression(field: String, value: BSONDocument)
-    extends Expression[BSONDocument]
+      extends Expression[BSONDocument]
       with ComparisonOperators {
     override def append(value: BSONDocument): BSONDocument = {
       this.value ++ value
@@ -366,11 +366,11 @@ trait dsl extends LowPriorityDsl {
 
   implicit class ElementBuilderLike(val field: String)
     extends ElementBuilder
-      with ComparisonOperators
-      with ElementOperators
-      with EvaluationOperators
-      with LogicalOperators
-      with ArrayOperators
+    with ComparisonOperators
+    with ElementOperators
+    with EvaluationOperators
+    with LogicalOperators
+    with ArrayOperators
 
   implicit def toBSONDocument[V <: BSONValue](expression: Expression[V])(implicit writer: BSONWriter[V, _ <: BSONValue]): BSONDocument =
     $doc(expression.field -> expression.value)

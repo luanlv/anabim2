@@ -3,7 +3,7 @@ package lila.hub
 import akka.pattern.ask
 import play.api.data._
 import actorApi.captcha._
-import lila.common.{Captcha, Captcha2}
+import lila.common.{ Captcha, Captcha2 }
 
 trait CaptchedForm {
 

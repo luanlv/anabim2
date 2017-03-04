@@ -12,7 +12,8 @@ final class Env(
     mongoCache: MongoCache.Builder,
     scheduler: lila.common.Scheduler,
     timeline: ActorSelection,
-    system: ActorSystem) {
+    system: ActorSystem
+) {
 
   private val settings = new {
     val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
@@ -34,7 +35,6 @@ final class Env(
   lazy val noteApi = new NoteApi(db(CollectionNote), timeline)
 
   lazy val trophyApi = new TrophyApi(db(CollectionTrophy))
-
 
   lazy val jsonView = new JsonView(isOnline)
 
@@ -74,7 +74,8 @@ final class Env(
     userColl = userColl,
     nbTtl = CachedNbTtl,
     onlineUserIdMemo = onlineUserIdMemo,
-    mongoCache = mongoCache)
+    mongoCache = mongoCache
+  )
 
 }
 
@@ -86,5 +87,6 @@ object Env {
     mongoCache = lila.memo.Env.current.mongoCache,
     scheduler = lila.common.PlayApp.scheduler,
     timeline = lila.hub.Env.current.actor.timeline,
-    system = lila.common.PlayApp.system)
+    system = lila.common.PlayApp.system
+  )
 }

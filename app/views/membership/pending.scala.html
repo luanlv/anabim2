@@ -1,15 +1,24 @@
 @(subscribe: lila.anabim.Subscribe)
 
 <div>
-  <h3>Đang chờ xét duyệt Membership với các thông tin sau</h3>
+  @{if(subscribe.state == "Không đồng ý"){
+      <h3 style="color: red">Bạn đã không được duyệt</h3>
+    }else {
+      <h3>Đang chờ xét duyệt Membership với các thông tin sau</h3>
+  }}
+
   <table class="ui celled striped table">
     <tr>
       <td>Số tháng đăng ký</td>
-      <td>@subscribe.month tháng</td>
+      <td>@subscribe.month tháng @{if(subscribe.bonusDay > 0){ " (+ " + subscribe.bonusDay + " ngày)" }}</td>
     </tr>
     <tr>
       <td>Số điện thoại liên hệ</td>
       <td>@subscribe.phone</td>
+    </tr>
+    <tr>
+      <td>Mã giảm giá</td>
+      <td>@{if(subscribe.coupon.isDefined){ subscribe.coupon.get.code }}</td>
     </tr>
     <tr>
       <td>Thành tiền</td>

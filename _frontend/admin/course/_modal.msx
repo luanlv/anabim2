@@ -17,12 +17,12 @@ var Modal = function(ctrl){
       
         </div>
       </div>,
-    <div class="modal fade slide-right" id="modalSlideLeft2" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade slide-right" id="modalSlideLeft_course" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-sm">
           <div class="modal-content-wrapper">
             <div class="modal-content">
               {ctrl.courses().map(function(el){
-                return <div style={"min-height: 40px; line-height: 40px; border-bottom: 1px solid #ddd; cursor: pointer; padding: 3px;" + ((ctrl.mode !== "new")?(ctrl.selectedCourse.related.indexOf(el.id)>=0?"background: #ddd;":""):(ctrl.newCourse.related.indexOf(el.id)>=0?"background: #ddd;":""))}
+                if(ctrl.selectedCourse.id !== el.id) return <div style={"min-height: 40px; line-height: 40px; border-bottom: 1px solid #ddd; cursor: pointer; padding: 3px;" + ((ctrl.mode !== "new")?(ctrl.selectedCourse.related.indexOf(el.id)>=0?"background: #ddd;":""):(ctrl.newCourse.related.indexOf(el.id)>=0?"background: #ddd;":""))}
                   onclick={function(){
                     if(ctrl.mode !== "new"){
                       if(ctrl.selectedCourse.related.indexOf(el.id)<0) {
@@ -35,7 +35,7 @@ var Modal = function(ctrl){
                         ctrl.newCourse.related2.push(el)
                       }
                     }
-                    $('#modalSlideLeft2').modal('toggle');
+                    $('#modalSlideLeft_course').modal('toggle');
                   }}
                 >
                   {el.name}
@@ -588,8 +588,8 @@ var Edit = function(ctrl){
                   >
                     <div className="summernote"
                          config={function (el, isInited) {
-                           if (!isInited) {
-                             $(el).summernote('code', ctrl.newCourse.documents);
+                           if (isInited) {
+                             $(el).summernote('code', ctrl.selectedCourse.documents);
                             }
                           }
                          }

@@ -12,7 +12,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
 
   def showProgress(progress: Int, withTitle: Boolean = true) = Html {
     val span = progress match {
-      case 0          => ""
+      case 0 => ""
       case p if p > 0 => s"""<span class="positive" data-icon="N">$p</span>"""
       case p if p < 0 => s"""<span class="negative" data-icon="M">${math.abs(p)}</span>"""
     }
@@ -21,14 +21,11 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     s"""<span $title class="$klass">$span</span>"""
   }
 
-
-
-
   def showRatingDiff(diff: Int) = Html {
     diff match {
-      case 0          => """<span class="rp null">±0</span>"""
+      case 0 => """<span class="rp null">±0</span>"""
       case d if d > 0 => s"""<span class="rp up">+$d</span>"""
-      case d          => s"""<span class="rp down">$d</span>"""
+      case d => s"""<span class="rp down">$d</span>"""
     }
   }
 
@@ -41,7 +38,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
   def isOnline(userId: String) = Env.user isOnline userId
 
   private def titleTag(title: Option[String]) = title match {
-    case None    => ""
+    case None => ""
     case Some(t) => s"""<span class="title" title="${User titleName t}">$t</span> """
   }
 
@@ -52,20 +49,18 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     }
   }
 
-
-
   protected def userClass(
     userId: String,
     cssClass: Option[String],
     withOnline: Boolean,
-    withPowerTip: Boolean = true) = {
+    withPowerTip: Boolean = true
+  ) = {
     "user_link" :: List(
       cssClass,
       withPowerTip option "ulpt",
       withOnline option isOnline(userId).fold("online", "offline")
     ).flatten
   }.mkString("class=\"", " ", "\"")
-
 
   val patronIconChar = ""
   val lineIconChar = ""

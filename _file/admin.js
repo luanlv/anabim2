@@ -982,6 +982,16 @@ var Sidebar = function(ctrl){
                 {tag: "a", attrs: {href:"/admin/price", 
                    config:m.route
                 }, children: ["Bảng giá"]}
+              ]}, 
+              {tag: "li", attrs: {className:""}, children: [
+                {tag: "a", attrs: {href:"/admin/coupon", 
+                   config:m.route
+                }, children: ["Mã giảm giá"]}
+              ]}, 
+              {tag: "li", attrs: {className:""}, children: [
+                {tag: "a", attrs: {href:"/admin/activecode", 
+                   config:m.route
+                }, children: ["Mã kích hoạt"]}
               ]}
             ]}
           ]}, 
@@ -999,8 +1009,9 @@ var Sidebar = function(ctrl){
                 }, children: ["KH"]}
               ]}
             ]}
-          ]}
-          
+          ]}, 
+          {tag: "li", attrs: {className:"m-t-30 "}
+          }
         ]}, 
         {tag: "div", attrs: {className:"clearfix"}}
       ]}
@@ -1010,6 +1021,405 @@ var Sidebar = function(ctrl){
 
 module.exports = Sidebar;
 },{}],8:[function(require,module,exports){
+var API = require('../_api.msx');
+
+function randomString() {
+  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+  var string_length = 5;
+  var randomstring = '';
+  for (var i=0; i<string_length; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    randomstring += chars.substring(rnum,rnum+1);
+  }
+  return randomstring;
+}
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.activeCodes = m.prop([]);
+  ctrl.init = function() {
+    ctrl.initValue = {
+      code: randomString(),
+      day: 3,
+      email: "",
+      all: false,
+      quantity: 1,
+      used: false
+    };
+    console.log(ctrl.initValue)
+  }
+  ctrl.init();
+  ctrl.setupFetchActiveCode = function(){
+    console.log(ctrl.activeCodes());
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchActiveCode = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/activecode/get"
+    }, ctrl.activeCodes, ctrl.setupFetchActiveCode);
+  };
+  ctrl.request();
+  
+  ctrl.textToList = function(text){
+    var list = text.split(',');
+    result = [];
+    list.map(function(el){
+      if(!isNaN(parseInt(el))) {
+        result.push(parseInt(el))
+      }
+    });
+    return result;
+  }
+  
+};
+
+
+module.exports = Controller;
+},{"../_api.msx":1}],9:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab = function(ctrl, index){
+  return (
+      {tag: "div", attrs: {className:"tab-pane active", id:"tab-fillup1"}, children: [
+        {tag: "div", attrs: {className:"row"}, children: [
+          
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Mã kích hoạt"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", 
+                     value:ctrl.activeCodes()[index].code, 
+                     onchange:function(e){
+                       ctrl.activeCodes()[index].code = $(e.target).val();
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số ngày"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                     value:ctrl.activeCodes()[index].day, 
+                     onchange:function(e){
+                       ctrl.activeCodes()[index].day = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          ctrl.activeCodes()[index].all?(
+              {tag: "div", attrs: {className:"col-md-3"}, children: [
+                {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                  {tag: "label", attrs: {}, children: ["Cho tất cả"]}, 
+                  {tag: "input", attrs: {type:"checkbox", name:"vehicle1", value:"1", checked:ctrl.activeCodes()[index].all?"checked":"", 
+                         onchange:function(){
+                           ctrl.activeCodes()[index].all = !ctrl.activeCodes()[index].all
+                         }
+                  }}
+                ]}
+              ]}
+          ):(
+              {tag: "div", attrs: {className:"col-md-3"}, children: [
+                {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                  {tag: "label", attrs: {}, children: ["Email áp dụng"]}, 
+                  {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.activeCodes()[index].all?"":ctrl.activeCodes()[index].email, 
+                         disabled:ctrl.activeCodes()[index].all?"true":"", 
+                         onchange:function(e){
+                           ctrl.activeCodes()[index].email = $(e.target).val();
+                         }}
+                  }
+                ]}
+              ]}
+          ), 
+
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                     value:ctrl.activeCodes()[index].quantity, 
+                     onchange:function(e){
+                       ctrl.activeCodes()[index].quantity = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Trạng thái"]}, 
+              ctrl.activeCodes()[index].used?(
+                  {tag: "div", attrs: {style:"color: blue"}, children: ["Đã sử dụng"]}
+              ):(
+                  {tag: "div", attrs: {style:"color: red"}, children: ["Chưa sử dụng"]}
+              )
+            ]}
+          ]}
+        ]}, 
+        
+        {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+          {tag: "div", attrs: {style:"float: right"}, children: [
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/activecode/delete",
+                        data: JSON.stringify({
+                          id: ctrl.activeCodes()[index].id
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request()
+                          alert("Đã xóa");
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: [
+              "Xóa"
+            ]}, 
+            {tag: "button", attrs: {className:"btn btn-primary", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/activecode/update",
+                        data: JSON.stringify({
+                          id: ctrl.activeCodes()[index].id,
+                          code: ctrl.activeCodes()[index].code,
+                          day: ctrl.activeCodes()[index].day,
+                          email: ctrl.activeCodes()[index].email,
+                          all: ctrl.activeCodes()[index].all,
+                          quantity: ctrl.activeCodes()[index].quantity,
+                          used: false
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          // ctrl.init();
+                          ctrl.request();
+                          alert("Đã cập nhập")
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: ["Cập nhập"]}
+          ]}
+        ]}
+      ]}
+  )
+}
+
+module.exports = Tab;
+},{"../_api.msx":1}],10:[function(require,module,exports){
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+var tab1 = require('./_tab1.msx');
+var kind1 = require('./_kind1.msx');
+var View = function(ctrl){
+  return [
+    {tag: "div", attrs: {className:"page-content-wrapper "}, children: [
+    
+      {tag: "div", attrs: {className:"content "}, children: [
+      
+        {tag: "div", attrs: {className:"jumbotron", "data-pages":"parallax"}, children: [
+          {tag: "div", attrs: {className:"container-fluid  container-fixed-lg sm-p-l-20 sm-p-r-20"}, children: [
+            {tag: "div", attrs: {className:"inner"}, children: [
+              {tag: "ul", attrs: {className:"breadcrumb"}, children: [
+                {tag: "li", attrs: {}, children: [
+                  {tag: "p", attrs: {}, children: ["Anabim"]}
+                ]}, 
+                {tag: "li", attrs: {}, children: [{tag: "a", attrs: {href:"#", className:"active"}, children: ["Mã kích hoạt"]}
+                ]}
+              ]}
+            ]}
+          ]}
+        ]}, 
+      
+      
+        {tag: "div", attrs: {className:"container-fluid container-fluid2 container-fixed-lg"}, children: [
+          {tag: "div", attrs: {className:"panel panel-transparent"}, children: [
+            {tag: "div", attrs: {className:"panel-body"}, children: [
+              {tag: "div", attrs: {className:"tab-content"}, children: [
+                tab1(ctrl)
+              ]}, 
+              
+              {tag: "div", attrs: {}, children: [
+                {tag: "div", attrs: {}, children: ["Các mã kích hoạt"]}, 
+                ctrl.activeCodes().map(function(el, index){
+                  return kind1(ctrl, index)
+                })
+              ]}
+            ]}
+          ]}
+      
+        ]}
+      ]}, 
+      {tag: "div", attrs: {className:"container-fluid container-fixed-lg footer"}, children: [
+        {tag: "div", attrs: {className:"copyright sm-text-center"}, children: [
+          {tag: "p", attrs: {className:"small no-margin pull-left sm-pull-reset"}, children: [
+            {tag: "span", attrs: {className:"hint-text"}, children: ["Copyright © 2014 "]}, 
+            {tag: "span", attrs: {className:"font-montserrat"}, children: ["REVOX"]}, ".", 
+            {tag: "span", attrs: {className:"hint-text"}, children: ["All rights reserved. "]}, 
+            {tag: "span", attrs: {className:"sm-block"}, children: [{tag: "a", attrs: {href:"#", className:"m-l-10 m-r-10"}, children: ["Terms of use"]}, " | ", {tag: "a", attrs: {href:"#", className:"m-l-10"}, children: ["Privacy Policy"]}]}
+          ]}, 
+          {tag: "p", attrs: {className:"small no-margin pull-right sm-pull-reset"}, children: [
+            {tag: "a", attrs: {href:"#"}, children: ["Hand-crafted"]}, " ", {tag: "span", attrs: {className:"hint-text"}, children: ["& Made with Love ®"]}
+          ]}, 
+          {tag: "div", attrs: {className:"clearfix"}}
+        ]}
+      ]}
+    ]}
+  ]
+}
+
+module.exports = View;
+},{"../_api.msx":1,"../_data.msx":2,"./_kind1.msx":9,"./_tab1.msx":11}],11:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab = function(ctrl){
+  return (
+      {tag: "div", attrs: {className:"tab-pane active", id:"tab-fillup1"}, children: [
+        {tag: "div", attrs: {className:"row"}, children: [
+          
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Mã kích hoạt"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", 
+                     value:ctrl.initValue.code, 
+                     onchange:function(e){
+                       ctrl.initValue.code = $(e.target).val();
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số ngày"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                value:ctrl.initValue.day, 
+                     onchange:function(e){
+                       ctrl.initValue.day = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Email áp dụng"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.initValue.all?"":ctrl.initValue.email, 
+                disabled:ctrl.initValue.all?"true":"", 
+                onchange:function(e){
+                  ctrl.initValue.email = $(e.target).val();
+                }}
+              }
+            ]}
+          ]}, 
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Cho tất cả"]}, 
+              {tag: "input", attrs: {type:"checkbox", name:"vehicle1", value:"1", checked:ctrl.initValue.all?"checked":"", 
+                onchange:function(){
+                  ctrl.initValue.all = !ctrl.initValue.all
+                }
+              }}
+            ]}
+          ]}, 
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                value:ctrl.initValue.quantity, 
+                onchange:function(e){
+                  ctrl.initValue.quantity = parseInt($(e.target).val());
+                }}
+              }
+            ]}
+          ]}
+        ]}, 
+        
+        {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+          {tag: "div", attrs: {style:"float: right"}, children: [
+            {tag: "button", attrs: {className:"btn btn-primary", style:"margin-right: 30px;", 
+              onclick:function(){
+                $.ajax({
+                  type: "POST",
+                  url: "/admin/activecode/new",
+                  data: JSON.stringify({
+                    code: ctrl.initValue.code,
+                    day: ctrl.initValue.day,
+                    email: ctrl.initValue.email,
+                    all: ctrl.initValue.all,
+                    quantity: ctrl.initValue.quantity,
+                    used: false
+                  }),
+                  contentType: "application/json",
+                  dataType: "text",
+                  success: function (data) {
+                    ctrl.init();
+                    ctrl.request();
+                  },
+                  error: function (data) {
+                    console.log(data)
+                    alert(data)
+                  }
+                });
+              }
+            }, children: ["Thêm mới"]}
+          ]}
+        ]}
+      ]}
+  )
+}
+
+module.exports = Tab;
+},{"../_api.msx":1}],12:[function(require,module,exports){
+var Sidebar = require('../_sidebar.msx');
+var Overlay = require('../_overlay.msx');
+var Quickview = require('../_quickview.msx');
+var Header = require('../_header.msx');
+var Main = require('./_partial.msx');
+
+var View = function(ctrl){
+  return [
+      Sidebar(ctrl),
+      {tag: "div", attrs: {class:"page-container "}, children: [
+        Header(ctrl), 
+        Main(ctrl)
+      ]},
+      Quickview(ctrl),
+      Overlay(ctrl),
+      {tag: "div", attrs: {className:"init", 
+           config:function(el, isInited){
+             if(!isInited) {
+               $.Pages.init();
+               initScript();
+               initMobileView();
+               quickview();
+               parallaxApi();
+               sidebarApi();
+             }
+           }
+      }}
+  ]
+};
+
+module.exports = View;
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":10}],13:[function(require,module,exports){
+var Controller = require('./_controller.msx');
+var View = require('./_view.msx');
+
+var Main = {
+  controller: Controller,
+  view: View
+}
+
+module.exports = Main;
+},{"./_controller.msx":8,"./_view.msx":12}],14:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -1065,7 +1475,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],9:[function(require,module,exports){
+},{"../_api.msx":1}],15:[function(require,module,exports){
 
 var Modal = function(ctrl){
   return (
@@ -1370,7 +1780,7 @@ var checkData = function(data){
 }
 
 module.exports = Modal;
-},{}],10:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 var Modal = require('./_modal.msx');
@@ -1480,7 +1890,7 @@ var View = function(ctrl){
 
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2,"../_image.msx":4,"./_modal.msx":9}],11:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2,"../_image.msx":4,"./_modal.msx":15}],17:[function(require,module,exports){
 var Sidebar = require('../_sidebar.msx');
 var Overlay = require('../_overlay.msx');
 var Quickview = require('../_quickview.msx');
@@ -1512,17 +1922,982 @@ var View = function(ctrl){
 };
 
 module.exports = View;
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":10}],12:[function(require,module,exports){
-var Controller = require('./_controller.msx');
-var View = require('./_view.msx');
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":16}],18:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":14,"./_view.msx":17}],19:[function(require,module,exports){
+var API = require('../_api.msx');
 
-var Main = {
-  controller: Controller,
-  view: View
+function randomString() {
+  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+  var string_length = 5;
+  var randomstring = '';
+  for (var i=0; i<string_length; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    randomstring += chars.substring(rnum,rnum+1);
+  }
+  return randomstring;
 }
 
-module.exports = Main;
-},{"./_controller.msx":8,"./_view.msx":11}],13:[function(require,module,exports){
+var Controller = function(){
+  var ctrl = this;
+  ctrl.coupons = m.prop([]);
+  ctrl.init = function() {
+    ctrl.initValue = {
+      code: randomString(),
+      price: 0,
+      percent: 0,
+      day: 0,
+      month: [1, 3, 6, 12],
+      quantity: 1000,
+      endTime: (new Date()).getTime()
+    };
+    console.log(ctrl.initValue)
+  }
+  ctrl.init();
+  ctrl.setupFetchCoupon = function(){
+    console.log(ctrl.coupons());
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchCoupon = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/coupon/get"
+    }, ctrl.coupons, ctrl.setupFetchCoupon);
+  };
+  ctrl.request();
+  
+  ctrl.textToList = function(text){
+    var list = text.split(',');
+    result = [];
+    list.map(function(el){
+      if(!isNaN(parseInt(el))) {
+        result.push(parseInt(el))
+      }
+    });
+    return result;
+  }
+  
+};
+
+
+module.exports = Controller;
+},{"../_api.msx":1}],20:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab = function(ctrl, index){
+  return (
+      {tag: "div", attrs: {}, children: [
+        {tag: "div", attrs: {className:"row"}, children: [
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Mã giảm giá"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", 
+                     value:ctrl.coupons()[index].code, 
+                     onchange:function(e){
+                       ctrl.coupons()[index].code = $(e.target).val();
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["% giảm giá"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                value:ctrl.coupons()[index].percent, 
+                     onchange:function(e){
+                       ctrl.coupons()[index].percent = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Tháng áp dụng"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.coupons()[index].month.join(','), 
+                onchange:function(e){
+                  console.log($(e.target).val())
+                  ctrl.coupons()[index].month = ctrl.textToList($(e.target).val());
+                }}
+              }
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {className:"form-group form-group-default required"}, children: [
+              {tag: "div", attrs: {className:"input-group date ", 
+                   config:function(el){
+                     $(el).datepicker({
+                       format: 'yyyy-mm-dd'
+                     });
+                   }
+              }, children: [
+                {tag: "label", attrs: {}, children: ["Hạn cuối"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", value:API.date2(ctrl.coupons()[index].endTime), 
+                       onchange:function(e){
+                         var time = (new Date($(e.target).val())).getTime();
+                         ctrl.coupons()[index].endTime = time;
+                       }}
+                }, {tag: "span", attrs: {class:"input-group-addon"}, children: [{tag: "i", attrs: {class:"fa fa-calendar"}}]}
+              ]}
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                value:ctrl.coupons()[index].quantity, 
+                onchange:function(e){
+                  ctrl.coupons()[index].quantity = parseInt($(e.target).val());
+                }}
+              }
+            ]}
+          ]}
+          
+        ]}, 
+        {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+          {tag: "div", attrs: {style:"float: right"}, children: [
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/coupon/delete",
+                        data: JSON.stringify({
+                          id: ctrl.coupons()[index].id
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request()
+                          alert("Đã xóa");
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: [
+              "Xóa"
+            ]}, 
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+              onclick:function(){
+                $.ajax({
+                  type: "POST",
+                  url: "/admin/coupon/update",
+                  data: JSON.stringify({
+                    id: ctrl.coupons()[index].id,
+                    kind: 1,
+                    code: ctrl.coupons()[index].code,
+                    percent: ctrl.coupons()[index].percent,
+                    month: ctrl.coupons()[index].month,
+                    endTime: ctrl.coupons()[index].endTime,
+                    active: !ctrl.coupons()[index].active,
+                    quantity: ctrl.coupons()[index].quantity
+                  }),
+                  contentType: "application/json",
+                  dataType: "text",
+                  success: function (data) {
+                    ctrl.request()
+                  },
+                  error: function (data) {
+                    console.log(data)
+                    alert(data)
+                  }
+                });
+              }
+            }, children: [
+              ctrl.coupons()[index].active?"Tạm dừng":"Tiếp tục"
+            ]}, 
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+              onclick:function(){
+                $.ajax({
+                  type: "POST",
+                  url: "/admin/coupon/update",
+                  data: JSON.stringify({
+                    id: ctrl.coupons()[index].id,
+                    kind: 1,
+                    code: ctrl.coupons()[index].code,
+                    percent: ctrl.coupons()[index].percent,
+                    month: ctrl.coupons()[index].month,
+                    endTime: ctrl.coupons()[index].endTime,
+                    active: ctrl.coupons()[index].active,
+                    quantity: ctrl.coupons()[index].quantity
+                  }),
+                  contentType: "application/json",
+                  dataType: "text",
+                  success: function (data) {
+                   ctrl.request()
+                    alert("Đã cập nhập")
+                  },
+                  error: function (data) {
+                    console.log(data)
+                    alert(data)
+                  }
+                });
+              }
+            }, children: ["Cập nhập"]}
+          ]}
+        ]}
+      ]}
+  )
+}
+
+module.exports = Tab;
+},{"../_api.msx":1}],21:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab = function(ctrl, index){
+  return (
+      {tag: "div", attrs: {}, children: [
+          {tag: "div", attrs: {className:"row"}, children: [
+            {tag: "div", attrs: {className:"col-md-3"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Mã giảm giá"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", 
+                       value:ctrl.coupons()[index].code, 
+                       onchange:function(e){
+                         ctrl.coupons()[index].code = $(e.target).val();
+                       }}
+                }
+              ]}
+            ]}, 
+            
+            {tag: "div", attrs: {className:"col-md-2"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Giá giảm"]}, 
+                {tag: "input", attrs: {type:"number", class:"form-control", 
+                       value:ctrl.coupons()[index].price, 
+                       onchange:function(e){
+                         ctrl.coupons()[index].price = parseInt($(e.target).val());
+                       }}
+                }
+              ]}
+            ]}, 
+  
+            {tag: "div", attrs: {className:"col-md-2"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Tháng áp dụng"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.coupons()[index].month.join(','), 
+                       onchange:function(e){
+                         console.log($(e.target).val())
+                         ctrl.coupons()[index].month = ctrl.textToList($(e.target).val());
+                       }}
+                }
+              ]}
+            ]}, 
+  
+            {tag: "div", attrs: {className:"col-md-3"}, children: [
+              {tag: "div", attrs: {className:"form-group form-group-default required"}, children: [
+                {tag: "div", attrs: {id:"datepicker-component2", className:"input-group date ", 
+                     config:function(el){
+                       $(el).datepicker({
+                         format: 'yyyy-mm-dd'
+                       });
+                     }
+                }, children: [
+                  {tag: "label", attrs: {}, children: ["Hạn cuối"]}, 
+                  {tag: "input", attrs: {type:"text", class:"form-control", value:API.date2(ctrl.coupons()[index].endTime), 
+                         onchange:function(e){
+                           var time = (new Date($(e.target).val())).getTime();
+                           ctrl.coupons()[index].endTime = time;
+                         }}
+                  }, {tag: "span", attrs: {class:"input-group-addon"}, children: [{tag: "i", attrs: {class:"fa fa-calendar"}}]}
+                ]}
+              ]}
+            ]}, 
+  
+            {tag: "div", attrs: {className:"col-md-2"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+                {tag: "input", attrs: {type:"number", class:"form-control", 
+                       value:ctrl.coupons()[index].quantity, 
+                       onchange:function(e){
+                         ctrl.coupons()[index].quantity = parseInt($(e.target).val());
+                       }}
+                }
+              ]}
+            ]}
+            
+          ]}, 
+          {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+            {tag: "div", attrs: {style:"float: right"}, children: [
+              {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                onclick:function(){
+                  $.ajax({
+                    type: "POST",
+                    url: "/admin/coupon/delete",
+                    data: JSON.stringify({
+                      id: ctrl.coupons()[index].id
+                    }),
+                    contentType: "application/json",
+                    dataType: "text",
+                    success: function (data) {
+                      ctrl.request()
+                      alert("Đã xóa");
+                    },
+                    error: function (data) {
+                      console.log(data)
+                      alert(data)
+                    }
+                  });
+                }
+              }, children: [
+                "Xóa"
+              ]}, 
+              {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                      onclick:function(){
+                        $.ajax({
+                          type: "POST",
+                          url: "/admin/coupon/update",
+                          data: JSON.stringify({
+                            id: ctrl.coupons()[index].id,
+                            kind: 1,
+                            code: ctrl.coupons()[index].code,
+                            percent: ctrl.coupons()[index].percent,
+                            month: ctrl.coupons()[index].month,
+                            endTime: ctrl.coupons()[index].endTime,
+                            active: !ctrl.coupons()[index].active,
+                            quantity: ctrl.coupons()[index].quantity
+                          }),
+                          contentType: "application/json",
+                          dataType: "text",
+                          success: function (data) {
+                            ctrl.request()
+                          },
+                          error: function (data) {
+                            console.log(data)
+                            alert(data)
+                          }
+                        });
+                      }
+              }, children: [
+                ctrl.coupons()[index].active?"Tạm dừng":"Tiếp tục"
+              ]}, 
+              {tag: "button", attrs: {className:"btn", style:"margin-right: 30px;", 
+                      onclick:function(){
+                        $.ajax({
+                          type: "POST",
+                          url: "/admin/coupon/update",
+                          data: JSON.stringify({
+                            id: ctrl.coupons()[index].id,
+                            kind: 2,
+                            code: ctrl.coupons()[index].code,
+                            price: ctrl.coupons()[index].price,
+                            month: ctrl.coupons()[index].month,
+                            endTime: ctrl.coupons()[index].endTime,
+                            active: ctrl.coupons()[index].active,
+                            quantity: ctrl.coupons()[index].quantity
+                          }),
+                          contentType: "application/json",
+                          dataType: "text",
+                          success: function (data) {
+                            ctrl.request()
+                          },
+                          error: function (data) {
+                            console.log(data)
+                            alert(data)
+                          }
+                        });
+                      }
+              }, children: ["Cập nhập"]}
+            ]}
+          ]}
+        ]}
+  )
+}
+
+module.exports = Tab;
+},{"../_api.msx":1}],22:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab3 = function(ctrl, index){
+  return (
+      {tag: "div", attrs: {}, children: [
+  
+        {tag: "div", attrs: {className:"row"}, children: [
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Mã giảm giá"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", 
+                     value:ctrl.coupons()[index].code, 
+                     onchange:function(e){
+                       ctrl.coupons()[index].code = $(e.target).val();
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số ngày thêm"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                     value:ctrl.coupons()[index].day, 
+                     onchange:function(e){
+                       ctrl.coupons()[index].day = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Tháng áp dụng"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.coupons()[index].month.join(','), 
+                     onchange:function(e){
+                       console.log($(e.target).val())
+                       ctrl.coupons()[index].month = ctrl.textToList($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {className:"form-group form-group-default required"}, children: [
+              {tag: "div", attrs: {id:"datepicker-component3", className:"datepicker-component input-group date ", 
+                   config:function(el){
+                     $(el).datepicker({
+                       format: 'yyyy-mm-dd'
+                     });
+                   }
+              }, children: [
+                {tag: "label", attrs: {}, children: ["Hạn cuối"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", value:API.date2(ctrl.coupons()[index].endTime), 
+                       onchange:function(e){
+                         var time = (new Date($(e.target).val())).getTime();
+                         ctrl.coupons()[index].endTime = time;
+                       }}
+                }, {tag: "span", attrs: {class:"input-group-addon"}, children: [{tag: "i", attrs: {class:"fa fa-calendar"}}]}
+              ]}
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                     value:ctrl.coupons()[index].quantity, 
+                     onchange:function(e){
+                       ctrl.coupons()[index].quantity = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}
+        ]}, 
+        
+        
+        {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+          {tag: "div", attrs: {style:"float: right"}, children: [
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/coupon/delete",
+                        data: JSON.stringify({
+                          id: ctrl.coupons()[index].id
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request()
+                          alert("Đã xóa");
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: [
+              "Xóa"
+            ]}, 
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/coupon/update",
+                        data: JSON.stringify({
+                          id: ctrl.coupons()[index].id,
+                          kind: 1,
+                          code: ctrl.coupons()[index].code,
+                          percent: ctrl.coupons()[index].percent,
+                          month: ctrl.coupons()[index].month,
+                          endTime: ctrl.coupons()[index].endTime,
+                          active: !ctrl.coupons()[index].active,
+                          quantity: ctrl.coupons()[index].quantity
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request()
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: [
+              ctrl.coupons()[index].active?"Tạm dừng":"Tiếp tục"
+            ]}, 
+            {tag: "button", attrs: {className:"btn ", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/coupon/update",
+                        data: JSON.stringify({
+                          id: ctrl.coupons()[index].id,
+                          kind: 3,
+                          code: ctrl.coupons()[index].code,
+                          day: ctrl.coupons()[index].day,
+                          month: ctrl.coupons()[index].month,
+                          endTime: ctrl.coupons()[index].endTime,
+                          active: ctrl.coupons()[index].active,
+                          quantity: ctrl.coupons()[index].quantity
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request()
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: ["Cập nhập"]}
+          ]}
+        ]}
+      ]}
+  )
+}
+
+module.exports = Tab3;
+},{"../_api.msx":1}],23:[function(require,module,exports){
+var Data = require('../_data.msx');
+var API = require('../_api.msx');
+var tab1 = require('./_tab1.msx');
+var kind1 = require('./_kind1.msx');
+var tab2 = require('./_tab2.msx');
+var kind2 = require('./_kind2.msx');
+var tab3 = require('./_tab3.msx');
+var kind3 = require('./_kind3.msx');
+var View = function(ctrl){
+  return [
+    {tag: "div", attrs: {className:"page-content-wrapper "}, children: [
+    
+      {tag: "div", attrs: {className:"content "}, children: [
+      
+        {tag: "div", attrs: {className:"jumbotron", "data-pages":"parallax"}, children: [
+          {tag: "div", attrs: {className:"container-fluid  container-fixed-lg sm-p-l-20 sm-p-r-20"}, children: [
+            {tag: "div", attrs: {className:"inner"}, children: [
+              {tag: "ul", attrs: {className:"breadcrumb"}, children: [
+                {tag: "li", attrs: {}, children: [
+                  {tag: "p", attrs: {}, children: ["Anabim"]}
+                ]}, 
+                {tag: "li", attrs: {}, children: [{tag: "a", attrs: {href:"#", className:"active"}, children: ["Mã giảm giá"]}
+                ]}
+              ]}
+            ]}
+          ]}
+        ]}, 
+      
+      
+        {tag: "div", attrs: {className:"container-fluid container-fluid2 container-fixed-lg"}, children: [
+          {tag: "div", attrs: {className:"panel panel-transparent"}, children: [
+            {tag: "div", attrs: {className:"panel-body"}, children: [
+              
+              {tag: "ul", attrs: {className:"nav nav-tabs nav-tabs-fillup", "data-init-reponsive-tabs":"dropdownfx"}, children: [
+                {tag: "li", attrs: {className:"active"}, children: [
+                  {tag: "a", attrs: {"data-toggle":"tab", href:"#tab-fillup1"}, children: [{tag: "span", attrs: {}, children: ["Theo %"]}]}
+                ]}, 
+                {tag: "li", attrs: {className:""}, children: [
+                  {tag: "a", attrs: {"data-toggle":"tab", href:"#tab-fillup2", 
+                    onclick:function(){
+                      $('#datepicker-component2').datepicker({
+                        format: 'yyyy-mm-dd'
+                      });
+                    }
+                  }, children: [{tag: "span", attrs: {}, children: ["Theo giá tiền"]}]}
+                ]}, 
+                {tag: "li", attrs: {className:""}, children: [
+                  {tag: "a", attrs: {"data-toggle":"tab", href:"#tab-fillup3", 
+                    onclick:function(){
+                      $('#datepicker-component3').datepicker({
+                        format: 'yyyy-mm-dd'
+                      });
+                    }
+                  }, children: [{tag: "span", attrs: {}, children: ["Thêm ngày"]}]}
+                ]}
+              ]}, 
+              
+              {tag: "div", attrs: {className:"tab-content"}, children: [
+                tab1(ctrl), 
+                tab2(ctrl), 
+                tab3(ctrl)
+              ]}, 
+              
+              {tag: "div", attrs: {}, children: [
+                {tag: "div", attrs: {}, children: ["Các mã giảm giá"]}, 
+                
+                  ctrl.coupons().map(function(coupon, index) {
+                    if (coupon.kind === 1) {
+                      return kind1(ctrl, index)
+                    } else if (coupon.kind === 2) {
+                      return kind2(ctrl, index)
+                    } else {
+                      return kind3(ctrl, index)
+                    }
+                  })
+                
+              ]}
+            ]}
+          ]}
+      
+        ]}
+      ]}, 
+      {tag: "div", attrs: {className:"container-fluid container-fixed-lg footer"}, children: [
+        {tag: "div", attrs: {className:"copyright sm-text-center"}, children: [
+          {tag: "p", attrs: {className:"small no-margin pull-left sm-pull-reset"}, children: [
+            {tag: "span", attrs: {className:"hint-text"}, children: ["Copyright © 2014 "]}, 
+            {tag: "span", attrs: {className:"font-montserrat"}, children: ["REVOX"]}, ".", 
+            {tag: "span", attrs: {className:"hint-text"}, children: ["All rights reserved. "]}, 
+            {tag: "span", attrs: {className:"sm-block"}, children: [{tag: "a", attrs: {href:"#", className:"m-l-10 m-r-10"}, children: ["Terms of use"]}, " | ", {tag: "a", attrs: {href:"#", className:"m-l-10"}, children: ["Privacy Policy"]}]}
+          ]}, 
+          {tag: "p", attrs: {className:"small no-margin pull-right sm-pull-reset"}, children: [
+            {tag: "a", attrs: {href:"#"}, children: ["Hand-crafted"]}, " ", {tag: "span", attrs: {className:"hint-text"}, children: ["& Made with Love ®"]}
+          ]}, 
+          {tag: "div", attrs: {className:"clearfix"}}
+        ]}
+      ]}
+    ]}
+  ]
+}
+
+module.exports = View;
+},{"../_api.msx":1,"../_data.msx":2,"./_kind1.msx":20,"./_kind2.msx":21,"./_kind3.msx":22,"./_tab1.msx":24,"./_tab2.msx":25,"./_tab3.msx":26}],24:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab = function(ctrl){
+  return (
+      {tag: "div", attrs: {className:"tab-pane active", id:"tab-fillup1"}, children: [
+        {tag: "div", attrs: {className:"row"}, children: [
+          
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Mã giảm giá"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", 
+                     value:ctrl.initValue.code, 
+                     onchange:function(e){
+                       ctrl.initValue.code = $(e.target).val();
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["% giảm giá"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                value:ctrl.initValue.percent, 
+                     onchange:function(e){
+                       ctrl.initValue.percent = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Tháng áp dụng"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.initValue.month.join(','), 
+                onchange:function(e){
+                  console.log($(e.target).val())
+                  ctrl.initValue.month = ctrl.textToList($(e.target).val());
+                }}
+              }
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {className:"form-group form-group-default required"}, children: [
+              {tag: "div", attrs: {id:"datepicker-component", className:"input-group date ", 
+                   config:function(){
+                     $('#datepicker-component').datepicker({
+                       format: 'yyyy-mm-dd'
+                     });
+                   }
+              }, children: [
+                {tag: "label", attrs: {}, children: ["Hạn cuối"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", value:API.date2(ctrl.initValue.endTime), 
+                       onchange:function(e){
+                         var time = (new Date($(e.target).val())).getTime();
+                         ctrl.initValue.endTime = time;
+                       }}
+                }, {tag: "span", attrs: {class:"input-group-addon"}, children: [{tag: "i", attrs: {class:"fa fa-calendar"}}]}
+              ]}
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                value:ctrl.initValue.quantity, 
+                onchange:function(e){
+                  ctrl.initValue.quantity = parseInt($(e.target).val());
+                }}
+              }
+            ]}
+          ]}
+          
+        ]}, 
+        {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+          {tag: "div", attrs: {style:"float: right"}, children: [
+            {tag: "button", attrs: {className:"btn btn-primary", style:"margin-right: 30px;", 
+              onclick:function(){
+                $.ajax({
+                  type: "POST",
+                  url: "/admin/coupon/new",
+                  data: JSON.stringify({
+                    kind: 1,
+                    code: ctrl.initValue.code,
+                    percent: ctrl.initValue.percent,
+                    month: ctrl.initValue.month,
+                    endTime: ctrl.initValue.endTime,
+                    quantity: ctrl.initValue.quantity
+                  }),
+                  contentType: "application/json",
+                  dataType: "text",
+                  success: function (data) {
+                    ctrl.request();
+                  },
+                  error: function (data) {
+                    console.log(data)
+                    alert(data)
+                  }
+                });
+              }
+            }, children: ["Thêm mới"]}
+          ]}
+        ]}
+      ]}
+  )
+}
+
+module.exports = Tab;
+},{"../_api.msx":1}],25:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab = function(ctrl){
+  return (
+      {tag: "div", attrs: {className:"tab-pane", id:"tab-fillup2"}, children: [
+          {tag: "div", attrs: {className:"row"}, children: [
+            {tag: "div", attrs: {className:"col-md-3"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Mã giảm giá"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", 
+                       value:ctrl.initValue.code, 
+                       onchange:function(e){
+                         ctrl.initValue.code = $(e.target).val();
+                       }}
+                }
+              ]}
+            ]}, 
+            
+            {tag: "div", attrs: {className:"col-md-2"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Giá giảm"]}, 
+                {tag: "input", attrs: {type:"number", class:"form-control", 
+                       value:ctrl.initValue.price, 
+                       onchange:function(e){
+                         ctrl.initValue.price = parseInt($(e.target).val());
+                       }}
+                }
+              ]}
+            ]}, 
+  
+            {tag: "div", attrs: {className:"col-md-2"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Tháng áp dụng"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.initValue.month.join(','), 
+                       onchange:function(e){
+                         console.log($(e.target).val())
+                         ctrl.initValue.month = ctrl.textToList($(e.target).val());
+                       }}
+                }
+              ]}
+            ]}, 
+  
+            {tag: "div", attrs: {className:"col-md-3"}, children: [
+              {tag: "div", attrs: {className:"form-group form-group-default required"}, children: [
+                {tag: "div", attrs: {id:"datepicker-component2", className:"input-group date "
+                }, children: [
+                  {tag: "label", attrs: {}, children: ["Hạn cuối"]}, 
+                  {tag: "input", attrs: {type:"text", class:"form-control", value:API.date2(ctrl.initValue.endTime), 
+                         onchange:function(e){
+                           var time = (new Date($(e.target).val())).getTime();
+                           ctrl.initValue.endTime = time;
+                         }}
+                  }, {tag: "span", attrs: {class:"input-group-addon"}, children: [{tag: "i", attrs: {class:"fa fa-calendar"}}]}
+                ]}
+              ]}
+            ]}, 
+  
+            {tag: "div", attrs: {className:"col-md-2"}, children: [
+              {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+                {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+                {tag: "input", attrs: {type:"number", class:"form-control", 
+                       value:ctrl.initValue.quantity, 
+                       onchange:function(e){
+                         ctrl.initValue.quantity = parseInt($(e.target).val());
+                       }}
+                }
+              ]}
+            ]}
+            
+          ]}, 
+          {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+            {tag: "div", attrs: {style:"float: right"}, children: [
+              {tag: "button", attrs: {className:"btn btn-primary", style:"margin-right: 30px;", 
+                      onclick:function(){
+                        $.ajax({
+                          type: "POST",
+                          url: "/admin/coupon/new",
+                          data: JSON.stringify({
+                            kind: 2,
+                            code: ctrl.initValue.code,
+                            price: ctrl.initValue.price,
+                            month: ctrl.initValue.month,
+                            endTime: ctrl.initValue.endTime,
+                            quantity: ctrl.initValue.quantity
+                          }),
+                          contentType: "application/json",
+                          dataType: "text",
+                          success: function (data) {
+                            ctrl.request();
+                          },
+                          error: function (data) {
+                            console.log(data)
+                            alert(data)
+                          }
+                        });
+                      }
+              }, children: ["Thêm mới"]}
+            ]}
+          ]}
+        ]}
+  )
+}
+
+module.exports = Tab;
+},{"../_api.msx":1}],26:[function(require,module,exports){
+var API = require('../_api.msx');
+var Tab3 = function(ctrl){
+  return (
+      {tag: "div", attrs: {className:"tab-pane", id:"tab-fillup3"}, children: [
+  
+        {tag: "div", attrs: {className:"row"}, children: [
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Mã giảm giá"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", 
+                     value:ctrl.initValue.code, 
+                     onchange:function(e){
+                       ctrl.initValue.code = $(e.target).val();
+                     }}
+              }
+            ]}
+          ]}, 
+          
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số ngày thêm"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                     value:ctrl.initValue.day, 
+                     onchange:function(e){
+                       ctrl.initValue.day = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Tháng áp dụng"]}, 
+              {tag: "input", attrs: {type:"text", class:"form-control", value:ctrl.initValue.month.join(','), 
+                     onchange:function(e){
+                       console.log($(e.target).val())
+                       ctrl.initValue.month = ctrl.textToList($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-3"}, children: [
+            {tag: "div", attrs: {className:"form-group form-group-default required"}, children: [
+              {tag: "div", attrs: {id:"datepicker-component3", className:"datepicker-component input-group date "
+              }, children: [
+                {tag: "label", attrs: {}, children: ["Hạn cuối"]}, 
+                {tag: "input", attrs: {type:"text", class:"form-control", value:API.date2(ctrl.initValue.endTime), 
+                       onchange:function(e){
+                         var time = (new Date($(e.target).val())).getTime();
+                         ctrl.initValue.endTime = time;
+                       }}
+                }, {tag: "span", attrs: {class:"input-group-addon"}, children: [{tag: "i", attrs: {class:"fa fa-calendar"}}]}
+              ]}
+            ]}
+          ]}, 
+  
+          {tag: "div", attrs: {className:"col-md-2"}, children: [
+            {tag: "div", attrs: {class:"form-group form-group-default required"}, children: [
+              {tag: "label", attrs: {}, children: ["Số lượng"]}, 
+              {tag: "input", attrs: {type:"number", class:"form-control", 
+                     value:ctrl.initValue.quantity, 
+                     onchange:function(e){
+                       ctrl.initValue.quantity = parseInt($(e.target).val());
+                     }}
+              }
+            ]}
+          ]}
+        ]}, 
+        
+        
+        {tag: "div", attrs: {className:"row", style:"text-align: right"}, children: [
+          {tag: "div", attrs: {style:"float: right"}, children: [
+            {tag: "button", attrs: {className:"btn btn-primary", style:"margin-right: 30px;", 
+                    onclick:function(){
+                      $.ajax({
+                        type: "POST",
+                        url: "/admin/coupon/new",
+                        data: JSON.stringify({
+                          kind: 3,
+                          code: ctrl.initValue.code,
+                          day: ctrl.initValue.day,
+                          month: ctrl.initValue.month,
+                          endTime: ctrl.initValue.endTime,
+                          quantity: ctrl.initValue.quantity
+                        }),
+                        contentType: "application/json",
+                        dataType: "text",
+                        success: function (data) {
+                          ctrl.request();
+                        },
+                        error: function (data) {
+                          console.log(data)
+                          alert(data)
+                        }
+                      });
+                    }
+            }, children: ["Thêm mới"]}
+          ]}
+        ]}
+      ]}
+  )
+}
+
+module.exports = Tab3;
+},{"../_api.msx":1}],27:[function(require,module,exports){
+arguments[4][12][0].apply(exports,arguments)
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":23}],28:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":19,"./_view.msx":27}],29:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -1613,7 +2988,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],14:[function(require,module,exports){
+},{"../_api.msx":1}],30:[function(require,module,exports){
 var Api = require('../_api.msx');
 
 
@@ -1633,12 +3008,12 @@ var Modal = function(ctrl){
       
         ]}
       ]},
-    {tag: "div", attrs: {class:"modal fade slide-right", id:"modalSlideLeft2", tabindex:"-1", role:"dialog", "aria-hidden":"true"}, children: [
+    {tag: "div", attrs: {class:"modal fade slide-right", id:"modalSlideLeft_course", tabindex:"-1", role:"dialog", "aria-hidden":"true"}, children: [
         {tag: "div", attrs: {class:"modal-dialog modal-sm"}, children: [
           {tag: "div", attrs: {class:"modal-content-wrapper"}, children: [
             {tag: "div", attrs: {class:"modal-content"}, children: [
               ctrl.courses().map(function(el){
-                return {tag: "div", attrs: {style:"min-height: 40px; line-height: 40px; border-bottom: 1px solid #ddd; cursor: pointer; padding: 3px;" + ((ctrl.mode !== "new")?(ctrl.selectedCourse.related.indexOf(el.id)>=0?"background: #ddd;":""):(ctrl.newCourse.related.indexOf(el.id)>=0?"background: #ddd;":"")), 
+                if(ctrl.selectedCourse.id !== el.id) return {tag: "div", attrs: {style:"min-height: 40px; line-height: 40px; border-bottom: 1px solid #ddd; cursor: pointer; padding: 3px;" + ((ctrl.mode !== "new")?(ctrl.selectedCourse.related.indexOf(el.id)>=0?"background: #ddd;":""):(ctrl.newCourse.related.indexOf(el.id)>=0?"background: #ddd;":"")), 
                   onclick:function(){
                     if(ctrl.mode !== "new"){
                       if(ctrl.selectedCourse.related.indexOf(el.id)<0) {
@@ -1651,7 +3026,7 @@ var Modal = function(ctrl){
                         ctrl.newCourse.related2.push(el)
                       }
                     }
-                    $('#modalSlideLeft2').modal('toggle');
+                    $('#modalSlideLeft_course').modal('toggle');
                   }
                 }, children: [
                   el.name
@@ -2204,8 +3579,8 @@ var Edit = function(ctrl){
                   }, children: [
                     {tag: "div", attrs: {className:"summernote", 
                          config:function (el, isInited) {
-                           if (!isInited) {
-                             $(el).summernote('code', ctrl.newCourse.documents);
+                           if (isInited) {
+                             $(el).summernote('code', ctrl.selectedCourse.documents);
                             }
                           }
                          
@@ -2266,7 +3641,7 @@ var checkData = function(data){
 }
 
 module.exports = Modal;
-},{"../_api.msx":1}],15:[function(require,module,exports){
+},{"../_api.msx":1}],31:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 var Modal = require('./_modal.msx');
@@ -2392,11 +3767,11 @@ var View = function(ctrl){
 
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2,"../_image.msx":4,"./_modal.msx":14}],16:[function(require,module,exports){
-arguments[4][11][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":15}],17:[function(require,module,exports){
-arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":13,"./_view.msx":16}],18:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2,"../_image.msx":4,"./_modal.msx":30}],32:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":31}],33:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":29,"./_view.msx":32}],34:[function(require,module,exports){
 
 var Home = require("./home/main.msx");
 var Users = require("./users/main.msx");
@@ -2407,6 +3782,8 @@ var Video = require("./video/main.msx");
 var Membership = require("./membership/main.msx");
 var Membership2 = require("./membership2/main.msx");
 var Price = require("./price/main.msx");
+var Coupon = require("./coupon/main.msx");
+var ActiveCode = require("./activeCode/main.msx");
 var Khoahoc = require("./khoahoc/main.msx");
 
 // var NewQuestion = require("./newquestion/main.msx");
@@ -2425,9 +3802,11 @@ m.route(document.body, "/", {
   "/admin/membership2": Membership2,
   "/admin/membership/users": Users,
   "/admin/price": Price,
+  "/admin/coupon": Coupon,
+  "/admin/activecode": ActiveCode,
   "/admin/trangchu/khoahoc": Khoahoc
 });
-},{"./cate/main.msx":12,"./course/main.msx":17,"./home/main.msx":22,"./khoahoc/main.msx":27,"./membership/main.msx":31,"./membership2/main.msx":35,"./price/main.msx":39,"./software/main.msx":44,"./users/main.msx":49,"./video/main.msx":53}],19:[function(require,module,exports){
+},{"./activeCode/main.msx":13,"./cate/main.msx":18,"./coupon/main.msx":28,"./course/main.msx":33,"./home/main.msx":38,"./khoahoc/main.msx":43,"./membership/main.msx":47,"./membership2/main.msx":51,"./price/main.msx":55,"./software/main.msx":60,"./users/main.msx":65,"./video/main.msx":69}],35:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -2438,7 +3817,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],20:[function(require,module,exports){
+},{"../_api.msx":1}],36:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 
@@ -2488,41 +3867,11 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2}],21:[function(require,module,exports){
-var Sidebar = require('../_sidebar.msx');
-var Overlay = require('../_overlay.msx');
-var Quickview = require('../_quickview.msx');
-var Header = require('../_header.msx');
-var Main = require('./_partial.msx');
-
-var View = function(ctrl){
-  return [
-      Sidebar(ctrl),
-      {tag: "div", attrs: {class:"page-container "}, children: [
-        Header(ctrl), 
-        Main(ctrl)
-      ]},
-      Quickview(ctrl),
-      Overlay(ctrl),
-      {tag: "div", attrs: {className:"init", 
-           config:function(el, isInited){
-             if(!isInited) {
-               $.Pages.init();
-               initScript();
-               initMobileView();
-               quickview();
-               parallaxApi();
-               sidebarApi();
-             }
-           }
-      }}
-  ]
-};
-
-module.exports = View;
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":20}],22:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2}],37:[function(require,module,exports){
 arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":19,"./_view.msx":21}],23:[function(require,module,exports){
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":36}],38:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":35,"./_view.msx":37}],39:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Sortable = {};
@@ -2648,7 +3997,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],24:[function(require,module,exports){
+},{"../_api.msx":1}],40:[function(require,module,exports){
 var Api = require('../_api.msx');
 
 var Modal = function(ctrl){
@@ -2731,7 +4080,7 @@ var New2 = function(ctrl){
 
 
 module.exports = Modal;
-},{"../_api.msx":1}],25:[function(require,module,exports){
+},{"../_api.msx":1}],41:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 var Modal = require('./_modal.msx');
@@ -2902,11 +4251,11 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2,"./_modal.msx":24}],26:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":25}],27:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2,"./_modal.msx":40}],42:[function(require,module,exports){
 arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":23,"./_view.msx":26}],28:[function(require,module,exports){
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":41}],43:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":39,"./_view.msx":42}],44:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -2915,7 +4264,7 @@ var Controller = function(){
   ctrl.subs = m.prop([]);
   
   ctrl.setupFetchSubs = function(){
-    console.log("setup fetch Subscribe");
+    console.log(ctrl.subs());
   };
   
   ctrl.request = function() {
@@ -2930,7 +4279,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],29:[function(require,module,exports){
+},{"../_api.msx":1}],45:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 
@@ -2966,6 +4315,7 @@ var View = function(ctrl){
                   {tag: "th", attrs: {}, children: ["Số điện thoại"]}, 
                   {tag: "th", attrs: {}, children: ["Thời gian"]}, 
                   {tag: "th", attrs: {}, children: ["Thành tiền"]}, 
+                  {tag: "th", attrs: {}, children: ["Mã giảm giá"]}, 
                   {tag: "th", attrs: {}}, 
                   {tag: "th", attrs: {}}
                 ]}
@@ -2989,6 +4339,9 @@ var View = function(ctrl){
                               ]}, 
                               {tag: "td", attrs: {className:"v-align-middle"}, children: [
                                 {tag: "p", attrs: {}, children: [API.numberWithCommas(sub.price), " đ"]}
+                              ]}, 
+                              {tag: "td", attrs: {}, children: [
+                                {tag: "p", attrs: {}, children: [sub.coupon?(sub.coupon.code):""]}
                               ]}, 
                               {tag: "td", attrs: {style:"min-width: 150px"}, children: [
                                 {tag: "p", attrs: {}, children: [API.time(sub.createAt)]}
@@ -3017,7 +4370,22 @@ var View = function(ctrl){
                                 "|", 
                                 {tag: "button", attrs: {className:"ui button", 
                                   onclick:function(){
-                                  
+                                    sub.action = false
+                                    $.ajax({
+                                      type: "POST",
+                                      url: "/admin/membership/action",
+                                      data: JSON.stringify(sub),
+                                      contentType: "application/json",
+                                      dataType: "text",
+                                      success: function(data){
+                                        {/*ctrl.initCate();*/}
+                                        ctrl.request();
+                                        {/*$('#myModal').modal('toggle');*/}
+                                      },
+                                      error: function(data){
+                                        alert(data)
+                                      }
+                                    })
                                   }
                                 }, children: ["Hủy"]}
                               ]}
@@ -3055,11 +4423,11 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2}],30:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":29}],31:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2}],46:[function(require,module,exports){
 arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":28,"./_view.msx":30}],32:[function(require,module,exports){
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":45}],47:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":44,"./_view.msx":46}],48:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -3068,7 +4436,7 @@ var Controller = function(){
   ctrl.subs = m.prop([]);
   
   ctrl.setupFetchSubs = function(){
-    console.log("setup fetch Subscribe");
+    console.log(ctrl.subs());
   };
   
   ctrl.request = function() {
@@ -3083,7 +4451,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],33:[function(require,module,exports){
+},{"../_api.msx":1}],49:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 
@@ -3119,6 +4487,7 @@ var View = function(ctrl){
                   {tag: "th", attrs: {}, children: ["Số điện thoại"]}, 
                   {tag: "th", attrs: {}, children: ["Thời gian"]}, 
                   {tag: "th", attrs: {}, children: ["Thành tiền"]}, 
+                  {tag: "th", attrs: {}, children: ["Mã giảm giá"]}, 
                   {tag: "th", attrs: {}}, 
                   {tag: "th", attrs: {}, children: ["Trạng thái"]}
                 ]}
@@ -3142,6 +4511,9 @@ var View = function(ctrl){
                               ]}, 
                               {tag: "td", attrs: {className:"v-align-middle"}, children: [
                                 {tag: "p", attrs: {}, children: [API.numberWithCommas(sub.price), " đ"]}
+                              ]}, 
+                              {tag: "td", attrs: {}, children: [
+                                {tag: "p", attrs: {}, children: [sub.coupon?(sub.coupon.code):""]}
                               ]}, 
                               {tag: "td", attrs: {style:"min-width: 150px"}, children: [
                                 {tag: "p", attrs: {}, children: [API.time(sub.createAt)]}
@@ -3187,11 +4559,11 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2}],34:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":33}],35:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2}],50:[function(require,module,exports){
 arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":32,"./_view.msx":34}],36:[function(require,module,exports){
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":49}],51:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":48,"./_view.msx":50}],52:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -3222,7 +4594,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],37:[function(require,module,exports){
+},{"../_api.msx":1}],53:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 
@@ -3239,7 +4611,7 @@ var View = function(ctrl){
                 {tag: "li", attrs: {}, children: [
                   {tag: "p", attrs: {}, children: ["Anabim"]}
                 ]}, 
-                {tag: "li", attrs: {}, children: [{tag: "a", attrs: {href:"#", className:"active"}, children: ["Membership"]}
+                {tag: "li", attrs: {}, children: [{tag: "a", attrs: {href:"#", className:"active"}, children: ["Bảng giá"]}
                 ]}
               ]}
             ]}
@@ -3345,11 +4717,11 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2}],38:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":37}],39:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2}],54:[function(require,module,exports){
 arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":36,"./_view.msx":38}],40:[function(require,module,exports){
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":53}],55:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":52,"./_view.msx":54}],56:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -3406,7 +4778,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],41:[function(require,module,exports){
+},{"../_api.msx":1}],57:[function(require,module,exports){
 
 var Modal = function(ctrl){
   return (
@@ -3644,7 +5016,7 @@ var checkData = function(data){
 }
 
 module.exports = Modal;
-},{}],42:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 var Modal = require('./_modal.msx');
@@ -3754,11 +5126,11 @@ var View = function(ctrl){
 
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2,"../_image.msx":4,"./_modal.msx":41}],43:[function(require,module,exports){
-arguments[4][11][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":42}],44:[function(require,module,exports){
-arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":40,"./_view.msx":43}],45:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2,"../_image.msx":4,"./_modal.msx":57}],59:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":58}],60:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":56,"./_view.msx":59}],61:[function(require,module,exports){
 var API = require('../_api.msx');
 
 var Controller = function(){
@@ -3780,7 +5152,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],46:[function(require,module,exports){
+},{"../_api.msx":1}],62:[function(require,module,exports){
 var API = require('../_api.msx');
 var Modal = function(ctrl){
   return (
@@ -3853,7 +5225,7 @@ var Edit = function(ctrl){
 
 
 module.exports = Modal;
-},{"../_api.msx":1}],47:[function(require,module,exports){
+},{"../_api.msx":1}],63:[function(require,module,exports){
 var Data = require('../_data.msx');
 var API = require('../_api.msx');
 var Modal = require('./_modal.msx');
@@ -3961,11 +5333,11 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2,"./_modal.msx":46}],48:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":47}],49:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2,"./_modal.msx":62}],64:[function(require,module,exports){
 arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":45,"./_view.msx":48}],50:[function(require,module,exports){
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":63}],65:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":61,"./_view.msx":64}],66:[function(require,module,exports){
 var API = require('../_api.msx');
 
 
@@ -4037,7 +5409,7 @@ var Controller = function(){
 
 
 module.exports = Controller;
-},{"../_api.msx":1}],51:[function(require,module,exports){
+},{"../_api.msx":1}],67:[function(require,module,exports){
 var Data = require('../_data.msx');
 var Api = require('../_api.msx');
 
@@ -4589,7 +5961,7 @@ var View = function(ctrl){
 }
 
 module.exports = View;
-},{"../_api.msx":1,"../_data.msx":2}],52:[function(require,module,exports){
+},{"../_api.msx":1,"../_data.msx":2}],68:[function(require,module,exports){
 var Sidebar = require('../_sidebar.msx');
 var Overlay = require('../_overlay.msx');
 var Quickview = require('../_quickview.msx');
@@ -4621,6 +5993,6 @@ var View = function(ctrl){
 };
 
 module.exports = View;
-},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":51}],53:[function(require,module,exports){
-arguments[4][12][0].apply(exports,arguments)
-},{"./_controller.msx":50,"./_view.msx":52}]},{},[18])
+},{"../_header.msx":3,"../_overlay.msx":5,"../_quickview.msx":6,"../_sidebar.msx":7,"./_partial.msx":67}],69:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_controller.msx":66,"./_view.msx":68}]},{},[34])

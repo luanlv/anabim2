@@ -6,7 +6,7 @@ var Controller = function(){
   ctrl.subs = m.prop([]);
   
   ctrl.setupFetchSubs = function(){
-    console.log("setup fetch Subscribe");
+    console.log(ctrl.subs());
   };
   
   ctrl.request = function() {

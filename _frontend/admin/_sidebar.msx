@@ -1,6 +1,6 @@
 var Sidebar = function(ctrl){
   return [
-    <nav className="page-sidebar" data-pages="sidebar">
+    <nav className="page-sidebar" data-pages="sidebar" >
       <div className="sidebar-header" style="font-weight: bold; text-align: center">
         <a href="/admin"
           config={m.route}
@@ -9,7 +9,7 @@ var Sidebar = function(ctrl){
         </a>
       </div>
  
-      <div className="sidebar-menu">
+      <div className="sidebar-menu" >
         <ul className="menu-items">
           {/*<li className="m-t-30 ">*/}
             {/*<a href="/admin/users" className="detailed"*/}
@@ -78,6 +78,16 @@ var Sidebar = function(ctrl){
                    config={m.route}
                 >Bảng giá</a>
               </li>
+              <li className="">
+                <a href="/admin/coupon"
+                   config={m.route}
+                >Mã giảm giá</a>
+              </li>
+              <li className="">
+                <a href="/admin/activecode"
+                   config={m.route}
+                >Mã kích hoạt</a>
+              </li>
             </ul>
           </li>
   
@@ -95,7 +105,8 @@ var Sidebar = function(ctrl){
               </li>
             </ul>
           </li>
-          
+          <li className="m-t-30 ">
+          </li>
         </ul>
         <div className="clearfix"></div>
       </div>

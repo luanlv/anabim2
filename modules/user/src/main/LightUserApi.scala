@@ -5,7 +5,7 @@ import lila.db.dsl._
 import reactivemongo.bson._
 
 import scala.concurrent.duration._
-import User.{BSONFields => F}
+import User.{ BSONFields => F }
 import org.joda.time.DateTime
 
 final class LightUserApi(coll: Coll) {
@@ -38,5 +38,6 @@ final class LightUserApi(coll: Coll) {
     ).uno[LightUser],
     timeToLive = 20 minutes,
     default = id => LightUser(id, id, Some(""), "", "none").some,
-    logger = logger branch "LightUserApi")
+    logger = logger branch "LightUserApi"
+  )
 }

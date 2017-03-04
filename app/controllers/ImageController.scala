@@ -1,14 +1,14 @@
 package controllers
 
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json.{ JsArray, JsObject, Json }
 import play.api.mvc._
 import play.twirl.api.Html
 import lila.api.Context
 import lila.app._
 import lila.relation.Related
-import lila.user.{UserRepo, User => UserModel}
-import lila.image.{ImageRepo}
-import lila.image.{Image => ImageModel}
+import lila.user.{ UserRepo, User => UserModel }
+import lila.image.{ ImageRepo }
+import lila.image.{ Image => ImageModel }
 import views._
 import java.util.UUID
 
@@ -26,7 +26,7 @@ object ImageController extends LilaController {
       picture.ref.moveTo(new File(path))
       env.newImage(filename, contentType, s"$uuid.jpg") map {
         result =>
-          if(result >=0 ) {
+          if (result >= 0) {
             Ok(Json.obj("status" -> "File uploaded!"))
           } else {
             BadRequest
@@ -38,7 +38,6 @@ object ImageController extends LilaController {
     }
   }
 
-
   def getList(page: Int) = Open { implicit ctx =>
     ImageRepo.getList(page) map {
       imgs => Ok(Json.toJson(imgs))
@@ -46,12 +45,11 @@ object ImageController extends LilaController {
   }
 
   def get(id: String) = Action {
-    val file = new java.io.File("_image/" + id  )
+    val file = new java.io.File("_image/" + id)
     Ok.sendFile(
       file,
       inline = true
     )
   }
-
 
 }

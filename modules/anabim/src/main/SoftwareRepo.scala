@@ -29,8 +29,6 @@ object SoftwareRepo {
     coll.insert(data)
   }
 
-
-
   //
   def update(data: Software): Future[WriteResult] = {
 
@@ -55,7 +53,7 @@ object SoftwareRepo {
   def getSofts(page: Int, nb: Int = 100): Fu[List[Software]] = {
     coll.find(BSONDocument())
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*nb)
+      .skip((page - 1) * nb)
       .cursor[Software]()
       .gather[List](nb)
   }
@@ -79,6 +77,5 @@ object SoftwareRepo {
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

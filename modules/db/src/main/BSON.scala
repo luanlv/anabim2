@@ -20,8 +20,7 @@ abstract class BSON[T]
 
   def read(doc: Bdoc): T = if (logMalformed) try {
     reads(new Reader(doc))
-  }
-  catch {
+  } catch {
     case e: Exception =>
       logger.warn(s"Can't read malformed doc ${debug(doc)}", e)
       throw e
@@ -37,8 +36,7 @@ object BSON extends Handlers {
     new BSONHandler[Bdoc, T] with BSONDocumentReader[T] with BSONDocumentWriter[T] {
       def read(doc: Bdoc): T = try {
         handler read doc
-      }
-      catch {
+      } catch {
         case e: Exception =>
           logger.warn(s"Can't read malformed doc ${debug(doc)}", e)
           throw e
@@ -163,11 +161,11 @@ object BSON extends Handlers {
       if (b.isEmpty) None else ByteArray.ByteArrayBSONHandler.write(b).some
     def bytesO(b: Array[Byte]): Option[BSONBinary] = byteArrayO(ByteArray(b))
     def strListO(list: List[String]): Option[List[String]] = list match {
-      case Nil          => None
-      case List("")     => None
+      case Nil => None
+      case List("") => None
       case List("", "") => None
-      case List(a, "")  => Some(List(a))
-      case full         => Some(full)
+      case List(a, "") => Some(List(a))
+      case full => Some(full)
     }
     def listO[A](list: List[A])(implicit writer: BSONWriter[A, _ <: BSONValue]): Option[Barr] =
       if (list.isEmpty) None
@@ -184,13 +182,13 @@ object BSON extends Handlers {
   val writer = new Writer
 
   def debug(v: BSONValue): String = v match {
-    case d: Bdoc        => debugDoc(d)
-    case d: Barr        => debugArr(d)
-    case BSONString(x)  => x
+    case d: Bdoc => debugDoc(d)
+    case d: Barr => debugArr(d)
+    case BSONString(x) => x
     case BSONInteger(x) => x.toString
-    case BSONDouble(x)  => x.toString
+    case BSONDouble(x) => x.toString
     case BSONBoolean(x) => x.toString
-    case v              => v.toString
+    case v => v.toString
   }
   def debugArr(doc: Barr): String = doc.values.toList.map(debug).mkString("[", ", ", "]")
   def debugDoc(doc: Bdoc): String = (doc.elements.toList map {

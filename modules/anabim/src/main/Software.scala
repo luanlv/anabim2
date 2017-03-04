@@ -3,14 +3,14 @@ package lila.anabim
 import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
-import lila.image.{Image => ImageModel}
+import lila.image.{ Image => ImageModel }
 
 private[anabim] case class Software(
-                                 id: Int,
-                                 name: String,
-                                 cover: ImageModel,
-                                 slug: String
-                               )
+  id: Int,
+  name: String,
+  cover: ImageModel,
+  slug: String
+)
 
 private[anabim] object Software {
 

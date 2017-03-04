@@ -7,15 +7,15 @@ import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 
 final class Env(
-                 config: Config,
-                 db: lila.db.Env,
-                 renderer: ActorSelection,
-                 system: ActorSystem,
-                 scheduler: lila.common.Scheduler,
-                 relationApi: lila.relation.RelationApi,
-                 userEnv: lila.user.Env,
-                 val isProd: Boolean) {
-
+    config: Config,
+    db: lila.db.Env,
+    renderer: ActorSelection,
+    system: ActorSystem,
+    scheduler: lila.common.Scheduler,
+    relationApi: lila.relation.RelationApi,
+    userEnv: lila.user.Env,
+    val isProd: Boolean
+) {
 
   val CliUsername = config getString "cli.username"
 
@@ -46,7 +46,8 @@ final class Env(
       },
       timeToLive = 10.seconds,
       default = Net.AssetVersion,
-      logger = lila.log("assetVersion"))
+      logger = lila.log("assetVersion")
+    )
     def get = cache get true
   }
 
@@ -60,8 +61,6 @@ final class Env(
     }
   }
 
-
-
   private def makeUrl(path: String): String = s"${Net.BaseUrl}/$path"
 
   lazy val cli = new Cli(system.lilaBus, renderer)
@@ -69,7 +68,6 @@ final class Env(
   KamonPusher.start(system) {
     new KamonPusher(countUsers = () => userEnv.onlineUserIdMemo.count)
   }
-
 
 }
 
@@ -83,5 +81,6 @@ object Env {
     relationApi = lila.relation.Env.current.api,
     system = lila.common.PlayApp.system,
     scheduler = lila.common.PlayApp.scheduler,
-    isProd = lila.common.PlayApp.isProd)
+    isProd = lila.common.PlayApp.isProd
+  )
 }

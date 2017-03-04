@@ -306,7 +306,7 @@ export default class Category extends Component {
 									<div className="column">
 										<div className="ui breadcrumb white" >
 											<Link to="/" className="section" >Trang chủ</Link>
-											<div class="divider"> /</div>
+											<div class="divider" style="display: inline"> / </div>
 											Danh mục: [ <Link to={"/category/" + Data.category.slug } className="section" >{Data.category.name}</Link> ]
 										</div>
 										{/*<h3 className="ui header" style="color: white !important">Web Training and Tutorials</h3>*/}

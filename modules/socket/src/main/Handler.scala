@@ -1,8 +1,8 @@
 package lila.socket
 
 import akka.actor.ActorRef
-import akka.pattern.{ask, pipe}
-import play.api.libs.iteratee.{Enumerator, Iteratee}
+import akka.pattern.{ ask, pipe }
+import play.api.libs.iteratee.{ Enumerator, Iteratee }
 import play.api.libs.json._
 
 import scala.concurrent.duration._
@@ -11,9 +11,9 @@ import lila.hub.actorApi.userMessage._
 import lila.common.LightUser
 import lila.common.PimpedJson._
 import lila.hub.actorApi.activity._
-import lila.hub.actorApi.chatRoom.{ChatRoomMessage, UserSubscribe}
-import lila.hub.actorApi.question.{AnswerQA, CommentQA, InitQA}
-import lila.hub.actorApi.relation.{GetFriendRequest, GetFriends, GetOnlineUser, ReloadOnlineFriends}
+import lila.hub.actorApi.chatRoom.{ ChatRoomMessage, UserSubscribe }
+import lila.hub.actorApi.question.{ AnswerQA, CommentQA, InitQA }
+import lila.hub.actorApi.relation.{ GetFriendRequest, GetFriends, GetOnlineUser, ReloadOnlineFriends }
 import makeTimeout.large
 
 import scala.concurrent.Future
@@ -34,7 +34,8 @@ object Handler {
     socket: ActorRef,
     uid: String,
     join: Any,
-    userId: Option[String])(connecter: Connecter): Fu[JsSocketHandler] = {
+    userId: Option[String]
+  )(connecter: Connecter): Fu[JsSocketHandler] = {
 
     def baseController(member: SocketMember): Controller = {
 
@@ -44,30 +45,28 @@ object Handler {
             socket ! Ping(uid, 0, 0)
           }
           case _ => {
-//            println("===================" + userId.get)
+            //            println("===================" + userId.get)
             (hub.actor.userMessage ? PingVersion(userId.get)) zip
               (hub.actor.relation ? PingVersion(userId.get)) map {
-              case (notify: Int, makeFriend: Int) => socket ! Ping(uid, notify, makeFriend)
-            }
+                case (notify: Int, makeFriend: Int) => socket ! Ping(uid, notify, makeFriend)
+              }
           }
         }
       }
 
-
-
-      case("chat", o) => {
+      case ("chat", o) => {
         userId foreach { userId =>
           val obj = (o obj "d").get
-          if(userId.length()> 0) hub.actor.chatRoom ! ChatRoomMessage(userId, (obj str "room").get,  (obj str "d").get)
+          if (userId.length() > 0) hub.actor.chatRoom ! ChatRoomMessage(userId, (obj str "room").get, (obj str "d").get)
         }
       }
 
-      case("prevChat", o) => {
+      case ("prevChat", o) => {
         val obj = (o obj "d").get
         socket ! GetPrevChat(uid, (obj str "v").get, (obj long "lastTime").get)
       }
 
-      case("initChat", o) => {
+      case ("initChat", o) => {
         val obj = (o obj "d").get
         (obj str "t").get match {
           case "chatrooms" => {
@@ -76,7 +75,7 @@ object Handler {
           case "room" => {
             val roomId = (obj str "v").get
             userId foreach { userId =>
-              if(userId.length()>0) hub.actor.chatRoom ! UserSubscribe(userId, roomId)
+              if (userId.length() > 0) hub.actor.chatRoom ! UserSubscribe(userId, roomId)
             }
             socket ! InitChatRoom(uid, roomId, userId)
           }
@@ -109,7 +108,7 @@ object Handler {
         }
       }
 
-      case("comment", o) => {
+      case ("comment", o) => {
         val obj = (o obj "d").get
         userId foreach { id =>
           (obj str "parent").get match {
@@ -133,7 +132,7 @@ object Handler {
 
       }
 
-      case("moreComment", o) => {
+      case ("moreComment", o) => {
         val obj = (o obj "d").get
         val postId = (obj str "id").get
         val time = (obj long "time").get
@@ -142,26 +141,26 @@ object Handler {
         }
       }
 
-      case("sub", o) => {
+      case ("sub", o) => {
         val obj = (o obj "d").get
         (obj str "t").get match {
           case "chatrooms" => {
             socket ! Sub(uid, "chatrooms", userId)
             userId foreach { userId =>
-              if(userId.length() > 0) hub.actor.chatRoom ! UserSubscribe(userId, "chatrooms")
+              if (userId.length() > 0) hub.actor.chatRoom ! UserSubscribe(userId, "chatrooms")
             }
           }
           case "room" => {
             val roomId = (obj str "v").get
             socket ! Sub(uid, roomId, userId)
             userId foreach { userId =>
-              if(userId.length()>0) hub.actor.chatRoom ! UserSubscribe(userId, roomId)
+              if (userId.length() > 0) hub.actor.chatRoom ! UserSubscribe(userId, roomId)
             }
           }
         }
       }
 
-      case("morePost", o) => {
+      case ("morePost", o) => {
         val obj = (o obj "d").get
         val time = (obj long "time").get
         (hub.actor.activity ? MorePost(userId.get, time)) foreach {
@@ -189,8 +188,7 @@ object Handler {
 
       case ("unSubQuestion", o) => socket ! UnSubQuestion(uid)
 
-
-      case("unSub", o) => {
+      case ("unSub", o) => {
         ((o obj "d").get str "t").get match {
           case "chatrooms" => {
             socket ! UnSub(uid, "chatrooms")
@@ -215,36 +213,35 @@ object Handler {
       }
 
       case ("gn", o) => userId foreach { u =>
-        val id = (o\"d").as[String]
+        val id = (o \ "d").as[String]
         (hub.actor.userMessage ? GetName(id)) foreach {
           case "error" => //println("errror:" +id)
-          case name:String  => socket ! SendName(uid, id, name)
+          case name: String => socket ! SendName(uid, id, name)
         }
       }
 
       case ("gmm", o) => userId foreach { u =>
-        if(u.length > 0){
-          val f = ((o\"d").as[JsObject]\"f").as[Int]
-          val t = ((o\"d").as[JsObject]\"t").as[Int]
+        if (u.length > 0) {
+          val f = ((o \ "d").as[JsObject] \ "f").as[Int]
+          val t = ((o \ "d").as[JsObject] \ "t").as[Int]
           (hub.actor.userMessage ? MissingMes(u, f, t)) foreach {
-            case dataFu: Future[List[JsValue]] => dataFu.map{
+            case dataFu: Future[List[JsValue]] => dataFu.map {
               data => socket ! SendMissingMes(uid, f, t, data)
             }
           }
         }
       }
 
-
       case ("mr", o) => userId foreach { userId =>
-        if(userId.length > 0){
-          val toId = (o\"d"\"uid").as[String]
-          val mv = (o\"d"\"mv").as[Int]
+        if (userId.length > 0) {
+          val toId = (o \ "d" \ "uid").as[String]
+          val mv = (o \ "d" \ "mv").as[Int]
           hub.actor.userMessage ! MarkRead(userId, toId, mv)
         }
       }
 
       case ("initPost", o) => userId foreach { id =>
-        if(id.length() > 0){
+        if (id.length() > 0) {
           (hub.actor.activity ? InitPost(id)) foreach {
             case posts: JsValue => {
               socket ! SendInitPost(uid, posts)
@@ -261,9 +258,9 @@ object Handler {
         }
 
       case ("init_chat", o) => userId foreach { fromId =>
-        if(fromId.length() > 0) {
-          (hub.actor.userMessage ? InitChat(fromId, (o \ "d" \ "w").as[String], (o \ "d" \ "cv").as[Int])) foreach{
-            case dataFu: Future[List[JsValue]] => dataFu.map{
+        if (fromId.length() > 0) {
+          (hub.actor.userMessage ? InitChat(fromId, (o \ "d" \ "w").as[String], (o \ "d" \ "cv").as[Int])) foreach {
+            case dataFu: Future[List[JsValue]] => dataFu.map {
               case data => {
                 socket ! SendInitMes(uid, data)
               }
@@ -273,9 +270,9 @@ object Handler {
       }
 
       case ("gnm", o) => userId foreach { userId =>
-        if(userId.length() > 0) {
+        if (userId.length() > 0) {
           (hub.actor.userMessage ? InitNotify(userId)) foreach {
-            case dataFu: Future[List[JsValue]] => dataFu.map{
+            case dataFu: Future[List[JsValue]] => dataFu.map {
               case data => socket ! SendInitNotify(uid, data)
             }
 
@@ -284,10 +281,10 @@ object Handler {
       }
 
       case ("gmf", o) => userId foreach { userId =>
-        if(userId.length() > 0) {
+        if (userId.length() > 0) {
           (hub.actor.relation ? GetFriendRequest(userId)) foreach {
-            case fuData:Future[Set[LightUser]] => {
-              fuData.map{
+            case fuData: Future[Set[LightUser]] => {
+              fuData.map {
                 data => socket ! SendFriendRequest(uid, data)
               }
             }
@@ -296,9 +293,9 @@ object Handler {
       }
 
       case ("m", o) => userId foreach { u =>
-        if(u.length() > 0 ) {
+        if (u.length() > 0) {
           (o \ "d").asOpt[JsObject] foreach { data =>
-            if(((o obj "d").get str "to").get != u) hub.actor.userMessage ! Msg(u, data)
+            if (((o obj "d").get str "to").get != u) hub.actor.userMessage ! Msg(u, data)
           }
         }
       }
@@ -307,14 +304,14 @@ object Handler {
         hub.actor.relation ! ReloadOnlineFriends(u)
       }
 
-//      case ("test", o) => {
-//        val mes = (o\"d").as[JsObject]
-//        mes str "to" foreach { to =>
-//          mes str "mes" foreach { mes =>
-//            socket ! Test2(uid, to, mes)
-//          }
-//        }
-//      }
+      //      case ("test", o) => {
+      //        val mes = (o\"d").as[JsObject]
+      //        mes str "to" foreach { to =>
+      //          mes str "mes" foreach { mes =>
+      //            socket ! Test2(uid, to, mes)
+      //          }
+      //        }
+      //      }
     }
 
     def iteratee(controller: Controller, member: SocketMember): JsIteratee = {
@@ -324,8 +321,7 @@ object Handler {
           obj str "t" foreach { t =>
             control.lift(t -> obj)
           }
-        }
-      ).map(_ => socket ! Quit(uid))
+        }).map(_ => socket ! Quit(uid))
     }
 
     socket ? join map connecter map {

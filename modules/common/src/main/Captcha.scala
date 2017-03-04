@@ -7,7 +7,8 @@ case class Captcha(
     fen: String,
     white: Boolean,
     solutions: Captcha.Solutions,
-    moves: Map[String, String]) {
+    moves: Map[String, String]
+) {
 
   def valid(solution: String) = solutions.list contains solution
 }
@@ -21,14 +22,15 @@ object Captcha {
     fen = "1k3b1r/r5pp/pNQppq2/2p5/4P3/P3B3/1P3PPP/n4RK1",
     white = true,
     solutions = NonEmptyList("c6 c8"),
-    moves = Map("c6" -> "c8"))
+    moves = Map("c6" -> "c8")
+  )
 }
 
-
 case class Captcha2(
-                     qId: String,
-                     question: String,
-                     solutions: Captcha2.Solutions) {
+    qId: String,
+    question: String,
+    solutions: Captcha2.Solutions
+) {
 
   def valid(solution: String) = solutions.list contains solution
 }
@@ -40,5 +42,6 @@ object Captcha2 {
   val default = Captcha2(
     qId = "00000000",
     question = "1 plus 1 = ?",
-    solutions = NonEmptyList("2", "hai", "two"))
+    solutions = NonEmptyList("2", "hai", "two")
+  )
 }

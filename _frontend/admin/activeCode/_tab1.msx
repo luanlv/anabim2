@@ -1,0 +1,99 @@
+var API = require('../_api.msx');
+var Tab = function(ctrl){
+  return (
+      <div className="tab-pane active" id="tab-fillup1">
+        <div className="row">
+          
+          <div className="col-md-3">
+            <div class="form-group form-group-default required">
+              <label>Mã kích hoạt</label>
+              <input type="text" class="form-control"
+                     value={ctrl.initValue.code}
+                     onchange={function(e){
+                       ctrl.initValue.code = $(e.target).val();
+                     }}
+              />
+            </div>
+          </div>
+          
+          <div className="col-md-2">
+            <div class="form-group form-group-default required">
+              <label>Số ngày</label>
+              <input type="number" class="form-control"
+                value={ctrl.initValue.day}
+                     onchange={function(e){
+                       ctrl.initValue.day = parseInt($(e.target).val());
+                     }}
+              />
+            </div>
+          </div>
+          
+          <div className="col-md-3">
+            <div class="form-group form-group-default required">
+              <label>Email áp dụng</label>
+              <input type="text" class="form-control" value={ctrl.initValue.all?"":ctrl.initValue.email}
+                disabled={ctrl.initValue.all?"true":""}
+                onchange={function(e){
+                  ctrl.initValue.email = $(e.target).val();
+                }}
+              />
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div class="form-group form-group-default required">
+              <label>Cho tất cả</label>
+              <input type="checkbox" name="vehicle1" value="1" checked={ctrl.initValue.all?"checked":""}
+                onchange={function(){
+                  ctrl.initValue.all = !ctrl.initValue.all
+                }}
+              ></input>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div class="form-group form-group-default required">
+              <label>Số lượng</label>
+              <input type="number" class="form-control"
+                value={ctrl.initValue.quantity}
+                onchange={function(e){
+                  ctrl.initValue.quantity = parseInt($(e.target).val());
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="row" style="text-align: right">
+          <div style="float: right">
+            <button className="btn btn-primary" style="margin-right: 30px;"
+              onclick={function(){
+                $.ajax({
+                  type: "POST",
+                  url: "/admin/activecode/new",
+                  data: JSON.stringify({
+                    code: ctrl.initValue.code,
+                    day: ctrl.initValue.day,
+                    email: ctrl.initValue.email,
+                    all: ctrl.initValue.all,
+                    quantity: ctrl.initValue.quantity,
+                    used: false
+                  }),
+                  contentType: "application/json",
+                  dataType: "text",
+                  success: function (data) {
+                    ctrl.init();
+                    ctrl.request();
+                  },
+                  error: function (data) {
+                    console.log(data)
+                    alert(data)
+                  }
+                });
+              }}
+            >Thêm mới</button>
+          </div>
+        </div>
+      </div>
+  )
+}
+
+module.exports = Tab;

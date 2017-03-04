@@ -16,11 +16,12 @@ object Lobby extends LilaController {
     negotiate(
       html = Ok(views.html.index.home()).fuccess,
       api = _ => fuccess {
-        Ok(Json.obj(
-          "lobby" -> Json.obj(
-            "version" -> "1")
-        ))
-      }
+      Ok(Json.obj(
+        "lobby" -> Json.obj(
+          "version" -> "1"
+        )
+      ))
+    }
     )
   }
 

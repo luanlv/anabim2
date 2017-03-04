@@ -2,7 +2,7 @@ package lila
 
 package object image extends PackageObject with WithPlay {
 
-  private[image] type ID = String
+  private[image]type ID = String
 
   object tube {
     // expose user tube

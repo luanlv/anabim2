@@ -6,9 +6,9 @@ import scala.concurrent.duration._
 import scala.util.Success
 import lila.db.dsl._
 import lila.db.paginator._
-import lila.hub.actorApi.timeline.{Propagate, Follow => FollowUser}
+import lila.hub.actorApi.timeline.{ Propagate, Follow => FollowUser }
 import lila.memo.AsyncCache
-import lila.user.{UserRepo, User => UserModel}
+import lila.user.{ UserRepo, User => UserModel }
 import BSONHandlers._
 import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
 import reactivemongo.bson._
@@ -23,7 +23,8 @@ final class RelationApi(
     reporter: ActorSelection,
     followable: ID => Fu[Boolean],
     maxFollow: Int,
-    maxBlock: Int) {
+    maxBlock: Int
+) {
 
   import RelationRepo.makeId
 
@@ -40,12 +41,12 @@ final class RelationApi(
   )), List(
     Group(BSONNull)(
       "u1" -> AddFieldToSet("u1"),
-      "u2" -> AddFieldToSet("u2")),
+      "u2" -> AddFieldToSet("u2")
+    ),
     Project($id($doc("$setDifference" -> $arr("$u1", "$u2"))))
   )).map {
     ~_.documents.headOption.flatMap(_.getAs[Set[String]]("_id")) - userId
   }
-
 
   def fetchBlocking = RelationRepo blocking _
 
@@ -55,7 +56,8 @@ final class RelationApi(
   )), List(
     Group(BSONNull)(
       "u1" -> AddFieldToSet("u1"),
-      "u2" -> AddFieldToSet("u2")),
+      "u2" -> AddFieldToSet("u2")
+    ),
     Project($id($doc("$setIntersection" -> $arr("$u1", "$u2"))))
   )).map {
     ~_.documents.headOption.flatMap(_.getAs[Set[String]]("_id")) - userId
@@ -72,19 +74,22 @@ final class RelationApi(
 
   private val countFriendRequestsCache = AsyncCache[ID, Int](
     f = userId => fetchFriendRequests(userId).map(_.size),
-    timeToLive = 10 minutes)
+    timeToLive = 10 minutes
+  )
 
   def countFriendRequests(userId: ID) = countFriendRequestsCache(userId)
 
   private val countFollowingCache = AsyncCache[ID, Int](
     f = userId => coll.countSel($doc("u1" -> userId, "r" -> Follow)),
-    timeToLive = 10 minutes)
+    timeToLive = 10 minutes
+  )
 
   def countFollowing(userId: ID) = countFollowingCache(userId)
 
   private val countFollowersCache = AsyncCache[ID, Int](
     f = userId => coll.countSel($doc("u2" -> userId, "r" -> Follow)),
-    timeToLive = 10 minutes)
+    timeToLive = 10 minutes
+  )
 
   def countFollowers(userId: ID) = countFollowersCache(userId)
 
@@ -98,19 +103,22 @@ final class RelationApi(
     collection = coll,
     selector = $doc("u1" -> userId, "r" -> Follow),
     projection = $doc("u2" -> true, "_id" -> false),
-    sort = $empty).map(_.userId)
+    sort = $empty
+  ).map(_.userId)
 
   def followersPaginatorAdapter(userId: ID) = new Adapter[Follower](
     collection = coll,
     selector = $doc("u2" -> userId, "r" -> Follow),
     projection = $doc("u1" -> true, "_id" -> false),
-    sort = $empty).map(_.userId)
+    sort = $empty
+  ).map(_.userId)
 
   def blockingPaginatorAdapter(userId: ID) = new Adapter[Blocked](
     collection = coll,
     selector = $doc("u1" -> userId, "r" -> Block),
     projection = $doc("u2" -> true, "_id" -> false),
-    sort = $empty).map(_.userId)
+    sort = $empty
+  ).map(_.userId)
 
   def follow(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit
@@ -118,7 +126,7 @@ final class RelationApi(
       case false => funit
       case true => fetchRelation(u1, u2) zip fetchRelation(u2, u1) flatMap {
         case (Some(Follow), _) => funit
-        case (_, Some(Block))  => funit
+        case (_, Some(Block)) => funit
         case _ => RelationRepo.follow(u1, u2) >> limitFollow(u1) >>- {
           countFollowersCache remove u2
           countFollowingCache remove u1

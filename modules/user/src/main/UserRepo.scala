@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import reactivemongo.api._
 import reactivemongo.api.commands.GetLastError
 import reactivemongo.bson._
-import lila.common.{ApiVersion, LightUser}
+import lila.common.{ ApiVersion, LightUser }
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
 
@@ -26,14 +26,14 @@ object UserRepo {
     coll.find(enabledSelect).sort($sort desc "count.game").cursor[User]().gather[List](nb)
 
   def getUsers(page: Int, nb: Int = 100): Fu[List[User]] =
-    coll.find(BSONDocument()).sort($sort desc "createdAt").skip((page-1)*nb).cursor[User]().gather[List](nb)
+    coll.find(BSONDocument()).sort($sort desc "createdAt").skip((page - 1) * nb).cursor[User]().gather[List](nb)
 
   def getMembershipUsers(page: Int, nb: Int = 100): Fu[List[User]] =
     coll.find(BSONDocument(
       "member" -> BSONDocument(
         "$in" -> BSONArray("membership", "trial")
       )
-    )).sort($sort desc "createdAt").skip((page-1)*nb).cursor[User]().gather[List](nb)
+    )).sort($sort desc "createdAt").skip((page - 1) * nb).cursor[User]().gather[List](nb)
   def byId(id: ID): Fu[Option[User]] = coll.byId[User](id)
 
   def byIds(ids: Iterable[ID]): Fu[List[User]] = coll.byIds[User](ids)
@@ -64,9 +64,6 @@ object UserRepo {
 
   def nameds(usernames: List[String]): Fu[List[User]] = coll.byIds[User](usernames.map(normalize))
 
-
-
-
   def usersFromSecondary(userIds: Seq[ID]): Fu[List[User]] =
     coll.byOrderedIds[User](userIds, readPreference = ReadPreference.secondaryPreferred)(_.id)
 
@@ -79,14 +76,13 @@ object UserRepo {
   def usernamesByIds(ids: List[ID]) =
     coll.distinct[String, List](F.username, $inIds(ids).some)
 
-
   def setProfile(id: ID, profile: Profile): Funit =
     coll.update(
       $id(id),
       $set(F.profile -> Profile.profileBSONHandler.write(profile))
     ).void
 
-  def newSub(id: ID, month: Int) ={
+  def newSub(id: ID, month: Int) = {
     val newInfo = Info(
       start = DateTime.now(),
       end = DateTime.now().plusMonths(month)
@@ -100,7 +96,22 @@ object UserRepo {
     ).void
   }
 
-  def updateEndDate(email: String, date: DateTime) ={
+  def trialMember(id: ID, day: Int) = {
+    println("setting trial member")
+    val newInfo = Info(
+      start = DateTime.now(),
+      end = DateTime.now().plusDays(day)
+    )
+    coll.update(
+      $id(id),
+      $set(
+        F.member -> "trial",
+        F.info -> Info.infoBSONHandler.write(newInfo)
+      )
+    ).void
+  }
+
+  def updateEndDate(email: String, date: DateTime) = {
     coll.update(
       $id(email),
       $set(
@@ -117,9 +128,8 @@ object UserRepo {
 
   def setTitle(id: ID, title: Option[String]): Funit = title match {
     case Some(t) => coll.updateField($id(id), F.title, t).void
-    case None    => coll.update($id(id), $unset(F.title)).void
+    case None => coll.update($id(id), $unset(F.title)).void
   }
-
 
   val enabledSelect = $doc(F.enabled -> true)
 
@@ -149,21 +159,22 @@ object UserRepo {
   private def checkPassword(select: Bdoc): Fu[Option[User.LoginCandidate]] =
     coll.uno[AuthData](select) zip coll.uno[User](select) map {
       case (Some(login), Some(user)) if user.enabled => User.LoginCandidate(user, login.compare).some
-      case _                                         => none
+      case _ => none
     }
 
   def getPasswordHash(id: ID): Fu[Option[String]] =
     coll.primitiveOne[String]($id(id), "password")
 
   def create(
-              username: String,
-              password: String,
-              name: String,
-              email: Option[String],
-              avatar: String,
-              blind: Boolean,
-              mobileApiVersion: Option[ApiVersion],
-              mustConfirmEmail: Boolean = false): Fu[Option[User]] =
+    username: String,
+    password: String,
+    name: String,
+    email: Option[String],
+    avatar: String,
+    blind: Boolean,
+    mobileApiVersion: Option[ApiVersion],
+    mustConfirmEmail: Boolean = false
+  ): Fu[Option[User]] =
     !nameExists(username) flatMap {
       _ ?? {
         val doc = newUser(
@@ -174,20 +185,22 @@ object UserRepo {
           email = email,
           blind = blind,
           mobileApiVersion = mobileApiVersion,
-          mustConfirmEmail = mustConfirmEmail) ++
+          mustConfirmEmail = mustConfirmEmail
+        ) ++
           ("len" -> BSONInteger(username.size))
         coll.insert(doc) >> named(normalize(username))
       }
     }
 
   def create2(
-              username: String,
-              password: String,
-              email: Option[String],
-              avatar: String,
-              blind: Boolean,
-              mobileApiVersion: Option[ApiVersion],
-              mustConfirmEmail: Boolean = false): Fu[Option[User]] =
+    username: String,
+    password: String,
+    email: Option[String],
+    avatar: String,
+    blind: Boolean,
+    mobileApiVersion: Option[ApiVersion],
+    mustConfirmEmail: Boolean = false
+  ): Fu[Option[User]] =
     !nameExists(username) flatMap {
       _ ?? {
         println("=============")
@@ -195,12 +208,12 @@ object UserRepo {
         val doc = newUser(
           username = username,
           password = password,
-          name = "Name",
+          name = username,
           avatar = avatar,
           email = email,
           blind = blind,
-          mobileApiVersion = mobileApiVersion,
-          mustConfirmEmail = mustConfirmEmail) ++
+          mobileApiVersion = mobileApiVersion
+        ) ++
           ("len" -> BSONInteger(username.size))
         coll.insert(doc) >> named(normalize(username))
       }
@@ -210,11 +223,11 @@ object UserRepo {
   def idExists(id: String): Fu[Boolean] = coll exists $id(id)
 
   /**
-    * Filters out invalid usernames and returns the IDs for those usernames
-    *
-    * @param usernames Usernames to filter out the non-existent usernames from, and return the IDs for
-    * @return A list of IDs for the usernames that were given that were valid
-    */
+   * Filters out invalid usernames and returns the IDs for those usernames
+   *
+   * @param usernames Usernames to filter out the non-existent usernames from, and return the IDs for
+   * @return A list of IDs for the usernames that were given that were valid
+   */
   def existingUsernameIds(usernames: Set[String]): Fu[List[String]] =
     coll.primitive[String]($inIds(usernames.map(normalize)), "_id")
 
@@ -228,7 +241,8 @@ object UserRepo {
       val regex = "^" + id + ".*$"
       coll.find(
         $doc("_id".$regex(regex, "")) ++ enabledSelect,
-        $doc(F.username -> true))
+        $doc(F.username -> true)
+      )
         .sort($doc("len" -> 1))
         .cursor[Bdoc](ReadPreference.secondaryPreferred).gather[List](max)
         .map {
@@ -236,7 +250,6 @@ object UserRepo {
         }
     }
   }
-
 
   def updateName(userID: ID, v: String) = coll.updateField($id(userID), "name", v)
 
@@ -246,13 +259,13 @@ object UserRepo {
 
   def enable(id: ID) = coll.updateField($id(id), F.enabled, true)
 
-
   def passwd(id: ID, password: String): Funit =
     coll.primitiveOne[String]($id(id), "salt") flatMap { saltOption =>
       saltOption ?? { salt =>
         coll.update($id(id), $set(
           "password" -> hash(password, salt),
-          "sha512" -> false)).void
+          "sha512" -> false
+        )).void
       }
     }
 
@@ -261,8 +274,6 @@ object UserRepo {
   def email(id: ID): Fu[Option[String]] = coll.primitiveOne[String]($id(id), F.email)
 
   def hasEmail(id: ID): Fu[Boolean] = email(id).map(_.isDefined)
-
-
 
   def setSeenAt(id: ID) {
     coll.updateFieldUnchecked($id(id), "seenAt", DateTime.now)
@@ -281,29 +292,29 @@ object UserRepo {
   def idsSumToints(ids: Iterable[String]): Fu[Int] =
     ids.nonEmpty ?? coll.aggregate(
       Match($inIds(ids)),
-      List(Group(BSONNull)(F.toints -> SumField(F.toints)))).map(
-      _.firstBatch.headOption flatMap { _.getAs[Int](F.toints) }
-    ).map(~_)
-
+      List(Group(BSONNull)(F.toints -> SumField(F.toints)))
+    ).map(
+        _.firstBatch.headOption flatMap { _.getAs[Int](F.toints) }
+      ).map(~_)
 
   def userIdsWithRoles(roles: List[String]): Fu[Set[User.ID]] =
     coll.distinct[String, Set]("_id", $doc("roles" $in roles).some)
 
-
   def mustConfirmEmail(id: String): Fu[Boolean] =
-    coll.exists($id(id) ++ $doc(F.mustConfirmEmail $exists true))
+    coll.exists($doc(F.id -> id, F.mustConfirmEmail -> true))
 
   def setEmailConfirmed(id: String): Funit = coll.update($id(id), $unset(F.mustConfirmEmail)).void
 
   private def newUser(
-                       username: String,
-                       password: String,
-                       name: String,
-                       avatar: String,
-                       email: Option[String],
-                       blind: Boolean,
-                       mobileApiVersion: Option[ApiVersion],
-                       mustConfirmEmail: Boolean = false) = {
+    username: String,
+    password: String,
+    name: String,
+    avatar: String,
+    email: Option[String],
+    blind: Boolean,
+    mobileApiVersion: Option[ApiVersion],
+    mustConfirmEmail: Boolean = false
+  ) = {
 
     val salt = ornicar.scalalib.Random nextStringUppercase 32
     import lila.db.BSON.BSONJodaDateTimeHandler
@@ -316,14 +327,15 @@ object UserRepo {
       F.avatar -> avatar,
       F.email -> email,
       F.roles -> List("student"),
-      F.mustConfirmEmail -> (email.isDefined && mustConfirmEmail).option(DateTime.now),
+      F.mustConfirmEmail -> mustConfirmEmail,
       "password" -> hash(password, salt),
       "salt" -> salt,
       F.enabled -> true,
       F.createdAt -> DateTime.now,
-      F.seenAt -> DateTime.now) ++ {
-      if (blind) $doc("blind" -> true) else $empty
-    }
+      F.seenAt -> DateTime.now
+    ) ++ {
+        if (blind) $doc("blind" -> true) else $empty
+      }
   }
 
   private def hash(pass: String, salt: String): String = "%s{%s}".format(pass, salt).sha1

@@ -33,8 +33,7 @@ private[i18n] final class Translator(messages: Messages, pool: I18nPool) {
 
   private def formatTranslation(key: String, pattern: String, args: Seq[Any]) = try {
     Some(if (args.isEmpty) pattern else pattern.format(args: _*))
-  }
-  catch {
+  } catch {
     case e: Exception =>
       logger.warn(s"Failed to translate $key -> $pattern ($args)", e)
       None

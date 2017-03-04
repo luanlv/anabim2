@@ -15,7 +15,8 @@ final class Cached(
     userColl: Coll,
     nbTtl: FiniteDuration,
     onlineUserIdMemo: ExpireSetMemo,
-    mongoCache: MongoCache.Builder) {
+    mongoCache: MongoCache.Builder
+) {
 
   private def oneWeekAgo = DateTime.now minusWeeks 1
   private def oneMonthAgo = DateTime.now minusMonths 1
@@ -23,14 +24,15 @@ final class Cached(
   private val countCache = mongoCache.single[Int](
     prefix = "user:nb",
     f = userColl.count(UserRepo.enabledSelect.some),
-    timeToLive = nbTtl)
+    timeToLive = nbTtl
+  )
 
   private implicit val LightUserBSONHandler = Macros.handler[LightUser]
-
 
   val topToints = mongoCache.single[List[User]](
     prefix = "user:top:toints",
     f = UserRepo allSortToints 10,
-    timeToLive = 5 minutes)
+    timeToLive = 5 minutes
+  )
 
 }

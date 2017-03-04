@@ -1,0 +1,55 @@
+var API = require('../_api.msx');
+
+function randomString() {
+  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+  var string_length = 5;
+  var randomstring = '';
+  for (var i=0; i<string_length; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    randomstring += chars.substring(rnum,rnum+1);
+  }
+  return randomstring;
+}
+
+var Controller = function(){
+  var ctrl = this;
+  ctrl.activeCodes = m.prop([]);
+  ctrl.init = function() {
+    ctrl.initValue = {
+      code: randomString(),
+      day: 3,
+      email: "",
+      all: false,
+      quantity: 1,
+      used: false
+    };
+    console.log(ctrl.initValue)
+  }
+  ctrl.init();
+  ctrl.setupFetchActiveCode = function(){
+    console.log(ctrl.activeCodes());
+  };
+  
+  ctrl.request = function() {
+    ctrl.fetchActiveCode = API.requestWithFeedback({
+      method: "GET",
+      url: "/admin/activecode/get"
+    }, ctrl.activeCodes, ctrl.setupFetchActiveCode);
+  };
+  ctrl.request();
+  
+  ctrl.textToList = function(text){
+    var list = text.split(',');
+    result = [];
+    list.map(function(el){
+      if(!isNaN(parseInt(el))) {
+        result.push(parseInt(el))
+      }
+    });
+    return result;
+  }
+  
+};
+
+
+module.exports = Controller;

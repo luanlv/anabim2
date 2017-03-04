@@ -21,7 +21,6 @@ object IndexCourseRepo {
 
   private lazy val coll = Env.current.indexCourseColl
 
-
   def update(data: IndexCourse): Future[WriteResult] = {
     coll.update(
       selector = BSONDocument("_id" -> 1),
@@ -41,6 +40,5 @@ object IndexCourseRepo {
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

@@ -29,12 +29,12 @@ object JsonView {
     JsString(u.username)
   }
 
-
   implicit val modWrites = OWrites[User] { u =>
     Json.obj(
       "id" -> u.id,
       "username" -> u.username,
-      "title" -> u.title)
+      "title" -> u.title
+    )
   }
 
 }

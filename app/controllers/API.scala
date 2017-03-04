@@ -6,7 +6,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.libs.json._
 import play.api.mvc._, Results._
 import play.api.Play.current
-import lila.anabim.{CourseRepo, VideoRepo, CateRepo, SoftwareRepo, SubscribeRepo, PriceRepo, IndexCourseRepo, CommentRepo}
+import lila.anabim.{ CourseRepo, VideoRepo, CateRepo, SoftwareRepo, SubscribeRepo, PriceRepo, IndexCourseRepo, CommentRepo }
 
 import lila.api.Context
 import lila.app._
@@ -16,7 +16,6 @@ import views._
 import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 import scala.concurrent.ExecutionContext.Implicits.global
-
 
 object API extends LilaController {
   private def env = Env.anabim.api
@@ -29,8 +28,7 @@ object API extends LilaController {
       Ok(Json.obj(
         "videos" -> Json.toJson(videos),
         "course" -> Json.toJson(course)
-        )
-      )
+      ))
     }
 
   }
@@ -43,8 +41,7 @@ object API extends LilaController {
       Ok(Json.obj(
         "category" -> Json.toJson(category),
         "courses" -> Json.toJson(courses)
-      )
-      )
+      ))
     }
   }
 
@@ -56,8 +53,7 @@ object API extends LilaController {
       Ok(Json.obj(
         "software" -> Json.toJson(software),
         "courses" -> Json.toJson(courses)
-      )
-      )
+      ))
     }
   }
 
@@ -78,7 +74,6 @@ object API extends LilaController {
       indexCourse => Ok(Json.toJson(indexCourse))
     }
   }
-
 
   def getComment(kind: String, id: Int) = Open { implicit ctx =>
     CommentRepo.getComment(kind, id) map {

@@ -4,26 +4,23 @@ import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
 
-
-
 private[anabim] case class Comment(
-                                      id: Int,
-                                      kind : String,
-                                      parentID : Int,
-                                      users: List[String] = List(),
-                                      comment: String,
-                                      user: LightUser,
-                                      time: DateTime,
-                                      children: List[ChildComment] = List()
-                                    )
+  id: Int,
+  kind: String,
+  parentID: Int,
+  users: List[String] = List(),
+  comment: String,
+  user: LightUser,
+  time: DateTime,
+  children: List[ChildComment] = List()
+)
 
 private[anabim] case class ChildComment(
-                                         id: Int,
-                                         comment: String,
-                                         user: LightUser,
-                                         time: DateTime
-                                         )
-
+  id: Int,
+  comment: String,
+  user: LightUser,
+  time: DateTime
+)
 
 private[anabim] object ChildComment {
   implicit val lightUser = Json.format[LightUser]

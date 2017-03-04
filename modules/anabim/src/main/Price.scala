@@ -3,19 +3,18 @@ package lila.anabim
 import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
-import lila.image.{Image => ImageModel}
+import lila.image.{ Image => ImageModel }
 
 private[anabim] case class Price(
-                                 one: Int,
-                                 three: Int,
-                                 six: Int,
-                                 twelve: Int
-                               )
+  one: Int,
+  three: Int,
+  six: Int,
+  twelve: Int
+)
 
 private[anabim] object Price {
 
-
-  implicit val formatPrice= Json.format[Price]
+  implicit val formatPrice = Json.format[Price]
 
   import reactivemongo.bson._
 

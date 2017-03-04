@@ -1,0 +1,103 @@
+var API = require('../_api.msx');
+var Tab = function(ctrl){
+  return (
+      <div className="tab-pane" id="tab-fillup2">
+          <div className="row">
+            <div className="col-md-3">
+              <div class="form-group form-group-default required">
+                <label>Mã giảm giá</label>
+                <input type="text" class="form-control"
+                       value={ctrl.initValue.code}
+                       onchange={function(e){
+                         ctrl.initValue.code = $(e.target).val();
+                       }}
+                />
+              </div>
+            </div>
+            
+            <div className="col-md-2">
+              <div class="form-group form-group-default required">
+                <label>Giá giảm</label>
+                <input type="number" class="form-control"
+                       value={ctrl.initValue.price}
+                       onchange={function(e){
+                         ctrl.initValue.price = parseInt($(e.target).val());
+                       }}
+                />
+              </div>
+            </div>
+  
+            <div className="col-md-2">
+              <div class="form-group form-group-default required">
+                <label>Tháng áp dụng</label>
+                <input type="text" class="form-control" value={ctrl.initValue.month.join(',')}
+                       onchange={function(e){
+                         console.log($(e.target).val())
+                         ctrl.initValue.month = ctrl.textToList($(e.target).val());
+                       }}
+                />
+              </div>
+            </div>
+  
+            <div className="col-md-3">
+              <div className="form-group form-group-default required">
+                <div id="datepicker-component2" className="input-group date "
+                >
+                  <label>Hạn cuối</label>
+                  <input type="text" class="form-control" value={API.date2(ctrl.initValue.endTime)}
+                         onchange={function(e){
+                           var time = (new Date($(e.target).val())).getTime();
+                           ctrl.initValue.endTime = time;
+                         }}
+                  /><span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+              </div>
+            </div>
+  
+            <div className="col-md-2">
+              <div class="form-group form-group-default required">
+                <label>Số lượng</label>
+                <input type="number" class="form-control"
+                       value={ctrl.initValue.quantity}
+                       onchange={function(e){
+                         ctrl.initValue.quantity = parseInt($(e.target).val());
+                       }}
+                />
+              </div>
+            </div>
+            
+          </div>
+          <div className="row" style="text-align: right">
+            <div style="float: right">
+              <button className="btn btn-primary" style="margin-right: 30px;"
+                      onclick={function(){
+                        $.ajax({
+                          type: "POST",
+                          url: "/admin/coupon/new",
+                          data: JSON.stringify({
+                            kind: 2,
+                            code: ctrl.initValue.code,
+                            price: ctrl.initValue.price,
+                            month: ctrl.initValue.month,
+                            endTime: ctrl.initValue.endTime,
+                            quantity: ctrl.initValue.quantity
+                          }),
+                          contentType: "application/json",
+                          dataType: "text",
+                          success: function (data) {
+                            ctrl.request();
+                          },
+                          error: function (data) {
+                            console.log(data)
+                            alert(data)
+                          }
+                        });
+                      }}
+              >Thêm mới</button>
+            </div>
+          </div>
+        </div>
+  )
+}
+
+module.exports = Tab;

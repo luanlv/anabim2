@@ -6,14 +6,15 @@ import org.joda.time.DateTime
 
 import scala.util.Success
 import lila.hub.actorApi.relation.ReloadOnlineFriends
-import lila.hub.actorApi.timeline.{Propagate, Follow => FollowUser}
+import lila.hub.actorApi.timeline.{ Propagate, Follow => FollowUser }
 import play.api.libs.json.JsObject
 //import lila.usrMessage.MessageRepo
 
 final class Api(
-                 cached: Cached,
-                 actor: ActorSelection,
-                 bus: lila.common.Bus) {
+    cached: Cached,
+    actor: ActorSelection,
+    bus: lila.common.Bus
+) {
 
   private def counter = lila.counter.Env.current.api
 

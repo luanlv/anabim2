@@ -7,16 +7,18 @@ import fn from '../../fn'
 
 export default class Layout extends Component {
 	constructor() {
-		super()
+		super();
 		this.state = {
 		};
-		this.changeMonth = this.changeMonth.bind(this)
+		this.changeMonth = this.changeMonth.bind(this);
 		this.change = this.change.bind(this);
 		this.redraw = this.redraw.bind(this);
 		this.membership = this.membership.bind(this);
+		this.activeCode = this.activeCode.bind(this);
 	}
 
 	componentDidMount() {
+		
 		var $menu = $('#danhmuc');
 		var firstMenu = $('#danhmuc').children('.item')[0];
 		console.log($('.maintainHover').length)
@@ -136,6 +138,20 @@ export default class Layout extends Component {
 		
 		var elem = document.getElementById("loading");
 		elem.parentElement.removeChild(elem);
+		
+		if(this.props.params.email !== undefined) {
+			$("#email").val(this.props.params.email)
+		}
+		if(this.props.params.name !== undefined) {
+			$("#name").val(this.props.params.name)
+		}
+		
+		if(this.props.params.exist !== undefined) {
+			$('#dang-ky').modal('show');
+		}
+		if(this.props.params.confirmEmail !== undefined){
+			$('#email-comfirm').modal('show');
+		}
 	}
 	
 	membership(){
@@ -154,6 +170,12 @@ export default class Layout extends Component {
 		}
 	}
 	
+	activeCode(){
+		$('#activeCode')
+			.modal('show')
+		;
+	}
+	
 	redraw(){
 		this.setState({});
 	}
@@ -170,6 +192,9 @@ export default class Layout extends Component {
 	
 	render() {
 		var this2 = this;
+		var link = function(slug, name){
+			return <Link to={Data.baseUrl + "/course/" + slug}>{name}</Link>
+		}
 		return (
 			<div>
 				<div class="nav">
@@ -191,25 +216,25 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list">
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>REVIT ARCHITECTURE NỀN TẢNG</li>
-															<li>REVIT ARCHITECTURE NÂNG CAO</li>
-															<li>REVIT CONCEPTUAL MASS</li>
-															<li>REVIT FAMILY CƠ BẢN</li>
-															<li>REVIT FAMILY NÂNG CAO</li>
-															<li>REVIT FAMILY ADAPTIVE CƠ BẢN</li>
-															<li>REVIT FAMILY ADAPTIVE NÂNG CAO</li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-lam-quen-voi-revit"}>Làm Quen Với Revit (FREE)</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-revit-architecture-nen-tang"}>Revit Arrchitecture Nền Tảng</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-revit-architecture-nang-cao"}>Revit Arrchitecture Nâng Cao</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-conceptual-massing"}>Revit Conceptual Mass</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-revit-family-co-ban"}>Revit Family Cơ Bản</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-revit-family-nang-cao"}>Revit Family Nâng Cao</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-revit-family-addaptive-co-ban"}>Revit Family Adaptive Cơ Bản</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-revit-family-adaptive-nang-cao"}>Revit Family Adaptive Nâng Cao</Link></li>
 														</ul>
 													</div>
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTODESK DYNAMO 2016</li>
-															<li>DYNAMO NÂNG CAO</li>
-															<li>AUTODESK FORMIT</li>
-															<li>SKETCHUP CƠ BẢN</li>
-															<li>SKETCHUP NÂNG CAO</li>
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
-															<li>THIẾT KẾ GẠCH THÔNG GIÓ</li>
+															<li>{link("khoa-hoc-dynamo-co-ban", "Autodesk Dynamo 2016")}</li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-dynamo-nang-cao"}>Dynamo Nâng Cao</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-formit-360"}>Autodesk Formit</Link></li>
+															<li><Link to={Data.baseUrl + "/course/sketchup-co-ban"}>Sketchup Cơ Bản</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-sketchup-nang-cao"}>Sketchup Nâng Cao</Link></li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-autocad-2015-co-ban"}>Autocad 2015 Miễn Phí</Link></li>
+															<li><Link to={Data.baseUrl + "/course/thiet-ke-gach-thong-gio-revit"}>Thiết Kế Gạch Thông Gió</Link></li>
 														</ul>
 													</div>
 												</div>
@@ -222,17 +247,17 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list">
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>KHÓA HỌC REVIT MEP CƠ BẢN</li>
-															<li>KHÓA HỌC REVIT MEP NÂNG CAO</li>
-															<li>KHOÁ HỌC FAMILY REVIT MEP</li>
+															<li><Link to={Data.baseUrl + "/course/khoa-hoc-lam-quen-voi-revit"}>Làm Quen Với Revit (FREE)</Link></li>
+															<li>{link("khoa-hoc-revit-mep-co-ban", "Khóa học Revit MEP cơ bản")}</li>
+															<li>{link("khoa-hoc-revit-mep-nang-cao", "Khóa Học Revit MEP Nâng Cao")}</li>
+															<li>{link("khoa-hoc-family-mep-phan-1", "Family MEP")}</li>
 														</ul>
 													</div>
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTODESK DYNAMO 2016</li>
-															<li>DYNAMO NÂNG CAO</li>
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
+															<li>{link("khoa-hoc-dynamo-co-ban", "Autodesk Dynamo 2016")}</li>
+															<li>{link("khoa-hoc-dynamo-nang-cao", "Khóa học Dynamo nâng cao")}</li>
+															<li>{link("khoa-hoc-autocad-2015-co-ban", "Autocad 2015 Miễn Phí")}</li>
 														</ul>
 													</div>
 												</div>
@@ -245,20 +270,19 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>REVIT STRUCTURE CƠ BẢN</li>
-															<li>ROBOT STRUCTURAL ANALYSIS CƠ BẢN</li>
-															<li>REVIT STRUCTURE CONCRETE</li>
+															<li>{link("khoa-hoc-autocad-2015-co-ban", "Autocad 2015 Miễn Phí")}</li>
+															<li>{link("khoa-hoc-lam-quen-voi-revit", "Làm Quen Với Revit (FREE)")}</li>
+															<li>{link("khoa-hoc-revit-structure-co-ban", "Revit Structure Cơ Bản")}</li>
+															<li>{link("khoa-hoc-robot-structural-co-ban", "Robot Structural Cơ Bản")}</li>
+															<li>{link("Revit-Structure-Concrete", "Revit Structure Concrete")}</li>
 														</ul>
 													</div>
 													<div className="column">
 														<ul class="ui list">
-															<li>REVIT STRUCTURE STEEL </li>
-															<li>REVIT STRUCTURE DETAILING </li>
-															<li>FAMILY REVIT STRUCTURE</li>
-															<li>AUTODESK DYNAMO 2016</li>
-															<li>DYNAMO NÂNG CAO</li>
+															<li>{link("khoa-hoc-revit-structure-steel", "Revit Structure Steel")}</li>
+															<li>{link("khoa-hoc-revit-family-structure", "Family Revit Structure")}</li>
+															<li>{link("khoa-hoc-dynamo-co-ban", "Autodesk Dynamo 2016")}</li>
+															<li>{link("khoa-hoc-dynamo-nang-cao", "Khóa học Dynamo nâng cao")}</li>
 														</ul>
 													</div>
 												</div>
@@ -271,16 +295,16 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>AUTODESK ECOTEC</li>
+															<li>{link("khoa-hoc-autocad-2015-co-ban", "Autocad 2015 Miễn Phí")}</li>
+															<li>{link("khoa-hoc-lam-quen-voi-revit", "Làm Quen Với Revit (FREE)")}</li>
+															<li>{link("khoa-hoc-ecotec-co-ban", "Autodesk Ecotec")}</li>
 														</ul>
 													</div>
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTODESK VASARI</li>
-															<li>AUTODESK DYNAMO 2016</li>
-															<li>DYNAMO NÂNG CAO</li>
+															<li>{link("khoa-hoc-vasari", "Autodesk Vasari")}</li>
+															<li>{link("khoa-hoc-dynamo-co-ban", "Autodesk Dynamo 2016")}</li>
+															<li>{link("khoa-hoc-dynamo-nang-cao", "Khóa học Dynamo nâng cao")}</li>
 														</ul>
 													</div>
 												</div>
@@ -293,16 +317,14 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>AUTODESK INVENTER</li>
+															<li>{link("khoa-hoc-autocad-2015-co-ban", "Autocad 2015 Miễn Phí")}</li>
+															<li>{link("khoa-hoc-lam-quen-voi-revit", "Làm Quen Với Revit (FREE)")}</li>
 														</ul>
 													</div>
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTODESK FUSHION 360</li>
-															<li>AUTODESK DYNAMO 2016</li>
-															<li>DYNAMO NÂNG CAO</li>
+															<li>{link("khoa-hoc-dynamo-co-ban", "Autodesk Dynamo 2016")}</li>
+															<li>{link("khoa-hoc-dynamo-nang-cao", "Dynamo Nâng Cao")}</li>
 														</ul>
 													</div>
 												</div>
@@ -315,10 +337,9 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list">
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>AUTODESK INFRAWORK 360</li>
-															<li>AUTODESK CIVIL 3D (UPDATING)</li>
+															<li>{link("khoa-hoc-autocad-2015-co-ban", "Autocad 2015 Miễn Phí")}</li>
+															<li>{link("khoa-hoc-lam-quen-voi-revit", "Làm Quen Với Revit (FREE)")}</li>
+															<li>{link("khoa-hoc-infrawork-360", "Khóa Học Infrawork 360")}</li>
 														</ul>
 													</div>
 													<div className="column">
@@ -334,22 +355,16 @@ export default class Layout extends Component {
 												<div className="ui two column grid">
 													<div className="column">
 														<ul class="ui list" >
-															<li>AUTOCAD 2015 MIỄN PHÍ</li>
-															<li>LÀM QUEN VỚI REVIT (FREE)</li>
-															<li>DYNAMO NÂNG CAO</li>
-															<li>BIM GLUE (UPDATING)</li>
-															<li>COLLABORATE TRONG REVIT</li>
-															<li>NAVISWORK PHẦN 2</li>
+															<li>{link("khoa-hoc-autocad-2015-co-ban", "Autocad 2015 Miễn Phí")}</li>
+															<li>{link("khoa-hoc-lam-quen-voi-revit", "Làm Quen Với Revit (FREE)")}</li>
+															<li>{link("khoa-hoc-dynamo-nang-cao", "Dynamo Nâng Cao")}</li>
+															<li>{link("khoa-hoc-bim-glue", "Khóa Học BIM Glue")}</li>
+															<li>{link("khoa-hoc-naviswork-phan-2", "Khóa Học Naviswork Phần 2")}</li>
 														</ul>
 													</div>
 													<div className="column">
 														<ul class="ui list">
-															<li>NAVISWORKS MANAGE 2016</li>
-															<li>BIM CẤP ĐỘ 1 (UPDATING)</li>
-															<li>BIM CẤP ĐỘ 2 (UPDATING)</li>
-															<li>BIM PHỐI HỢP THIẾT KẾ KIẾN TRÚC (UPDATING)</li>
-															<li>BIM QUẢN LÝ XÂY DỰNG – BIM360 (UPDATING)</li>
-															<li>BIM CHẾ TẠO – BIM FABRICATION (UPDATING)</li>
+															<li>{link("khoa-hoc-naviswork-co-ban", "Khóa Học Naviswork 2016")}</li>
 														</ul>
 													</div>
 												</div>
@@ -422,11 +437,16 @@ export default class Layout extends Component {
 									<i class="home icon"></i>
 								</Link>
 								<div class="right menu">
-									{/*{(Data.user.member === "member")?(""):(*/}
-											{/*<a class="item">*/}
-												{/*Điền mã kích hoạt*/}
-											{/*</a>*/}
-										{/*)}*/}
+									
+									{(Data.user.member === "member")?(""):(
+											<a class="item"
+												 onClick={this.activeCode}
+											>
+												Điền mã kích hoạt
+											</a>
+										)}
+										
+										
 									<a class="red item"
 										onClick={function(){
 											this2.membership()
@@ -435,6 +455,7 @@ export default class Layout extends Component {
 										Membership
 									</a>
 								</div>
+								
 							</div>
 						</div>
 					</div>
@@ -539,7 +560,7 @@ export default class Layout extends Component {
 					</div>
 					<div class="ui two column stackable segment grid noBor noSha">
 						<div class="column">
-							<form class="ui large form" action="/login?referrer=/" method="POST">
+							<form class="ui large form" action="/login" method="POST">
 								<div class="ui stacked segment">
 									<div class="field">
 										<div class="ui left icon input">
@@ -590,10 +611,8 @@ export default class Layout extends Component {
 				</div>
 
 				<div id="dang-ky" class="ui modal">
-
-
 					<div class="header" style="text-align: center">
-						Đăng ký
+						{(this.props.params.exist !== undefined)?("Email đã tồn tại, hãy chọn email khác"):("Đăng ký")}
 					</div>
 					<div class="ui two column stackable segment grid noBor noSha">
 						<div class="column">
@@ -648,6 +667,69 @@ export default class Layout extends Component {
 						</div>
 					</div>
 
+				</div>
+				
+				
+				<div id="email-comfirm" class="ui small modal ">
+					<div class="header" style="text-align: center">
+						Kích hoạt email
+					</div>
+					<div class="ui"  style="text-align: center; padding: 30px 10px">
+						Một email kích hoạt đã được gửi đến email <span style="color: red">{this2.props.params.email}</span>
+						<br/>
+						Bạn hãy check email và làm theo hướng dẫn để kích hoạt tài khoản
+					</div>
+				
+				</div>
+				
+				<div id="activeCode" class="ui small modal ">
+					<div class="header" style="text-align: center">
+						Điền mã kích hoạt
+					</div>
+					<div class="ui"  style="text-align: center; padding: 30px 10px">
+						<div className="ui two column stackable grid">
+							<div className="column">
+								<div className="ui form">
+									<div className="field">
+										<input type="text" placeholder="VD:3DAYS"
+													 ref={(input) => { this.inputActiveCode = input; }}
+										/>
+									</div>
+								</div>
+							</div>
+							<div className="column">
+								<div className="ui form">
+									<div className="field">
+										<button class="ui primary button"
+											onClick={function(){
+												var code = this2.inputActiveCode.value.trim();
+												console.log(code)
+												if(code.length > 0){
+													$.ajax({
+														type: "POST",
+														url: "/membership/activebycode/" + code,
+														data: JSON.stringify(Data.membership),
+														contentType: "application/json",
+														dataType: "text"
+													}).done(function () {
+														Data.user.member = "trial"
+														alert("Mã đã được chấp nhận")
+														location.reload();
+													})
+														.fail(function () {
+															alert("Sai mã kích hoạt");
+														});
+												} else {
+													alert("Chưa điền mã kích hoạt")
+												}
+											}}
+										>Kích hoạt</button>
+									</div>
+								</div></div>
+						</div>
+						
+					</div>
+				
 				</div>
 				
 				<div className="ui container">
@@ -752,10 +834,10 @@ export default class Layout extends Component {
 											<i class="checkmark icon"></i>
 											<div class="content">
 												Đăng ký càng lâu giá càng giảm: <br/>
-												<span style="margin-left: 20px; ">1 tháng: <span style="color: red">799.999 đ </span></span><br/>
-												<span style="margin-left: 20px; ">3 tháng: <span style="color: red">1.200.000 đ</span></span><br/>
-												<span style="margin-left: 20px; ">6 tháng: <span style="color: red">1.789.000 đ</span></span><br/>
-												<span style="margin-left: 20px; ">1 năm: <span style="color: red">2.499.000 đ</span></span><br/>
+												<span style="margin-left: 20px; ">1 tháng: <span style="color: red">{fn.numberWithCommas(Data.price[1])} đ </span></span><br/>
+												<span style="margin-left: 20px; ">3 tháng: <span style="color: red">{fn.numberWithCommas(Data.price[3])} đ</span></span><br/>
+												<span style="margin-left: 20px; ">6 tháng: <span style="color: red">{fn.numberWithCommas(Data.price[6])} đ</span></span><br/>
+												<span style="margin-left: 20px; ">1 năm: <span style="color: red">{fn.numberWithCommas(Data.price[12])} đ</span></span><br/>
 											</div>
 										</div>
 									</div>
@@ -830,14 +912,41 @@ export default class Layout extends Component {
 									<div class="ui form">
 										<div class="inline field actions">
 											<div class="ui labeled button" tabindex="0">
-													<input type="text" placeholder="Mã giảm giá"/>
-												<a class="ui basic inverted grey left pointing label">
+													<input type="text" placeholder="Mã giảm giá"
+																 ref={(input) => { this.couponCode = input; }}
+													/>
+												<a class="ui basic inverted grey left pointing label"
+													onClick={function(){
+														$.get( "/coupon/get/" + this2.couponCode.value, function(data) {
+															if(data) {
+																console.log(data)
+																console.log(data)
+																Data.coupon = data
+																this2.redraw()
+															} else {
+																alert( "Mã không tồn tại" );
+															}
+														})
+															.fail(function() {
+																alert( "Mã không tồn tại" );
+															})
+													}}
+												>
 													<i className="large checkmark icon noMa"></i>
 												</a>
 											</div>
+											{Data.coupon?(<span style="color: blue">{fn.infoCoupon(Data.coupon, Data.membership)}</span>):("")}
 											<button class="ui right floated  green approve button"
 												onClick={function() {
 													if(checkForm(Data.membership)){
+														if(Data.coupon){
+															Data.membership.coupon = Data.coupon;
+															if(Data.coupon.kind === 3 ){
+																console.log(fn.bonusDay(Data.coupon, Data.membership.month) + " day")
+																Data.membership.bonusDay = fn.bonusDay(Data.coupon, Data.membership.month)
+															}
+															Data.membership.price = fn.priceWithCoupon(Data.coupon, Data.price[Data.membership.month], Data.membership.month);
+														}
 														$.ajax({
 															type: "POST",
 															url: "/membership/subscribe",
@@ -862,7 +971,7 @@ export default class Layout extends Component {
 												<a class="ui basic inverted grey right pointing label">
 													Total
 												</a>
-												<input style="color: red" disable type="text" value={fn.numberWithCommas(Data.price[Data.membership.month]) + " đ"}/>
+												<input style="color: red" disable type="text" value={fn.numberWithCommas(fn.priceWithCoupon(Data.coupon, Data.price[Data.membership.month], Data.membership.month)) + " đ"}/>
 											</div>
 											
 										</div>

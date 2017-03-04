@@ -10,7 +10,8 @@ final class RateLimit(
     credits: Int,
     duration: Duration,
     name: String,
-    key: String) {
+    key: String
+) {
 
   private type Cost = Int
   private type ClearAt = Long

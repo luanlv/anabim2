@@ -9,13 +9,14 @@ import lila.pref.Pref
 import lila.user.{ UserContext, HeaderUserContext, BodyUserContext }
 
 case class PageData(
-                     onlineFriends: OnlineFriends,
-                     teamNbRequests: Int,
-                     nbChallenges: Int,
-                     nbNotifications: Int,
-                     pref: Pref,
-                     blindMode: Boolean,
-                     hasFingerprint: Boolean)
+  onlineFriends: OnlineFriends,
+  teamNbRequests: Int,
+  nbChallenges: Int,
+  nbNotifications: Int,
+  pref: Pref,
+  blindMode: Boolean,
+  hasFingerprint: Boolean
+)
 
 object PageData {
 
@@ -72,19 +73,22 @@ sealed trait Context extends lila.user.UserContextWrapper {
 }
 
 sealed abstract class BaseContext(
-                                   val userContext: lila.user.UserContext,
-                                   val pageData: PageData) extends Context
+  val userContext: lila.user.UserContext,
+  val pageData: PageData
+) extends Context
 
 final class BodyContext[A](
-                            val bodyContext: BodyUserContext[A],
-                            data: PageData) extends BaseContext(bodyContext, data) {
+    val bodyContext: BodyUserContext[A],
+    data: PageData
+) extends BaseContext(bodyContext, data) {
 
   def body = bodyContext.body
 }
 
 final class HeaderContext(
-                           headerContext: HeaderUserContext,
-                           data: PageData) extends BaseContext(headerContext, data)
+  headerContext: HeaderUserContext,
+  data: PageData
+) extends BaseContext(headerContext, data)
 
 object Context {
 

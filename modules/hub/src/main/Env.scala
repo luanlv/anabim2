@@ -57,5 +57,6 @@ object Env {
 
   lazy val current = "hub" boot new Env(
     config = lila.common.PlayApp loadConfig "hub",
-    system = lila.common.PlayApp.system)
+    system = lila.common.PlayApp.system
+  )
 }

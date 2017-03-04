@@ -1,21 +1,18 @@
 package lila.security
 
-import scala.collection.JavaConversions._
-
-import akka.actor.{ ActorRef, ActorSystem }
 import com.typesafe.config.Config
 import scala.concurrent.duration._
 
 import lila.common.PimpedConfig._
-import lila.db.dsl.Coll
-import lila.user.{ User, UserRepo }
 
 final class Env(
     config: Config,
     captcher: akka.actor.ActorSelection,
-    system: ActorSystem,
+    system: akka.actor.ActorSystem,
     scheduler: lila.common.Scheduler,
-    db: lila.db.Env) {
+
+    db: lila.db.Env
+) {
 
   private val settings = new {
     val CollectionSecurity = config getString "collection.security"
@@ -30,14 +27,17 @@ final class Env(
     val EmailConfirmMailgunApiUrl = config getString "email_confirm.mailgun.api.url"
     val EmailConfirmMailgunApiKey = config getString "email_confirm.mailgun.api.key"
     val EmailConfirmMailgunSender = config getString "email_confirm.mailgun.sender"
+    val EmailConfirmMailgunReplyTo = config getString "email_confirm.mailgun.reply_to"
     val EmailConfirmMailgunBaseUrl = config getString "email_confirm.mailgun.base_url"
     val EmailConfirmSecret = config getString "email_confirm.secret"
     val EmailConfirmEnabled = config getBoolean "email_confirm.enabled"
     val PasswordResetMailgunApiUrl = config getString "password_reset.mailgun.api.url"
     val PasswordResetMailgunApiKey = config getString "password_reset.mailgun.api.key"
     val PasswordResetMailgunSender = config getString "password_reset.mailgun.sender"
+    val PasswordResetMailgunReplyTo = config getString "password_reset.mailgun.reply_to"
     val PasswordResetMailgunBaseUrl = config getString "password_reset.mailgun.base_url"
     val PasswordResetSecret = config getString "password_reset.secret"
+    val LoginTokenSecret = config getString "login_token.secret"
     val TorProviderUrl = config getString "tor.provider_url"
     val TorRefreshDelay = config duration "tor.refresh_delay"
     val DisposableEmailProviderUrl = config getString "disposable_email.provider_url"
@@ -47,7 +47,6 @@ final class Env(
     val RecaptchaEnabled = config getBoolean "recaptcha.enabled"
     val NetDomain = config getString "net.domain"
     val CsrfEnabled = config getBoolean "csrf.enabled"
-//    val CsrfEnabled = false
   }
   import settings._
 
@@ -57,23 +56,27 @@ final class Env(
     coll = firewallColl,
     cookieName = FirewallCookieName.some filter (_ => FirewallCookieEnabled),
     enabled = FirewallEnabled,
-    cachedIpsTtl = FirewallCachedIpsTtl)
+    cachedIpsTtl = FirewallCachedIpsTtl
+  )
 
   lazy val flood = new Flood(FloodDuration)
 
   lazy val recaptcha: Recaptcha =
     if (RecaptchaEnabled) new RecaptchaGoogle(
       privateKey = RecaptchaPrivateKey,
-      endpoint = RecaptchaEndpoint)
+      endpoint = RecaptchaEndpoint
+    )
     else RecaptchaSkip
 
   lazy val forms = new DataForm(
     captcher = captcher,
-    emailAddress = emailAddress)
+    emailAddress = emailAddress
+  )
 
   lazy val geoIP = new GeoIP(
     file = GeoIPFile,
-    cacheTtl = GeoIPCacheTtl)
+    cacheTtl = GeoIPCacheTtl
+  )
 
   lazy val userSpy = UserSpy(firewall, geoIP)(storeColl) _
 
@@ -81,30 +84,37 @@ final class Env(
 
   lazy val disconnect = store disconnect _
 
-  lazy val emailConfirm: EmailConfirm = {
-    println("emailConfrm")
-    if (true) new EmailConfirmMailGun(
+  lazy val emailConfirm: EmailConfirm =
+    if (EmailConfirmEnabled) new EmailConfirmMailGun(
       apiUrl = EmailConfirmMailgunApiUrl,
       apiKey = EmailConfirmMailgunApiKey,
       sender = EmailConfirmMailgunSender,
+      replyTo = EmailConfirmMailgunReplyTo,
       baseUrl = EmailConfirmMailgunBaseUrl,
       secret = EmailConfirmSecret,
-      system = system)
+      system = system
+    )
     else EmailConfirmSkip
-  }
 
   lazy val passwordReset = new PasswordReset(
     apiUrl = PasswordResetMailgunApiUrl,
     apiKey = PasswordResetMailgunApiKey,
     sender = PasswordResetMailgunSender,
+    replyTo = PasswordResetMailgunReplyTo,
     baseUrl = PasswordResetMailgunBaseUrl,
-    secret = PasswordResetSecret)
+    secret = PasswordResetSecret
+  )
+
+  //  lazy val loginToken = new LoginToken(
+  //    secret = LoginTokenSecret
+  //  )
 
   lazy val emailAddress = new EmailAddress(disposableEmailDomain)
 
   private lazy val disposableEmailDomain = new DisposableEmailDomain(
     providerUrl = DisposableEmailProviderUrl,
-    busOption = system.lilaBus.some)
+    busOption = system.lilaBus.some
+  )
 
   scheduler.once(10 seconds)(disposableEmailDomain.refresh)
   scheduler.effect(DisposableEmailRefreshDelay, "Refresh disposable email domains")(disposableEmailDomain.refresh)
@@ -130,5 +140,6 @@ object Env {
     db = lila.db.Env.current,
     system = lila.common.PlayApp.system,
     scheduler = lila.common.PlayApp.scheduler,
-    captcher = lila.hub.Env.current.actor.captcher)
+    captcher = lila.hub.Env.current.actor.captcher
+  )
 }

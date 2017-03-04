@@ -3,8 +3,9 @@ package lila.user
 import org.joda.time.DateTime
 
 case class Info(
-                    start: DateTime ,
-                    end: DateTime){
+    start: DateTime,
+    end: DateTime
+) {
 }
 
 object Info {

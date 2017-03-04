@@ -17,7 +17,8 @@ final class Env(
     lightUser: String => Option[lila.common.LightUser],
     followable: String => Fu[Boolean],
     system: ActorSystem,
-    scheduler: lila.common.Scheduler) {
+    scheduler: lila.common.Scheduler
+) {
 
   private val settings = new {
     val CollectionRelation = config getString "collection.relation"
@@ -38,7 +39,8 @@ final class Env(
     reporter = hub.actor.report,
     followable = followable,
     maxFollow = MaxFollow,
-    maxBlock = MaxBlock)
+    maxBlock = MaxBlock
+  )
 
   private[relation] val actor = system.actorOf(Props(new RelationActor(
     getOnlineUserIds = getOnlineUserIds,
@@ -63,5 +65,6 @@ object Env {
     lightUser = lila.user.Env.current.lightUser,
     followable = lila.pref.Env.current.api.followable _,
     system = lila.common.PlayApp.system,
-    scheduler = lila.common.PlayApp.scheduler)
+    scheduler = lila.common.PlayApp.scheduler
+  )
 }

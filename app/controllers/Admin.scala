@@ -1,19 +1,104 @@
 package controllers
 
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json.{ JsArray, JsObject, Json }
 import play.api.mvc._
 import play.twirl.api.Html
 import lila.api.Context
 import lila.app._
 import lila.relation.Related
-import lila.user.{UserRepo, User => UserModel}
-import lila.anabim.{CourseRepo, VideoRepo, CateRepo, SoftwareRepo, SubscribeRepo, PriceRepo, IndexCourseRepo}
+import lila.user.{ UserRepo, User => UserModel }
+import lila.anabim.{ CourseRepo, VideoRepo, CateRepo, SoftwareRepo, SubscribeRepo, PriceRepo, IndexCourseRepo, CouponRepo, ActiveCodeRepo }
 import views._
-
 
 object Admin extends LilaController {
 
   private def env = Env.anabim.api
+
+  def updateCoupon = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
+    val req = ctx.body
+    ctx.me match {
+      case Some(user) => {
+        val data = Json.parse(req.body.toString).as[JsObject]
+        env.updateCoupon(data) map {
+          result =>
+            if (result >= 0) {
+              Ok(result)
+            } else {
+              BadRequest
+            }
+        }
+      }
+      case None => {
+
+        BadRequest.fuccess
+      }
+
+    }
+  }
+  def deleteCoupon = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
+    val req = ctx.body
+    ctx.me match {
+      case Some(user) => {
+        val data = Json.parse(req.body.toString).as[JsObject]
+        env.deleteCoupon(data) map {
+          result =>
+            if (result >= 0) {
+              Ok(result)
+            } else {
+              BadRequest
+            }
+        }
+      }
+      case None => {
+
+        BadRequest.fuccess
+      }
+
+    }
+  }
+  def deleteActiveCode = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
+    val req = ctx.body
+    ctx.me match {
+      case Some(user) => {
+        val data = Json.parse(req.body.toString).as[JsObject]
+        env.deleteActiveCode(data) map {
+          result =>
+            if (result >= 0) {
+              Ok(result)
+            } else {
+              BadRequest
+            }
+        }
+      }
+      case None => {
+
+        BadRequest.fuccess
+      }
+
+    }
+  }
+
+  def updateActiveCode = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
+    val req = ctx.body
+    ctx.me match {
+      case Some(user) => {
+        val data = Json.parse(req.body.toString).as[JsObject]
+        env.updateActiveCode(data) map {
+          result =>
+            if (result >= 0) {
+              Ok(result)
+            } else {
+              BadRequest
+            }
+        }
+      }
+      case None => {
+
+        BadRequest.fuccess
+      }
+
+    }
+  }
 
   def newCourse = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
 
@@ -25,7 +110,55 @@ object Admin extends LilaController {
 
         env.newCourse(course) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
+              Ok(result)
+            } else {
+              BadRequest
+            }
+        }
+      }
+      case None => {
+
+        BadRequest.fuccess
+      }
+
+    }
+  }
+  def newCoupon = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
+
+    val req = ctx.body
+    ctx.me match {
+      case Some(user) => {
+
+        val data = Json.parse(req.body.toString).as[JsObject]
+
+        env.newCoupon(data) map {
+          result =>
+            if (result >= 0) {
+              Ok(result)
+            } else {
+              BadRequest
+            }
+        }
+      }
+      case None => {
+
+        BadRequest.fuccess
+      }
+
+    }
+  }
+  def newActiveCode = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
+
+    val req = ctx.body
+    ctx.me match {
+      case Some(user) => {
+
+        val data = Json.parse(req.body.toString).as[JsObject]
+
+        env.newActiveCode(data) map {
+          result =>
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -50,7 +183,7 @@ object Admin extends LilaController {
 
         env.newCate(cate) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -75,7 +208,7 @@ object Admin extends LilaController {
 
         env.deleteCate(cateID) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -103,7 +236,7 @@ object Admin extends LilaController {
         val video = Json.parse(req.body.toString).as[JsObject]
         env.newVideo(video) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -124,7 +257,7 @@ object Admin extends LilaController {
         val videoID = (Json.parse(req.body.toString).as[JsObject] \ "id").as[Int]
         env.deleteVideo(videoID) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -145,7 +278,7 @@ object Admin extends LilaController {
         val video = Json.parse(req.body.toString).as[JsObject]
         env.editVideo(video) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -166,7 +299,7 @@ object Admin extends LilaController {
         val course = Json.parse(req.body.toString).as[JsObject]
         env.editCourse(course) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -180,7 +313,6 @@ object Admin extends LilaController {
     }
   }
 
-
   def editCate(id: Int) = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
     val req = ctx.body
     ctx.me match {
@@ -188,7 +320,7 @@ object Admin extends LilaController {
         val cate = Json.parse(req.body.toString).as[JsObject]
         env.editCate(cate) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -209,7 +341,7 @@ object Admin extends LilaController {
         val data = Json.parse(req.body.toString).as[JsObject]
         env.updateEndDate(data) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -225,27 +357,47 @@ object Admin extends LilaController {
 
   def getMembershipUsers = Open { implicit ctx =>
     UserRepo.getMembershipUsers(1) map {
-      users => Ok(Json.toJson(users.map{
-        user => Json.obj(
-          "email" -> user.email,
-          "name" -> user.name,
-          "role" -> user.roles,
-          "member" -> user.member,
-          "time" -> user.time,
-          "createdAt" -> user.createdAt,
-          "member" -> user.member,
-          "info" -> Json.obj(
-            "start" -> user.info.get.start,
-            "end" -> user.info.get.end
-          )
-        )
-      }))
+      users =>
+        Ok(Json.toJson(users.map {
+          user =>
+            Json.obj(
+              "email" -> user.email,
+              "name" -> user.name,
+              "role" -> user.roles,
+              "member" -> user.member,
+              "time" -> user.time,
+              "createdAt" -> user.createdAt,
+              "member" -> user.member,
+              "info" -> Json.obj(
+                "start" -> user.info.get.start,
+                "end" -> user.info.get.end
+              )
+            )
+        }))
     }
   }
 
   def getCourses = Open { implicit ctx =>
     CourseRepo.getCourse(1) map {
       courses => Ok(Json.toJson(courses))
+    }
+  }
+
+  def getCoupons = Open { implicit ctx =>
+    CouponRepo.getCoupons map {
+      coupons => Ok(Json.toJson(coupons))
+    }
+  }
+
+  def getActiveCodes = Open { implicit ctx =>
+    ActiveCodeRepo.getActiveCodes map {
+      activeCodes => Ok(Json.toJson(activeCodes))
+    }
+  }
+
+  def getCouponByCode(code: String) = Open { implicit ctx =>
+    CouponRepo.getCouponByCode(code) map {
+      coupon => Ok(Json.toJson(coupon))
     }
   }
 
@@ -267,7 +419,6 @@ object Admin extends LilaController {
     }
   }
 
-
   def newSoft = OpenBody(BodyParsers.parse.tolerantJson) { implicit ctx =>
 
     val req = ctx.body
@@ -278,7 +429,7 @@ object Admin extends LilaController {
 
         env.newSoft(soft) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -303,7 +454,7 @@ object Admin extends LilaController {
 
         env.deleteSoft(softID) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -325,7 +476,7 @@ object Admin extends LilaController {
         val soft = Json.parse(req.body.toString).as[JsObject]
         env.editSoft(soft) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -351,7 +502,6 @@ object Admin extends LilaController {
     }
   }
 
-
   def getSubs = Open { implicit ctx =>
     SubscribeRepo.getSubs(1) map {
       subs => Ok(Json.toJson(subs))
@@ -376,6 +526,7 @@ object Admin extends LilaController {
       }
     }
   }
+
   def getPrice = Open { implicit ctx =>
     PriceRepo.get map {
       price => Ok(Json.toJson(price))
@@ -389,7 +540,7 @@ object Admin extends LilaController {
         val price = Json.parse(req.body.toString).as[JsObject]
         env.price(price) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest
@@ -415,7 +566,7 @@ object Admin extends LilaController {
         val indexCourse = Json.parse(req.body.toString).as[JsObject]
         env.indexCourse(indexCourse) map {
           result =>
-            if(result >=0 ) {
+            if (result >= 0) {
               Ok(result)
             } else {
               BadRequest

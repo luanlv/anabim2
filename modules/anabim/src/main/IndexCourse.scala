@@ -3,16 +3,16 @@ package lila.anabim
 import lila.common.LightUser
 import org.joda.time.DateTime
 import play.api.libs.json._
-import lila.image.{Image => ImageModel}
+import lila.image.{ Image => ImageModel }
 
 private[anabim] case class CateWithCourses(
   category: Cate,
   courses: List[Course]
-                                      )
+)
 
 private[anabim] object CateWithCourses {
 
-  implicit val formatCateWithCourses= Json.format[CateWithCourses]
+  implicit val formatCateWithCourses = Json.format[CateWithCourses]
 
   import reactivemongo.bson._
 
@@ -34,13 +34,13 @@ private[anabim] object CateWithCourses {
 }
 
 private[anabim] case class IndexCourse(
-                                      value : List[CateWithCourses]
-                                )
+  value: List[CateWithCourses]
+)
 
 private[anabim] object IndexCourse {
 
-  implicit val formatCateWithCourses= Json.format[CateWithCourses]
-  implicit val formatIndexCourse= Json.format[IndexCourse]
+  implicit val formatCateWithCourses = Json.format[CateWithCourses]
+  implicit val formatIndexCourse = Json.format[IndexCourse]
 
   import reactivemongo.bson._
 

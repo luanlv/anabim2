@@ -3,13 +3,13 @@ package lila.socket
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.Random
-import akka.actor.{Deploy => _, _}
+import akka.actor.{ Deploy => _, _ }
 import play.api.libs.json._
 import play.twirl.api.Html
-import actorApi.{SetAlive, _}
+import actorApi.{ SetAlive, _ }
 import lila.common.LightUser
 import lila.hub.actorApi.chatRoom._
-import lila.hub.actorApi.{Deploy, GetUids, HasUserId, SocketUids}
+import lila.hub.actorApi.{ Deploy, GetUids, HasUserId, SocketUids }
 import lila.memo.ExpireSetMemo
 import akka.pattern.{ ask, pipe }
 import makeTimeout.large
@@ -17,11 +17,11 @@ import makeTimeout.large
 abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket with Actor {
 
   val listRoomIds = List("01", "02", "03", "04", "05", "06")
-  val listSid  = scala.collection.mutable.Map.empty[String, (Option[String], String)]
+  val listSid = scala.collection.mutable.Map.empty[String, (Option[String], String)]
 
-  val listSidPost  = scala.collection.mutable.Map.empty[String, String]
+  val listSidPost = scala.collection.mutable.Map.empty[String, String]
 
-  val listSidQuestion  = scala.collection.mutable.Map.empty[String, String]
+  val listSidQuestion = scala.collection.mutable.Map.empty[String, String]
 
   val members = scala.collection.mutable.Map.empty[String, M]
   val aliveUids = new ExpireSetMemo(uidTtl)
@@ -54,34 +54,33 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
   // generic message handler
   def receiveGeneric: Receive = {
 
-    case Ping(uid, notify, makeFriend)      => ping(uid, notify, makeFriend)
+    case Ping(uid, notify, makeFriend) => ping(uid, notify, makeFriend)
 
-    case Broom             => broom
+    case Broom => broom
 
-    case NbMembers(nb)                     => {
+    case NbMembers(nb) => {
       pong = pong + ("d" -> JsNumber(nb))
     }
 
     // when a member quits
-    case Quit(uid)         => {
-      if(listSid.keySet.contains(uid)) unSub(uid)
-      if(listSidPost.keySet.contains(uid)) unSubPost(uid)
-      if(listSidQuestion.keySet.contains(uid)) unSubQuestion(uid)
+    case Quit(uid) => {
+      if (listSid.keySet.contains(uid)) unSub(uid)
+      if (listSidPost.keySet.contains(uid)) unSubPost(uid)
+      if (listSidQuestion.keySet.contains(uid)) unSubQuestion(uid)
       quit(uid)
     }
 
-    case GetUids           => sender ! SocketUids(members.keySet.toSet)
+    case GetUids => sender ! SocketUids(members.keySet.toSet)
 
     case HasUserId(userId) => sender ! members.values.exists(_.userId.contains(userId))
 
-    case Resync(uid)       => resync(uid)
+    case Resync(uid) => resync(uid)
 
-    case d: Deploy         => onDeploy(d)
+    case d: Deploy => onDeploy(d)
 
+    case SetAlive(uid) => setAlive(uid)
 
-    case SetAlive(uid)         => setAlive(uid)
-
-    case SendName(uid, id, name)   => sendName(uid, id,  name)
+    case SendName(uid, id, name) => sendName(uid, id, name)
 
     case SendOnlineFriends(uid, listUser) => sendOnlineFriend(uid, listUser)
 
@@ -100,7 +99,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     case SendInitNotify(uid, data) => sendInitNotify(uid, data)
 
     case InitChatRoom(uid, roomId, userId) => {
-      if(roomId != "chatrooms") initChat(uid, roomId, userId)
+      if (roomId != "chatrooms") initChat(uid, roomId, userId)
       else initChatRooms(uid, roomId, userId)
     }
 
@@ -130,7 +129,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
 
     case UserLeavesRoom(user, roomId) => notifyUserLeaveRoom(user, roomId)
 
-    case DoChat(chat, roomId) =>  sendChatRoom(chat, roomId)
+    case DoChat(chat, roomId) => sendChatRoom(chat, roomId)
 
     case SendFriendRequest(uid, data) => sendFriendRequester(uid, data)
   }
@@ -182,20 +181,20 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
 
   def listUidInRoom(roomId: String) = {
     listSid collect {
-      case (uid, (_, idRoom)) if (roomId == idRoom) =>  uid
+      case (uid, (_, idRoom)) if (roomId == idRoom) => uid
     }
   }
 
   def notifyUserEnterRoom(user: JsValue, roomId: String) {
     val mes = Json.obj("room" -> roomId, "t" -> "userEnter", "u" -> user)
-    listUidInRoom(roomId) foreach {uid =>
+    listUidInRoom(roomId) foreach { uid =>
       withMember(uid)(_ push makeMessage("chatNotify", mes))
     }
   }
 
   def notifyUserLeaveRoom(user: String, roomId: String) = {
     val mes = Json.obj("room" -> roomId, "t" -> "userLeaves", "u" -> user)
-    listUidInRoom(roomId) foreach {uid =>
+    listUidInRoom(roomId) foreach { uid =>
       withMember(uid)(_ push makeMessage("chatNotify", mes))
     }
   }
@@ -206,18 +205,16 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     }
   }
 
-
-
-  def initChatRooms(uid: String, roomId: String, userId:Option[String]) = {
+  def initChatRooms(uid: String, roomId: String, userId: Option[String]) = {
     sub(uid, roomId, userId)
     val listByGroup = listSid.groupBy(x => x._2._2)
-    val data = listRoomIds.map(roomId => Json.obj("id" -> roomId, "c" -> (if(listByGroup.contains(roomId)) listByGroup(roomId).toSeq.length else 0), "u" -> (if(listByGroup.contains(roomId)) listByGroup(roomId).values.toList.map(x => x._1).distinct.size else 0)))
+    val data = listRoomIds.map(roomId => Json.obj("id" -> roomId, "c" -> (if (listByGroup.contains(roomId)) listByGroup(roomId).toSeq.length else 0), "u" -> (if (listByGroup.contains(roomId)) listByGroup(roomId).values.toList.map(x => x._1).distinct.size else 0)))
     listUidInRoom(roomId) foreach { uid =>
-      withMember(uid)(_ push makeMessage("chatNotify", Json.obj("t" -> "initChatRooms" , "v" -> data)))
+      withMember(uid)(_ push makeMessage("chatNotify", Json.obj("t" -> "initChatRooms", "v" -> data)))
     }
   }
 
-  def initChat(uid: String, roomId: String, userId:Option[String]) = {
+  def initChat(uid: String, roomId: String, userId: Option[String]) = {
     sub(uid, roomId, userId)
     (lila.hub.Env.current.actor.chatRoom ? GetInitChatRoom(roomId)) foreach {
       case data: JsObject => {
@@ -228,12 +225,10 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     }
   }
 
-
-
   def getPrevChat(uid: String, roomId: String, lastTime: Long) = {
     (lila.hub.Env.current.actor.chatRoom ? PrevChat(roomId, lastTime)) foreach {
       case data: JsValue => {
-        val mes = Json.obj("room" -> roomId, "t" -> "prevChat" , "lc" -> data)
+        val mes = Json.obj("room" -> roomId, "t" -> "prevChat", "lc" -> data)
         withMember(uid)(_ push makeMessage("chatNotify", mes))
       }
     }
@@ -247,7 +242,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
 
   def sendNewComment(postId: String, comment: JsValue) = {
     listSidPost collect {
-      case (uid, pId) if (pId == postId) =>  uid
+      case (uid, pId) if (pId == postId) => uid
     } foreach { uid =>
       withMember(uid)(_ push makeMessage("newComment", comment))
     }
@@ -259,29 +254,28 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
 
   def sendNewCommentQA(questionId: String, comment: JsValue) = {
     listSidQuestion collect {
-      case (uid, pId) if (pId == questionId) =>  uid
+      case (uid, pId) if (pId == questionId) => uid
     } foreach { uid =>
       withMember(uid)(_ push makeMessage("newCommentQA", comment))
     }
   }
 
-
   def sendNewAnswer(questionId: String, answer: JsValue) = {
     listSidQuestion collect {
-      case (uid, pId) if (pId == questionId) =>  uid
+      case (uid, pId) if (pId == questionId) => uid
     } foreach { uid =>
       withMember(uid)(_ push makeMessage("newAnswer", answer))
     }
   }
 
   def subPost(uid: String, postId: String) = {
-    if(!listSidPost.contains(uid)){
+    if (!listSidPost.contains(uid)) {
       listSidPost += (uid -> postId)
     }
   }
 
   def subQuestion(uid: String, questionId: String) = {
-    if(!listSidQuestion.contains(uid)){
+    if (!listSidQuestion.contains(uid)) {
       listSidQuestion += (uid -> questionId)
     }
   }
@@ -295,11 +289,11 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
   }
 
   def sub(uid: String, roomId: String, userId: Option[String]) = {
-    if(!listSid.contains(uid)){
+    if (!listSid.contains(uid)) {
       userId foreach { userId =>
-        if(userId.length > 0){
-          if(roomId != "chatrooms") {
-            if(!userInRoom(userId, roomId, listSid.keys.toList)) {
+        if (userId.length > 0) {
+          if (roomId != "chatrooms") {
+            if (!userInRoom(userId, roomId, listSid.keys.toList)) {
               listSid += (uid -> (Some(userId), roomId))
               val data = Json.obj("t" -> "io", "v" -> Json.obj("rid" -> roomId, "c" -> 1, "u" -> 1))
               changeNBMember("chatrooms", data)
@@ -315,7 +309,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
           }
         } else {
           listSid += (uid -> (Some(userId), roomId))
-          if(roomId != "chatrooms") {
+          if (roomId != "chatrooms") {
             val data = Json.obj("t" -> "io", "v" -> Json.obj("rid" -> roomId, "c" -> 1))
             changeNBMember("chatrooms", data)
             changeNBMember(roomId, data)
@@ -325,18 +319,17 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     }
   }
 
-
-  def unSub(uid: String):Unit = {
+  def unSub(uid: String): Unit = {
     unSub(uid, listSid(uid)._2)
   }
 
-  def unSub(uid: String, roomId: String):Unit = {
+  def unSub(uid: String, roomId: String): Unit = {
     listSid(uid)._1 foreach { userId =>
-      if(userId.length > 0){
+      if (userId.length > 0) {
         listSid -= uid
-        if(!userInRoom(userId, roomId, listSid.keys.toList)) {
+        if (!userInRoom(userId, roomId, listSid.keys.toList)) {
           lila.hub.Env.current.actor.chatRoom ! UserUnSubscribe(userId, roomId)
-          if(roomId != "chatrooms" ){
+          if (roomId != "chatrooms") {
             val data = Json.obj("t" -> "io", "v" -> Json.obj("rid" -> roomId, "u" -> -1, "c" -> -1))
             changeNBMember(roomId, data)
             changeNBMember("chatrooms", data)
@@ -357,15 +350,14 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     }
   }
 
-  def userInRoom(userId: String, roomId: String, sids: List[String]):Boolean = {
-    if (sids.isEmpty)  false
-    else if(listSid(sids.head)._1.contains(userId) && listSid(sids.head)._2 == roomId) true
+  def userInRoom(userId: String, roomId: String, sids: List[String]): Boolean = {
+    if (sids.isEmpty) false
+    else if (listSid(sids.head)._1.contains(userId) && listSid(sids.head)._2 == roomId) true
     else userInRoom(userId, roomId, sids.tail)
   }
 
-
   def uidByUserId(userId: String): Iterable[String] = members collect {
-    case (uid , member) if member.userId.contains(userId) => uid
+    case (uid, member) if member.userId.contains(userId) => uid
   }
 
   def broom {
@@ -406,7 +398,6 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
       lilaBus.publish(SocketLeave(uid, member), 'socketDoor)
     }
   }
-
 
   def onDeploy(d: Deploy) {
     notifyAll(makeMessage(d.key))
@@ -462,7 +453,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     withMember(uid)(_ push makeMessage("initQA", questions))
   }
 
-  def sendMissingMes(uid: String, f: Int, t: Int, data: List[JsValue]){
+  def sendMissingMes(uid: String, f: Int, t: Int, data: List[JsValue]) {
     withMember(uid)(_ push makeMessage("smm", Json.obj("f" -> f, "t" -> t, "d" -> data)))
   }
 
@@ -479,7 +470,6 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
   }
 
   def uids = members.keys
-
 
   def membersByUserId(userId: String): Iterable[M] = members collect {
     case (_, member) if member.userId.contains(userId) => member
@@ -506,7 +496,8 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration) extends Socket w
     else Json.obj(
       "nb" -> total,
       "users" -> userIds.flatMap { lightUser(_) }.map(_.titleName),
-      "anons" -> anons)
+      "anons" -> anons
+    )
   }
 
   def withMember(uid: String)(f: M => Unit) {

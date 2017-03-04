@@ -84,7 +84,7 @@ export default class Blog extends Component {
 		});
 
 		$('.ui.rating')
-			.rating()
+			.rating('disable')
 		;
 
 		$('.ui.accordion')
@@ -92,14 +92,16 @@ export default class Blog extends Component {
 		;
 
 		// $('.tabular.menu .item').tab();
-		$('#context2 .menu .item')
-			.tab({
-				context: 'parent'
-			});
-		
-		$('.menu .item')
-			.tab()
-		;
+		// $('#context2 .menu .item')
+		// 	.tab({
+		// 		context: 'parent'
+		// 	});
+		//
+		setTimeout(function(){
+			$('.tabs.menu .item')
+				.tab()
+			;
+		}, 300);
 		console.log("load tab")
 		// this.redraw();
 		
@@ -386,8 +388,8 @@ export default class Blog extends Component {
 									<div class="row">
 										<div class="ui">
 											{ (videoBySlug.kind === "free" || Data.user.member === "membership" || Data.user.member === "trial") ? (
-													<iframe width="100%" height="556" id="player-frame" name="player-frame" frameborder="0"
-																	allowfullscreen=""
+													<iframe width="100%" height="556" id="player-frame" name="player-frame"
+																	allowFullScreen and frameBorder="0"
 																	src={linkVideo}>
 													</iframe>
 												) : (
@@ -408,9 +410,10 @@ export default class Blog extends Component {
 									</div>
 									<div class="ui segment">
 										<div id="context2">
-											<div class="ui secondary pointing menu ">
+											<div class="tabs ui secondary pointing menu ">
 												<a class="item active" data-tab="1">Giới thiệu</a>
 												<a class="item" data-tab="2">Tài liệu thực hành</a>
+												<a class="item" data-tab="3">Sản phẩm học viên</a>
 											</div>
 											<div class="ui active tab " data-tab="1">
 												<div class="ui column stackable grid">
@@ -434,7 +437,7 @@ export default class Blog extends Component {
 															<div class="ui massive star rating" data-rating={Data.course.level} data-max-rating="3"></div>
 														</div>
 														<div class="centerInside">
-															Skill Level
+															Cấp độ : {Data.course.level}
 														</div>
 														<div class="ui inverted grey segment centerInside " style="margin-bottom: 0px !important;">
 															Đang cập nhập
@@ -448,7 +451,16 @@ export default class Blog extends Component {
 												</div>
 											</div>
 											<div class="ui  tab " data-tab="2" style="padding: 15px;">
-												Đang cập nhập
+												{
+													(Data.user.member === "member")?
+														(Data.course.documents?(<div dangerouslySetInnerHTML={{__html: Data.course.documents}}></div>):("")):
+														(<div style="color:red">
+															Bạn phải là membership
+														</div>)
+												}
+											</div>
+											<div className="ui tab" data-tab="3" style="padding: 15px;">
+												{Data.course.sanpham?(<div dangerouslySetInnerHTML={{__html: Data.course.sanpham}}></div>):("")}
 											</div>
 										
 										</div>
@@ -460,36 +472,36 @@ export default class Blog extends Component {
 											<div class="column grid "></div>
 										</div>
 									</div>
-									<div class="ui segment">
-										<h4 class="ui header">Các kỹ năng trong khóa học</h4>
-										<div class="ui horizontal list">
-											<div class="item">
-												<div class="ui left aligned segment">
-													BIM
-												</div>
-											</div>
-											<div class="item">
-												<div class="ui left aligned segment">
-													Autocard
-												</div>
-											</div>
-											<div class="item">
-												<div class="ui left aligned segment">
-													IT
-												</div>
-											</div>
-											<div class="item">
-												<div class="ui left aligned segment">
-													...........
-												</div>
-											</div>
-										</div>
-									</div>
+									{/*<div class="ui segment">*/}
+										{/*<h4 class="ui header">Các kỹ năng trong khóa học</h4>*/}
+										{/*<div class="ui horizontal list">*/}
+											{/*<div class="item">*/}
+												{/*<div class="ui left aligned segment">*/}
+													{/*BIM*/}
+												{/*</div>*/}
+											{/*</div>*/}
+											{/*<div class="item">*/}
+												{/*<div class="ui left aligned segment">*/}
+													{/*Autocard*/}
+												{/*</div>*/}
+											{/*</div>*/}
+											{/*<div class="item">*/}
+												{/*<div class="ui left aligned segment">*/}
+													{/*IT*/}
+												{/*</div>*/}
+											{/*</div>*/}
+											{/*<div class="item">*/}
+												{/*<div class="ui left aligned segment">*/}
+													{/*...........*/}
+												{/*</div>*/}
+											{/*</div>*/}
+										{/*</div>*/}
+									{/*</div>*/}
 								</div>
 								<div class="five wide column " style="padding-left: 0 !important;">
 									
 									<div class="ui segment noPa noBor noSha course-info">
-											<div class="ui top attached tabular menu" style="">
+											<div class="tabs ui top attached tabular menu" style="">
 												<a class="item active" data-tab="first">Video khóa học</a>
 												<a class="item" data-tab="second"
 													onClick={function(){
@@ -568,7 +580,7 @@ export default class Blog extends Component {
 																			<a class="author">{el.name}</a>
 																			<div class="metadata">
 																				<span class="date">{fn.time(el.time)}</span>
-																				<a class="reply">Reply</a>
+																				{/*<a class="reply">Reply</a>*/}
 																			</div>
 																			<pre class="text">
 																				{el.comment}
@@ -581,19 +593,17 @@ export default class Blog extends Component {
 															
 															<div class="ui form">
 																<div class="field">
-															<textarea rows="2"
-																				onKeyUp={function(e){
-																					this2.setState({comment: $(e.target).val()})
-																				}}
-															>{this2.state.comment}</textarea>
+																	<textarea rows="2"
+																						ref={(input) => { this.textInput = input; }}
+																	></textarea>
 																</div>
 																<div class="ui blue labeled submit icon button"
 																		 onClick={function(){
-																	
-																			 if(this2.state.comment.trim().length>5){
+																			 var input = this2.textInput.value.trim();
+																			 if(input.length >= 10){
 																				 var newComment = {
 																					 parentID : (this2.props.params.videoId?(videoBySlug.id):(Data.course.id)),
-																					 comment : this2.state.comment.trim(),
+																					 comment : input,
 																					 kind : (this2.props.params.videoId?"video":"index")
 																				 };
 																		
@@ -613,9 +623,10 @@ export default class Blog extends Component {
 																							 list: list
 																						 };
 																						 this2.setState({
-																							 comment: "",
 																							 comments: newComments
 																						 });
+																						 this2.textInput.value = '';
+																						 this2.textInput.focus();
 																					 },
 																					 error: function(data){
 																						 alert("Co loi")
@@ -647,76 +658,42 @@ export default class Blog extends Component {
 										>Khóa học liên quan</h3>
 										<div class="ui attached celled list  noBor noMa related-courses"
 												 style="background: white; border-radius: 0 0 5px 5px">
-											<div class="item">
-												<div class="ui avatar index-card-wr">
-													<div class="index-card-text">
-														<div>
-															<p>Implementing a Data Warehouse
-																<br />
-																3h 3m with Gerry O'Brien
-															</p>
-															<div class="card-text">Beginner</div>
-															<div class="card-button">
-																<button class="ui inverted button">
-																	<i class="play icon"></i>
-																	Preview course
-																</button>
+											{Data.relatedCourses.map(function(el){
+												return (
+													<div class="item">
+														<div class="ui avatar index-card-wr">
+															<div class="index-card-text">
+																<div>
+																	<p>{el.name}</p>
+																	<div class="card-text">Cấp độ {el.level}</div>
+																	<div class="card-button">
+																		<Link to={"/course/" + el.slug}>
+																			<button class="ui inverted button">
+																				<i class="play icon"></i>
+																				Xem khóa học
+																			</button>
+																		</Link>
+																	</div>
+																</div>
 															</div>
+															<img class="ui fluid rounded image"
+																	 src={"/image/get/" + el.cover.path}
+																	 style="height: 140px;"/>
 														</div>
 													</div>
-													<img class="ui fluid rounded image"
-															 src="https://cdn.lynda.com/courses/485599-636180090956206330_270x480_thumb.jpg"
-															 style="height: 140px;"/>
-												</div>
-											</div>
-											<div class="item">
-												<div class="ui avatar index-card-wr">
-													<div class="index-card-text">
-														<div>
-															<p>Securing SQL Server 2012
-																<br />
-																1h 30m with Gerry O'Brien
-															</p>
-															<div class="card-text">Advance</div>
-															<div class="card-button">
-																<button class="ui inverted button">
-																	<i class="play icon"></i>
-																	Preview course
-																</button>
-															</div>
-														</div>
-													</div>
-													<img class="ui fluid rounded image"
-															 src="https://cdn.lynda.com/courses/450189-636162023973127349_270x480_thumb.jpg"
-															 style="height: 140px;"/>
-												</div>
-											</div>
-											<div class="item">
-												<div class="ui avatar index-card-wr">
-													<div class="index-card-text">
-														<div>
-															<p>Implementing a Data Warehouse
-																<br />
-																3h 3m with Gerry O'Brien
-															</p>
-															<div class="card-text">Beginner</div>
-															<div class="card-button">
-																<button class="ui inverted button">
-																	<i class="play icon"></i>
-																	Preview course
-																</button>
-															</div>
-														</div>
-													</div>
-													<img class="ui fluid rounded image"
-															 src="https://cdn.lynda.com/courses/485599-636180090956206330_270x480_thumb.jpg"
-															 style="height: 140px;"/>
-												</div>
-											</div>
+												)
+											})}
 										</div>
 									</div>
 								</div>
 							</div>
+						</div>
+					</div>
+					
+					
+					<div className="ui segment">
+						<div className="ui container">
+							<div class="fb-comments" data-href="https://developers.facebook.com/docs/plugins/comments#configurator" data-numposts="10" data-width="100%"></div>
 						</div>
 					</div>
 				

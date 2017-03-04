@@ -21,13 +21,13 @@ object CommentRepo {
 
   private lazy val coll = Env.current.commentColl
 
-  def insert(data: Comment) : Future[WriteResult] = {
+  def insert(data: Comment): Future[WriteResult] = {
 
     coll.insert(data)
 
   }
 
-  def getComment(kind: String, id: Int) : Future[List[Comment]] = {
+  def getComment(kind: String, id: Int): Future[List[Comment]] = {
     coll.find(BSONDocument("kind" -> kind, "parentID" -> id))
       .sort(BSONDocument("_id" -> 1))
       .cursor[Comment]()
@@ -35,6 +35,5 @@ object CommentRepo {
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]

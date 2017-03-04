@@ -37,6 +37,6 @@ object Spam {
     s"""${protocol}${cb}(\\.com)?[^\\s]*""" -> tosUrl,
     s"""${protocol}${in}[^\\s]+""" -> tosUrl
   ).map {
-    case (regex, replacement) => regex.r -> replacement
-  }
+      case (regex, replacement) => regex.r -> replacement
+    }
 }

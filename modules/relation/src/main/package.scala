@@ -8,6 +8,6 @@ package object relation extends PackageObject with WithPlay {
   private[relation] val Friend: Relation = true
   private[relation] val Block: Relation = false
 
-  private[relation] type ID = String
+  private[relation]type ID = String
 
 }

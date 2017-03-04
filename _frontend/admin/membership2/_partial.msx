@@ -33,6 +33,7 @@ var View = function(ctrl){
                   <th>Số điện thoại</th>
                   <th>Thời gian</th>
                   <th>Thành tiền</th>
+                  <th>Mã giảm giá</th>
                   <th></th>
                   <th>Trạng thái</th>
                 </tr>
@@ -56,6 +57,9 @@ var View = function(ctrl){
                               </td>
                               <td className="v-align-middle">
                                 <p>{API.numberWithCommas(sub.price)} đ</p>
+                              </td>
+                              <td>
+                                <p>{sub.coupon?(sub.coupon.code):""}</p>
                               </td>
                               <td style="min-width: 150px">
                                 <p>{API.time(sub.createAt)}</p>

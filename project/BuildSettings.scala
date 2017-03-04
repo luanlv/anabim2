@@ -1,5 +1,8 @@
 import play.sbt.Play.autoImport._
 import sbt._, Keys._
+import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scalariform.formatter.preferences._
 
 object BuildSettings {
 
@@ -21,6 +24,12 @@ object BuildSettings {
     // disable publishing the main sources jar
     publishArtifact in (Compile, packageSrc) := false
   )
+    SbtScalariform.scalariformSettings ++ Seq(
+      ScalariformKeys.preferences := ScalariformKeys.preferences.value
+        .setPreference(AlignSingleLineCaseStatements, true)
+        .setPreference(CompactControlReadability, true)
+        .setPreference(SpacesAroundMultiImports, true)
+        .setPreference(DanglingCloseParenthesis, Preserve))
 
   def defaultDeps = Seq(scalaz, scalalib, jodaTime, spray.util, ws, java8compat)
 

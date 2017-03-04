@@ -143,6 +143,64 @@ object BSONHandlers {
     }
   }
 
+  implicit val couponBSONHandler = new BSON[Coupon] {
+    def reads(r: BSON.Reader) = {
+      Coupon(
+        id = r int "_id",
+        code = r str "code",
+        kind = r int "kind",
+        price = r intO "price",
+        percent = r intO "percent",
+        day = r intO "day",
+        month = r get[List[Int]] "month",
+        active = r bool "active",
+        quantity = r int "quantity",
+        endTime = r date "endTime"
+      )
+    }
+
+    def writes(w: BSON.Writer, o: Coupon) = {
+      BSONDocument(
+        "_id" -> o.id,
+        "code" -> o.code,
+        "kind" -> o.kind,
+        "price" -> o.price,
+        "percent" -> o.percent,
+        "day" -> o.day,
+        "month" -> o.month,
+        "active" -> o.active,
+        "quantity" -> o.quantity,
+        "endTime" -> BSONDateTime(o.endTime.getMillis)
+      )
+    }
+  }
+
+  implicit val activeCodeBSONHandler = new BSON[ActiveCode] {
+    def reads(r: BSON.Reader) = {
+      ActiveCode(
+        id = r int "_id",
+        code = r str "code",
+        day = r int "day",
+        email = r str "email",
+        all = r bool "all",
+        quantity = r int "quantity",
+        used = r bool "used"
+      )
+    }
+
+    def writes(w: BSON.Writer, o: ActiveCode) = {
+      BSONDocument(
+        "_id" -> o.id,
+        "code" -> o.code,
+        "day" -> o.day,
+        "email" -> o.email,
+        "all" -> o.all,
+        "quantity" -> o.quantity,
+        "used" -> o.used
+      )
+    }
+  }
+
 
   implicit val subscribeBSONHandler = new BSON[Subscribe] {
     def reads(r: BSON.Reader) = {
@@ -154,8 +212,10 @@ object BSONHandlers {
         name = r str "name",
         phone = r str "phone",
         month = r int "month",
+        bonusDay = r int "bonusDay",
         price = r int "price",
         info = r str "info",
+        coupon = r getO[Coupon] "coupon",
         createAt = r date "createAt"
       )
     }
@@ -169,8 +229,10 @@ object BSONHandlers {
         "name" -> o.name,
         "phone" -> o.phone,
         "month" -> o.month,
+        "bonusDay" -> o.bonusDay,
         "price" -> o.price,
         "info" -> o.info,
+        "coupon" -> o.coupon,
         "createAt" -> BSONDateTime(o.createAt.getMillis)
       )
     }

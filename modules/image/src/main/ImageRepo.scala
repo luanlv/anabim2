@@ -21,7 +21,6 @@ object ImageRepo {
 
   private lazy val coll = Env.current.imageColl
 
-
   def insert(newImage: Image): Future[WriteResult] = {
     coll.insert(newImage)
   }
@@ -29,12 +28,11 @@ object ImageRepo {
   def getList(page: Int): Future[List[Image]] = {
     coll.find(BSONDocument())
       .sort(BSONDocument("_id" -> -1))
-      .skip((page-1)*10)
+      .skip((page - 1) * 10)
       .cursor[Image]()
       .gather[List](10)
   }
 
 }
-
 
 //val bson = BSONFormats.toBSON(o).get.asInstanceOf[BSONDocument]
