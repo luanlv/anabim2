@@ -15,8 +15,6 @@ export default class Home extends Component {
 	}
 
 	componentDidMount() {
-		
-		$('body').scrollTop(0);
 
 		$('#context2 .menu .item')
 			.tab({
@@ -38,15 +36,15 @@ export default class Home extends Component {
 		$('#video-background').html('<source src="http://video.vnguy.com/video.mp4" type="video/mp4" />');
 
 	}
-	
+
 	shouldComponentUpdate(nextProps, nextState) {
 			console.log("shouldComponentUpdate");
 		if(!window.initIndexCourse) {
 			this.getIndexCourses()
 		}
-		
+
 	}
-	
+
 	getIndexCourses(){
 		var this2 = this;
 		if(!window.initIndexCourse) {
@@ -67,8 +65,8 @@ export default class Home extends Component {
 			this2.setState({ready: true});
 		}
 	}
-	
-	
+
+
 	redraw(){
 		this.setState({});
 	}
@@ -98,7 +96,7 @@ export default class Home extends Component {
 								}}
 				>Đăng ký học ngay</button>)
 			);
-			
+
 		return (
 			<div id="main">
 				<div id="slider">
@@ -124,12 +122,12 @@ export default class Home extends Component {
 					</div>
 
 					<video autoplay loop id="video-background"  muted>
-					
+
 					</video>
 				</div>
 
 				<div className="main">
-					
+
 
 					<div className="ui container segment noBor noSha" style="margin: 100px auto !important">
 						<div className="ui three column stackable grid">
@@ -253,7 +251,7 @@ export default class Home extends Component {
 																 }}
 											>{el.category.name}</a>)
 										})}
-									
+
 									</div>
 									{Data.indexCourse.value.map(function(el, index){
 										return [
@@ -296,12 +294,12 @@ export default class Home extends Component {
 													</Link>
 												</div>
 											</div>
-										
+
 										]
 									})}
-								
-								
-								
+
+
+
 								</div>):("")}
 							<div className="ui four column stackable grid">
 								<div className="column grid ">

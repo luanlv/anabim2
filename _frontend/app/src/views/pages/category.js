@@ -11,7 +11,7 @@ export default class Category extends Component {
 		this.state = {
 			ready: false
 		};
-		
+
 		this.redraw = this.redraw.bind(this);
 		this.getCategory = this.getCategory.bind(this);
 		if(this.props.params.cateID === Data.category.slug){
@@ -19,20 +19,20 @@ export default class Category extends Component {
 		} else {
 			this.getCategory(this.props.params.cateID)
 		}
-		
+
 	}
-	
+
 	shouldComponentUpdate(nextProps, nextState) {
-		
+
 		if(nextProps.params.cateID !== this.props.params.cateID) {
 			this.getCategory(nextProps.params.cateID)
 		}
 	}
-	
+
 	redraw(){
 		this.setState({});
 	}
-	
+
 	getCategory(cateID){
 		var this2 = this;
 		if(cateID !== Data.category.slug) {
@@ -56,12 +56,12 @@ export default class Category extends Component {
 
 	componentDidMount() {
 		$('body').scrollTop(0);
-		
+
 		$('.special.cards .image').dimmer({
 			on: 'hover'
 		});
-		
-		
+
+
 		$('#context2 .menu .item')
 			.tab({
 				context: 'parent'
@@ -113,13 +113,13 @@ export default class Category extends Component {
 							<div className="hex-brick h2"></div>
 							<div className="hex-brick h3"></div>
 						</div>
-						
+
 						<div className="gel c7 r2">
 							<div className="hex-brick h1"></div>
 							<div className="hex-brick h2"></div>
 							<div className="hex-brick h3"></div>
 						</div>
-						
+
 						<div className="gel c8 r2">
 							<div className="hex-brick h1"></div>
 							<div className="hex-brick h2"></div>
@@ -265,7 +265,7 @@ export default class Category extends Component {
 							<div className="hex-brick h2"></div>
 							<div className="hex-brick h3"></div>
 						</div>
-					
+
 					</div>
 				)
 			}
@@ -296,7 +296,7 @@ export default class Category extends Component {
 										}
 									}}
 					>Đăng ký học ngay</button>
-				);
+				)
 			return (
 				<div id="main">
 					<div className="ui segment noBor noRa noSha noPa noMa">
@@ -311,7 +311,7 @@ export default class Category extends Component {
 										</div>
 										{/*<h3 className="ui header" style="color: white !important">Web Training and Tutorials</h3>*/}
 										<div style="color: white !important" dangerouslySetInnerHTML={{__html: Data.category.description}}>
-										
+
 										</div>
 										<div className="row " style="padding-top: 10px;">
 											{button}
@@ -368,7 +368,7 @@ export default class Category extends Component {
 								</div>
 							</div>
 						</div>
-						
+
 						<div style=" background: linear-gradient(to right, black , #333);">
 							<div className="ui container">
 								<div className="ui stackable grid">
@@ -389,7 +389,7 @@ export default class Category extends Component {
 										</div>
 									</div>
 									<div className="four wide column grid">
-										
+
 										<div className="ui inverted relaxed divided list" style="margin-top: 30px">
 											<div className="item">
 												<i className="huge inverted history middle aligned icon"></i>

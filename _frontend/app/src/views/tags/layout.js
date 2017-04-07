@@ -18,7 +18,7 @@ export default class Layout extends Component {
 	}
 
 	componentDidMount() {
-		
+
 		var $menu = $('#danhmuc');
 		var firstMenu = $('#danhmuc').children('.item')[0];
 		console.log($('.maintainHover').length)
@@ -58,7 +58,6 @@ export default class Layout extends Component {
 
 			// Keep the currently activated row's highlighted look
 			$row.addClass("maintainHover");
-//        $row.find("a").addClass("maintainHover");
 		}
 
 		function deactivateSubmenu(row) {
@@ -85,23 +84,24 @@ export default class Layout extends Component {
 				.modal('show')
 			;
 		});
+
 		$('.dang-ky').click(function(){
 			$('#dang-ky')
 				.modal('show')
 			;
 		});
-		
+
 		$('.coupled.modal')
 			.modal({
 				allowMultiple: false
 			});
-		
+
 		$('.second.modal')
 			.modal('attach events', '.first.modal .button');
-		
+
 		if(Data.user.id.length > 0){
-			
-			
+
+
 			$('#membership-info')
 				.modal({
 					onShow  : function(){
@@ -118,34 +118,34 @@ export default class Layout extends Component {
 							});
 					}
 				});
-			
-			
-			
+
+
+
 			if(Data.user.member == "none" || Data.user.member == "trialed" || Data.user.member == "membershiped") {
 				$('.first.modal')
 					.modal('show')
 				;
 			}
-			
+
 			console.log(Data.videos)
-		
-			
+
+
 		}
-		
+
 		$('.ui.checkbox')
 			.checkbox()
 		;
-		
+
 		var elem = document.getElementById("loading");
 		elem.parentElement.removeChild(elem);
-		
+
 		if(this.props.params.email !== undefined) {
 			$("#email").val(this.props.params.email)
 		}
 		if(this.props.params.name !== undefined) {
 			$("#name").val(this.props.params.name)
 		}
-		
+
 		if(this.props.params.exist !== undefined) {
 			$('#dang-ky').modal('show');
 		}
@@ -153,7 +153,7 @@ export default class Layout extends Component {
 			$('#email-comfirm').modal('show');
 		}
 	}
-	
+
 	membership(){
 		if(Data.user.id.length === 0) {
 			$('#dang-ky')
@@ -169,13 +169,13 @@ export default class Layout extends Component {
 			}
 		}
 	}
-	
+
 	activeCode(){
 		$('#activeCode')
 			.modal('show')
 		;
 	}
-	
+
 	redraw(){
 		this.setState({});
 	}
@@ -189,7 +189,7 @@ export default class Layout extends Component {
 		console.log(Data.membership);
 		this.setState({});
 	}
-	
+
 	render() {
 		var this2 = this;
 		var link = function(slug, name){
@@ -437,7 +437,7 @@ export default class Layout extends Component {
 									<i class="home icon"></i>
 								</Link>
 								<div class="right menu">
-									
+
 									{(Data.user.member === "member")?(""):(
 											<a class="item"
 												 onClick={this.activeCode}
@@ -445,8 +445,8 @@ export default class Layout extends Component {
 												Điền mã kích hoạt
 											</a>
 										)}
-										
-										
+
+
 									<a class="red item"
 										onClick={function(){
 											this2.membership()
@@ -455,7 +455,7 @@ export default class Layout extends Component {
 										Membership
 									</a>
 								</div>
-								
+
 							</div>
 						</div>
 					</div>
@@ -479,7 +479,7 @@ export default class Layout extends Component {
 											<a>Về chúng tôi</a>
 											<a>Liên hệ</a>
 										</div>
-										
+
 										<div class="column">
 											<h3>VĂN PHÒNG ANABIM</h3>
 											<span>ANABIM CO,.LTD
@@ -488,7 +488,7 @@ export default class Layout extends Component {
 											<div>revithanoi@gmail.com</div>
 											<div> www.anabim.com</div>
 										</div>
-										
+
 										<div class="column ">
 											<h3>HỖ TRỢ</h3>
 											<div>
@@ -506,7 +506,7 @@ export default class Layout extends Component {
 												<br/>
 												0978 542 680
 											</div>
-											
+
 											<div>
 												Mr. Vượng - Doanh nghiệp
 												<br/>
@@ -515,7 +515,7 @@ export default class Layout extends Component {
 										</div>
 									</div>
 								</div>
-								
+
 								<div class="four wide column ">
 									<h3 class="centerInside">Connect</h3>
 									<div class="row centerInside">
@@ -668,8 +668,8 @@ export default class Layout extends Component {
 					</div>
 
 				</div>
-				
-				
+
+
 				<div id="email-comfirm" class="ui small modal ">
 					<div class="header" style="text-align: center">
 						Kích hoạt email
@@ -679,9 +679,9 @@ export default class Layout extends Component {
 						<br/>
 						Bạn hãy check email và làm theo hướng dẫn để kích hoạt tài khoản
 					</div>
-				
+
 				</div>
-				
+
 				<div id="activeCode" class="ui small modal ">
 					<div class="header" style="text-align: center">
 						Điền mã kích hoạt
@@ -727,13 +727,13 @@ export default class Layout extends Component {
 									</div>
 								</div></div>
 						</div>
-						
+
 					</div>
-				
+
 				</div>
-				
+
 				<div className="ui container">
-					
+
 					<div class="ui first coupled modal thanh-vien-1">
 						<div class="header" style="text-align: center">
 							Đăng ký thành viên Membership
@@ -779,7 +779,7 @@ export default class Layout extends Component {
 									</div>
 								</div>
 								<div className="actions eight wide column" onClick={() => this.changeMonth(12)}>
-									
+
 									<div class=" button centerInside">
 										<div class="ui huge horizontal statistic">
 											<div class="value">
@@ -790,16 +790,16 @@ export default class Layout extends Component {
 											</div>
 										</div>
 									</div>
-								
+
 								</div>
 							</div>
-							
-							
+
+
 						</div>
-						
+
 						<div className="ui segment noMa">
 							<div className="ui padded grid">
-								
+
 								<div className="five wide column ">
 									<div className="row centerInside">
 										<i className="huge thumbs outline up icon"></i>
@@ -808,9 +808,9 @@ export default class Layout extends Component {
 										<h3 style="text-align: center">Các lợi ích khi đăng ký membership</h3>
 									</div>
 								</div>
-								
+
 								<div className="eleven wide column">
-									
+
 									<div class="ui list">
 										<div class="item">
 											<i class="checkmark icon"></i>
@@ -841,32 +841,32 @@ export default class Layout extends Component {
 											</div>
 										</div>
 									</div>
-									
+
 								</div>
 							</div>
 						</div>
-						
-						
+
+
 					</div>
-					
-					
-					
-					
+
+
+
+
 					<div class="ui large second coupled modal">
-						
+
 						<div class="header noBor" style="text-align: center">
 							Đăng ký thành viên Membership
 						</div>
 						<div className="ui">
 							<h3 style="text-align: center">Bạn đang đăng ký gói <span style="color: red">{(Data.membership.month === 12)?("1 năm"):(Data.membership.month + " tháng")}</span>, hay chọn hình thức thanh toán phía dưới</h3>
 						</div>
-						
+
 							<div class="ui top attached tabular menu" style="margin-bottom: 10px">
 								<a class="item active" data-tab="first">Thanh toán trực tiếp</a>
 								<a class="item" data-tab="second">Chuyển khoản ngân hàng</a>
 							</div>
-					
-					
+
+
 							<div className="ui stackable grid">
 								<div className="eight wide column">
 									<div class="ui bottom attached tab segment noBor active" data-tab="first">
@@ -906,7 +906,7 @@ export default class Layout extends Component {
 									</div>
 								</div>
 							</div>
-						
+
 							<div className="ui segment noBor noMa">
 								<div className="ui" style="height: 40px">
 									<div class="ui form">
@@ -960,12 +960,12 @@ export default class Layout extends Component {
 															.fail(function () {
 																alert("error");
 															});
-														
+
 													} else {
 														$('.first.modal').modal('show');
 													}
 												} }
-												
+
 											>Xác nhận</button>
 											<div class="ui red labeled right floated button" tabindex="0">
 												<a class="ui basic inverted grey right pointing label">
@@ -973,30 +973,30 @@ export default class Layout extends Component {
 												</a>
 												<input style="color: red" disable type="text" value={fn.numberWithCommas(fn.priceWithCoupon(Data.coupon, Data.price[Data.membership.month], Data.membership.month)) + " đ"}/>
 											</div>
-											
+
 										</div>
-										
+
 									</div>
-									
+
 								</div>
 							</div>
-						
+
 							</div>
-					
-					
+
+
 					<div id="membership-info" class="ui modal">
 						<i class="close icon"></i>
 						<div class="header" style="text-align: center">
 							Thông tin membership
 						</div>
 						<div id="membership-info-body" className="ui loading segment noBor" style="min-height: 400px">
-						
+
 						</div>
 					</div>
-					
+
 				</div>
-				
-				
+
+
 			</div>
 		);
 	}
@@ -1009,5 +1009,5 @@ var checkForm = function(form){
 		alert("Số điện thoại điền chưa đúng định dạng, ( phải có 10 hoặc 11 số )");
 		return false;
 	};
-	
+
 };

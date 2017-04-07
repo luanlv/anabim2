@@ -3,11 +3,13 @@ import Component from 'inferno-component'
 import { Link } from 'inferno-router';
 import Data from '../../Data'
 import fn from '../../fn'
+import moment from 'moment'
 
 export default class Blog extends Component {
 
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			ready: false,
 			comment : "",
@@ -16,10 +18,11 @@ export default class Blog extends Component {
 				list: []
 			}
 		};
-		
+
 		this.redraw = this.redraw.bind(this);
 		this.getCourse = this.getCourse.bind(this)
 		this.setComment = this.setComment.bind(this)
+
 		if(this.props.params.courseId === Data.course.slug){
 			this.state.ready = true;
 		} else {
@@ -30,10 +33,10 @@ export default class Blog extends Component {
 			this.getCourse(this.props.params.courseId)
 		}
 	}
-	
-	
+
+
 	shouldComponentUpdate(nextProps, nextState) {
-		
+
 		if(nextProps.params.videoId !== this.props.params.videoId) {
 			this.setState({comments: {
 				init: false,
@@ -44,16 +47,17 @@ export default class Blog extends Component {
 		if(nextProps.params.courseId !== this.props.params.courseId) {
 			this.getCourse(nextProps.params.courseId)
 		}
+
 	}
-	
+
 	redraw(){
 		this.setState({});
 	}
-	
+
 	setComment(val){
 		this.setState({comment: val});
 	}
-	
+
 	getCourse(courseId){
 		var this2 = this;
 		if(courseId !== Data.course.slug) {
@@ -76,7 +80,7 @@ export default class Blog extends Component {
 	}
 
 	componentDidMount() {
-		
+
 		$('body').scrollTop(0);
 
 		$('.special.cards .image').dimmer({
@@ -91,20 +95,13 @@ export default class Blog extends Component {
 			.accordion({exclusive: false})
 		;
 
-		// $('.tabular.menu .item').tab();
-		// $('#context2 .menu .item')
-		// 	.tab({
-		// 		context: 'parent'
-		// 	});
-		//
 		setTimeout(function(){
 			$('.tabs.menu .item')
 				.tab()
 			;
 		}, 300);
 		console.log("load tab")
-		// this.redraw();
-		
+
 	}
 
 	render() {
@@ -147,13 +144,13 @@ export default class Blog extends Component {
 							<div class="hex-brick h2"></div>
 							<div class="hex-brick h3"></div>
 						</div>
-						
+
 						<div class="gel c7 r2">
 							<div class="hex-brick h1"></div>
 							<div class="hex-brick h2"></div>
 							<div class="hex-brick h3"></div>
 						</div>
-						
+
 						<div class="gel c8 r2">
 							<div class="hex-brick h1"></div>
 							<div class="hex-brick h2"></div>
@@ -299,7 +296,6 @@ export default class Blog extends Component {
 							<div class="hex-brick h2"></div>
 							<div class="hex-brick h3"></div>
 						</div>
-					
 					</div>
 				)
 			}
@@ -307,14 +303,16 @@ export default class Blog extends Component {
 				{loading()}
 			</div>)
 		} else {
-			
+
 			var this2 = this;
 			var category = [];
 			Data.course.cateID.forEach(function (el) {
 				category.push(fn.findById(window.categories, el))
 			});
 			var videoBySlug = fn.findVideoBySlug(Data.videos, this.props.params.videoId);
-			var linkVideo = ((videoBySlug.source == "anabim") ? ("http://video.vnguy.com/?v=" + fn.fixVideo(videoBySlug.link)) : ("https://www.youtube.com/embed/" + videoBySlug.link + "?autoplay=1"));
+			var day = Math.floor(Math.random()*10)
+			var key = "" + moment(moment().format()).add(day, 'days').unix() + day
+			var linkVideo = ((videoBySlug.source == "anabim") ? ("http://video.vnguy.com/?v=" + fn.fixVideo(videoBySlug.link) + '&k=' + key) : ("https://www.youtube.com/embed/" + videoBySlug.link + "?autoplay=1"));
 			var button = (Data.user.member === "pending") ? (
 					<button class="ui large orange button"
 									onClick={function () {
@@ -347,7 +345,7 @@ export default class Blog extends Component {
 									<div class="ui column stackable grid">
 										<div class="ten wide column">
 											<div style="color: white; ">
-											
+
 											</div>
 										</div>
 										<div class="six wide column">
@@ -379,7 +377,7 @@ export default class Blog extends Component {
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="ui segment noBor noRa noSha noMa"
 							 style="background-color: #e5e5e5 !important; padding: 0px !important;">
 						<div class="ui container ">
@@ -403,10 +401,11 @@ export default class Blog extends Component {
 															{ button }
 														</div>
 													</div>
-												)}
-										
+												)
+											}
+
 										</div>
-									
+
 									</div>
 									<div class="ui segment">
 										<div id="context2">
@@ -462,7 +461,7 @@ export default class Blog extends Component {
 											<div className="ui tab" data-tab="3" style="padding: 15px;">
 												{Data.course.sanpham?(<div dangerouslySetInnerHTML={{__html: Data.course.sanpham}}></div>):("")}
 											</div>
-										
+
 										</div>
 										<div class="ui four column stackable grid">
 											<div class="column grid ">
@@ -472,34 +471,9 @@ export default class Blog extends Component {
 											<div class="column grid "></div>
 										</div>
 									</div>
-									{/*<div class="ui segment">*/}
-										{/*<h4 class="ui header">Các kỹ năng trong khóa học</h4>*/}
-										{/*<div class="ui horizontal list">*/}
-											{/*<div class="item">*/}
-												{/*<div class="ui left aligned segment">*/}
-													{/*BIM*/}
-												{/*</div>*/}
-											{/*</div>*/}
-											{/*<div class="item">*/}
-												{/*<div class="ui left aligned segment">*/}
-													{/*Autocard*/}
-												{/*</div>*/}
-											{/*</div>*/}
-											{/*<div class="item">*/}
-												{/*<div class="ui left aligned segment">*/}
-													{/*IT*/}
-												{/*</div>*/}
-											{/*</div>*/}
-											{/*<div class="item">*/}
-												{/*<div class="ui left aligned segment">*/}
-													{/*...........*/}
-												{/*</div>*/}
-											{/*</div>*/}
-										{/*</div>*/}
-									{/*</div>*/}
 								</div>
 								<div class="five wide column " style="padding-left: 0 !important;">
-									
+
 									<div class="ui segment noPa noBor noSha course-info">
 											<div class="tabs ui top attached tabular menu" style="">
 												<a class="item active" data-tab="first">Video khóa học</a>
@@ -526,7 +500,7 @@ export default class Blog extends Component {
 															var el = document.getElementsByClassName("comments")[0];
 															el.scrollTop = el.scrollHeight - el.scrollTop;
 														}, 500);
-														
+
 													}}
 												>Bình luận</a>
 											</div>
@@ -565,7 +539,7 @@ export default class Blog extends Component {
 														]
 													})
 													}
-												
+
 												</div>
 											</div>
 											<div class="ui bottom attached tab segment" data-tab="second">
@@ -589,8 +563,8 @@ export default class Blog extends Component {
 																	</div>
 																)
 															})}
-															
-															
+
+
 															<div class="ui form">
 																<div class="field">
 																	<textarea rows="2"
@@ -606,7 +580,7 @@ export default class Blog extends Component {
 																					 comment : input,
 																					 kind : (this2.props.params.videoId?"video":"index")
 																				 };
-																		
+
 																				 $.ajax({
 																					 type: "POST",
 																					 url: "/activity/comment",
@@ -636,22 +610,22 @@ export default class Blog extends Component {
 																			 } else {
 																				 alert("Bình luận phải có ít nhất 10 ký tự")
 																			 }
-																	
+
 																		 }}
 																>
 																	<i class="icon edit"></i> Thêm bình luận
 																</div>
 															</div>
-														
+
 														</div>
 													)}
-												
-												
+
+
 											</div>
-										
-									
+
+
 									</div>
-									
+
 									<div class="ui segment noPa">
 										<h3 class="ui top attached  header noBor noMa"
 												style="border: 2px solid transparent !important;"
@@ -689,14 +663,13 @@ export default class Blog extends Component {
 							</div>
 						</div>
 					</div>
-					
-					
+
 					<div className="ui segment">
 						<div className="ui container">
-							<div class="fb-comments" data-href="https://developers.facebook.com/docs/plugins/comments#configurator" data-numposts="10" data-width="100%"></div>
+
 						</div>
 					</div>
-				
+
 				</div>
 			)
 		}
